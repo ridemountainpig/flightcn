@@ -2,16 +2,30 @@
   "name": "flightcn",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "registry:build": "npx shadcn build -o ./public/r"
   },
   "dependencies": {
+    "@turf/bearing": "^7.3.4",
+    "@turf/great-circle": "^7.3.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.35.0",
+    "lucide-react": "^0.575.0",
+    "maplibre-gl": "^5.19.0",
     "next": "16.1.6",
+    "radix-ui": "^1.4.3",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -20,7 +34,11 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "shadcn": "^3.8.5",
     "tailwindcss": "^4",
+    "tw-animate-css": "^1.4.0",
     "typescript": "^5"
   }
 }

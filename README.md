@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# flightcn
 
-## Getting Started
+![flightcn](public/flightcn-og.png)
 
-First, run the development server:
+`flightcn` is a flight route visualization component set built for the `mapcn` ecosystem.
+It helps you render airport markers, great-circle flight paths, and multi-leg routes on top of MapLibre-powered maps with a built-in airport dataset.
+
+## Highlights
+
+- Built to work with `mapcn`
+- Render airports and routes directly from IATA codes like `TPE`, `HND`, and `LAX`
+- Great-circle arc rendering with antimeridian handling
+- Support for single routes, multiple routes, and multi-leg journeys
+- Optional airport labels, hover states, and route animation
+- Built-in airport registry with `code`, `name`, `city`, `country`, `latitude`, and `longitude`
+
+## Install
+
+Add `flightcn` from the shadcn registry:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx shadcn@latest add @flightcn/flight
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The registry item depends on `mapcn`, so the required `map` component will also be pulled in through the registry dependency chain.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Installed files:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `components/ui/flight.tsx`
+- `components/ui/flight-airports.ts`
+- `components/ui/flight-airports-utils.ts`
 
-## Learn More
+## Quick Start
 
-To learn more about Next.js, take a look at the following resources:
+Import `Map` from `mapcn` and `FlightRoute` from `flightcn`, then render a route with airport markers:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```tsx
+import { Map } from "@/components/ui/map";
+import { FlightRoute } from "@/components/ui/flight";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+export default function Demo() {
+  return (
+    <div className="h-screen w-screen">
+      <Map className="h-full w-full" center={[121.5, 25]} zoom={3}>
+        <FlightRoute from="TPE" to="LAX" showAirports showLabel />
+      </Map>
+    </div>
+  );
+}
+```
 
-## Deploy on Vercel
+## Components
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### `FlightAirport`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Render a single airport marker from an IATA code or custom coordinates.
+
+### `FlightRoute`
+
+Render one route between two airports. Use this for the common point-to-point case.
+
+### `FlightRoutes`
+
+Render multiple independent routes in one map. Use this when each route should remain separate.
+
+### `FlightMultiRoute`
+
+Render a single journey across multiple waypoints. Use this when one trip should connect several legs in sequence.
+
+## Airport Data
+
+The built-in dataset is sourced from [OurAirports](https://ourairports.com/data/) and bundled locally in this project.
+
+Current `AirportInfo` fields:
+
+- `code`
+- `name`
+- `city`
+- `country`
+- `latitude`
+- `longitude`
+
+## Docs
+
+- Main docs: [flightcn.yencheng.dev/docs](https://flightcn.yencheng.dev/docs)
+- Install guide: [flightcn.yencheng.dev/docs/install](https://flightcn.yencheng.dev/docs/install)
+- Registry homepage: [flightcn.yencheng.dev](https://flightcn.yencheng.dev)
+
+## Local Development
+
+For local development:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Useful commands:
+
+```bash
+pnpm lint
+pnpm build
+pnpm registry:build
+pnpm format
+```
