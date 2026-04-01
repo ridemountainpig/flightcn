@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { InstallCommandCopy } from "@/components/home/install-command-copy";
+import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
 import { installCommand } from "@/components/home/home-config";
 import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
@@ -44,10 +45,12 @@ export default function InstallPage() {
           <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
             Import components
           </h2>
-          <pre className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
-            <code>{`import { Map } from "@/components/ui/map";
-import { FlightRoute } from "@/components/ui/flight";`}</code>
-          </pre>
+          <div className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
+            <ShikiCodeBlock
+              code={`import { Map } from "@/components/ui/map";
+import { FlightRoute } from "@/components/ui/flight";`}
+            />
+          </div>
         </section>
 
         <section className="mt-4 rounded-[1.8rem] border border-black/10 bg-white/85 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-6">
@@ -57,8 +60,9 @@ import { FlightRoute } from "@/components/ui/flight";`}</code>
           <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
             Render your first route
           </h2>
-          <pre className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
-            <code>{`export default function Demo() {
+          <div className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
+            <ShikiCodeBlock
+              code={`export default function Demo() {
   return (
     <div className="h-screen w-screen">
       <Map className="h-full w-full" center={[121.5, 25]} zoom={3}>
@@ -66,8 +70,9 @@ import { FlightRoute } from "@/components/ui/flight";`}</code>
       </Map>
     </div>
   );
-}`}</code>
-          </pre>
+}`}
+            />
+          </div>
 
           <div className="mt-5 text-sm text-slate-600">
             Full component API can be found on the

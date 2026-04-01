@@ -13,6 +13,7 @@ import {
 } from "@/components/home/home-config";
 import { FlightAirport } from "@/registry/flight";
 import { searchAirports } from "@/lib/flight-airports-search";
+import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
 
 export function AirportSearchSection() {
   const [query, setQuery] = useState("");
@@ -38,6 +39,9 @@ export function AirportSearchSection() {
       results[0]
     );
   }, [results, selectedAirportCode]);
+
+  const baseZoom = selectedAirport ? 2.8 : 0.9;
+  const mapZoom = useResponsiveZoom(baseZoom);
 
   return (
     <motion.section
@@ -172,7 +176,7 @@ export function AirportSearchSection() {
               center: selectedAirport
                 ? [selectedAirport.longitude, selectedAirport.latitude]
                 : [15, 18],
-              zoom: selectedAirport ? 2.8 : 0.9,
+              zoom: mapZoom,
             }}
             onViewportChange={() => {}}
             styles={mapStyles}

@@ -224,6 +224,19 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     };
   }, [ref, mapInstance]);
 
+  // MapLibre does not always pick up container size changes (flex, breakpoints,
+  // orientation). Resize the map when the container box changes.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(() => {
+      mapInstance?.resize();
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [mapInstance]);
+
   const clearStyleTimeout = useCallback(() => {
     if (styleTimeoutRef.current) {
       clearTimeout(styleTimeoutRef.current);

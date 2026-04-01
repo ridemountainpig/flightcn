@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 
+import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
 import { Map } from "@/components/ui/map";
 import {
   FlightAirport,
@@ -17,6 +18,7 @@ import {
   type ExampleConfig,
   type ExampleId,
 } from "@/components/home/home-config";
+import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
 
 const sectionReveal = {
   hidden: { opacity: 0, y: 24 },
@@ -112,9 +114,12 @@ function ExampleDetailsCard({
       <p className="mt-2 text-sm leading-6 text-slate-600">
         {selectedExample.description}
       </p>
-      <pre className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-[11px] text-slate-100 sm:text-xs">
-        <code>{selectedExample.code}</code>
-      </pre>
+      <div className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-slate-100">
+        <ShikiCodeBlock
+          code={selectedExample.code}
+          className="[&_pre]:text-[11px] sm:[&_pre]:text-xs"
+        />
+      </div>
     </motion.div>
   );
 }
@@ -124,6 +129,8 @@ function ExamplePreview({
 }: {
   selectedExample: ExampleConfig;
 }) {
+  const zoom = useResponsiveZoom(selectedExample.zoom);
+
   return (
     <motion.div
       className="relative order-1 min-w-0 overflow-hidden rounded-[1.5rem] border border-black/8 bg-[#ececeb] xl:order-1"
@@ -133,7 +140,7 @@ function ExamplePreview({
         className="h-72 w-full sm:h-96 lg:h-120 xl:h-152"
         viewport={{
           center: selectedExample.center,
-          zoom: selectedExample.zoom,
+          zoom,
         }}
         onViewportChange={() => {}}
         styles={mapStyles}

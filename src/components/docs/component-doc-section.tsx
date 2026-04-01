@@ -3,7 +3,9 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 import { mapStyles } from "@/components/home/home-config";
+import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
 import { Map } from "@/components/ui/map";
+import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
 
 import {
   buildSnippet,
@@ -97,6 +99,8 @@ function DocSectionShell({
   controls: ControlMap;
   previewArgs: ComponentPreviewArgs;
 }) {
+  const zoom = useResponsiveZoom(component.mapZoom);
+
   return (
     <section
       id={component.id}
@@ -116,8 +120,11 @@ function DocSectionShell({
         <DocsMapMountWhenVisible>
           <Map
             className="h-80 w-full sm:h-96"
-            center={component.mapCenter}
-            zoom={component.mapZoom}
+            viewport={{
+              center: component.mapCenter,
+              zoom,
+            }}
+            onViewportChange={() => {}}
             styles={mapStyles}
           >
             {renderComponentPreview(previewArgs)}
@@ -125,9 +132,9 @@ function DocSectionShell({
         </DocsMapMountWhenVisible>
       </div>
 
-      <pre className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
-        <code>{snippet}</code>
-      </pre>
+      <div className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
+        <ShikiCodeBlock code={snippet} />
+      </div>
 
       <h3 className="mt-5 text-lg font-semibold text-slate-900">Props</h3>
       <div className="mt-3">
