@@ -14,6 +14,7 @@
     "registry:build": "npx shadcn build -o ./public/r"
   },
   "dependencies": {
+    "@next/third-parties": "^16.2.2",
     "@shikijs/langs": "4.0.2",
     "@shikijs/themes": "4.0.2",
     "@turf/bearing": "^7.3.4",
