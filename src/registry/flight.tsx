@@ -28,6 +28,61 @@ import { airports, type AirportInfo, type AirportRef } from "./flight-airports";
 import { getAirportInfo, resolveAirport } from "./flight-airports-utils";
 export type { AirportInfo, AirportRef } from "./flight-airports";
 
+type FlightMapTheme = "light" | "dark";
+
+function getDocumentTheme(): FlightMapTheme | null {
+  if (typeof document === "undefined") return null;
+  if (document.documentElement.classList.contains("dark")) return "dark";
+  if (document.documentElement.classList.contains("light")) return "light";
+  return null;
+}
+
+function getSystemTheme(): FlightMapTheme {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+/**
+ * Resolves light/dark the same way as Map’s basemap: `html` class (e.g. next-themes)
+ * or `prefers-color-scheme` when unset.
+ */
+function useFlightMapTheme(): FlightMapTheme {
+  const [theme, setTheme] = useState<FlightMapTheme>(
+    () => getDocumentTheme() ?? getSystemTheme(),
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const docTheme = getDocumentTheme();
+      if (docTheme) setTheme(docTheme);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const onSystem = (e: MediaQueryListEvent) => {
+      if (!getDocumentTheme()) setTheme(e.matches ? "dark" : "light");
+    };
+    mediaQuery.addEventListener("change", onSystem);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener("change", onSystem);
+    };
+  }, []);
+
+  return theme;
+}
+
+/** Default arc stroke on light basemap when `color` is omitted */
+const FLIGHT_ROUTE_COLOR_LIGHT = "#0a0a0a";
+/** Default arc stroke on dark basemap when `color` is omitted */
+const FLIGHT_ROUTE_COLOR_DARK = "#e8e8e8";
+
 function normalizeAirportRefKey(ref: AirportRef): string {
   if (typeof ref === "string") {
     return `code:${ref.toUpperCase()}`;
@@ -340,7 +395,7 @@ type FlightAirportProps = {
    * - Numbered: `<div className="size-5 rounded-full bg-blue-500 border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-semibold">1</div>`
    * - Pulsing: `<div className="relative flex items-center justify-center"><div className="absolute size-6 rounded-full bg-cyan-500/20 animate-ping" /><div className="size-4 rounded-full bg-cyan-500 border-2 border-white shadow-lg" /></div>`
    *
-   * When omitted, uses a black dot (h-4 w-4).
+   * When omitted, uses a theme-aware dot (h-4 w-4) for contrast on light/dark maps.
    */
   markerContent?: ReactNode;
   /** Callback when the airport marker is clicked */
@@ -369,6 +424,7 @@ function FlightAirport({
 }: FlightAirportProps) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { map } = useMap();
+  const flightMapTheme = useFlightMapTheme();
   const isVisible = useAirportMarkerVisibility(map, dedupeKey);
 
   // Resolve coordinates
@@ -401,13 +457,28 @@ function FlightAirport({
 
   return (
     <MapMarker longitude={lng} latitude={lat} onClick={handleClick}>
-      {/* When markerContent is provided, it replaces the default black dot */}
+      {/* When markerContent is provided, it replaces the default theme-aware dot */}
       <MarkerContent className={className}>
         {markerContent || (
-          <div className="relative h-4 w-4 rounded-full border-2 border-white bg-black shadow-lg" />
+          <div
+            className={cn(
+              "relative h-4 w-4 rounded-full border-2 shadow-lg",
+              flightMapTheme === "dark"
+                ? "border-neutral-700 bg-neutral-100"
+                : "border-white bg-neutral-950",
+            )}
+          />
         )}
         {showLabel && displayName && (
-          <MarkerLabel position={labelPosition} className={labelClassName}>
+          <MarkerLabel
+            position={labelPosition}
+            className={cn(
+              flightMapTheme === "dark"
+                ? "text-neutral-100"
+                : "text-neutral-950",
+              labelClassName,
+            )}
+          >
             {displayName}
           </MarkerLabel>
         )}
@@ -475,7 +546,10 @@ type FlightRouteProps = {
   to: AirportRef;
   /** Optional unique identifier for this route layer */
   id?: string;
-  /** Route line color (default: "#000000") */
+  /**
+   * Route line color. When omitted, picks a contrast color for the active map
+   * theme (same rules as Map basemap: `html` class or system preference).
+   */
   color?: string;
   /** Route line width in pixels (default: 2) */
   width?: number;
@@ -619,7 +693,7 @@ function FlightRoute({
   from,
   to,
   id: propId,
-  color = "#000000",
+  color,
   width = 2,
   opacity = 0.7,
   lineStyle = "solid",
@@ -637,6 +711,12 @@ function FlightRoute({
   tripType,
 }: FlightRouteProps) {
   const { map, isLoaded } = useMap();
+  const flightMapTheme = useFlightMapTheme();
+  const resolvedRouteColor =
+    color ??
+    (flightMapTheme === "dark"
+      ? FLIGHT_ROUTE_COLOR_DARK
+      : FLIGHT_ROUTE_COLOR_LIGHT);
   const autoId = useId();
   const id = propId ?? autoId;
   const sourceId = `flight-route-source-${id}`;
@@ -740,7 +820,7 @@ function FlightRoute({
     const paint: Record<string, unknown> = {
       "line-width": width,
       "line-opacity": opacity,
-      "line-color": color,
+      "line-color": resolvedRouteColor,
     };
 
     if (resolvedDash) {
@@ -788,12 +868,20 @@ function FlightRoute({
   useEffect(() => {
     if (!isLoaded || !map || !map.getLayer(layerId)) return;
 
-    map.setPaintProperty(layerId, "line-color", color);
+    map.setPaintProperty(layerId, "line-color", resolvedRouteColor);
     map.setPaintProperty(layerId, "line-dasharray", resolvedDash ?? null);
     map.setPaintProperty(layerId, "line-width", width);
     map.setPaintProperty(layerId, "line-opacity", opacity);
     map.setLayoutProperty(layerId, "line-cap", resolvedDash ? "butt" : "round");
-  }, [isLoaded, map, layerId, color, width, opacity, resolvedDash]);
+  }, [
+    isLoaded,
+    map,
+    layerId,
+    resolvedRouteColor,
+    width,
+    opacity,
+    resolvedDash,
+  ]);
 
   // Handle click and hover events (with hover effect: line thickening + tooltip)
   useEffect(() => {
@@ -962,7 +1050,7 @@ type FlightRouteData = {
 type FlightRoutesProps = {
   /** Array of route data */
   routes: readonly FlightRouteData[];
-  /** Default route line color (default: "#000000") */
+  /** Default route line color; when omitted, uses theme-aware stroke (see FlightRoute `color`). */
   color?: string;
   /** Default route line width (default: 2) */
   width?: number;
@@ -1026,7 +1114,7 @@ type FlightRoutesProps = {
 
 function FlightRoutes({
   routes,
-  color = "#000000",
+  color,
   width = 2,
   opacity = 0.7,
   lineStyle = "solid",
@@ -1133,7 +1221,7 @@ type FlightMultiRouteProps = {
   waypoints: readonly AirportRef[];
   /** Optional unique identifier prefix for route layers */
   id?: string;
-  /** Route line color (default: "#000000") */
+  /** Route line color; when omitted, uses theme-aware stroke (see FlightRoute `color`). */
   color?: string;
   /** Route line width in pixels (default: 2) */
   width?: number;
@@ -1189,7 +1277,7 @@ type FlightMultiRouteProps = {
 function FlightMultiRoute({
   waypoints,
   id: propId,
-  color = "#000000",
+  color,
   width = 2,
   opacity = 0.7,
   lineStyle = "solid",
@@ -1207,6 +1295,7 @@ function FlightMultiRoute({
 }: FlightMultiRouteProps) {
   const autoId = useId();
   const id = propId ?? autoId;
+  const flightMapTheme = useFlightMapTheme();
 
   // Normalize animate prop
   const animateConfig = useMemo<FlightRouteAnimateConfig | null>(() => {
@@ -1271,7 +1360,14 @@ function FlightMultiRoute({
             !isEndpoint && stopoverMarkerContent !== undefined ? (
               stopoverMarkerContent
             ) : !isEndpoint ? (
-              <div className="relative h-2.5 w-2.5 rounded-full border-2 border-white bg-black shadow-lg" />
+              <div
+                className={cn(
+                  "relative h-2.5 w-2.5 rounded-full border-2 shadow-lg",
+                  flightMapTheme === "dark"
+                    ? "border-neutral-700 bg-neutral-100"
+                    : "border-white bg-neutral-950",
+                )}
+              />
             ) : (
               markerContent
             );

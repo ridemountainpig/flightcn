@@ -64,7 +64,7 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "markerContent",
         type: "ReactNode",
-        defaultValue: "default black dot",
+        defaultValue: "theme-aware dot",
         description: "Custom marker content",
       },
       {
@@ -109,8 +109,9 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "color",
         type: "string",
-        defaultValue: '"#000000"',
-        description: "Route color",
+        defaultValue: "-",
+        description:
+          "Route color; when omitted, uses a theme-aware contrast stroke (light/dark)",
       },
       {
         name: "width",
@@ -145,7 +146,7 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "markerContent",
         type: "ReactNode",
-        defaultValue: "default black dot",
+        defaultValue: "theme-aware dot",
         description: "Custom marker content for auto-rendered airports",
       },
       {
@@ -239,8 +240,9 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "color",
         type: "string",
-        defaultValue: '"#000000"',
-        description: "Default route color",
+        defaultValue: "-",
+        description:
+          "Default route color; when omitted, uses a theme-aware contrast stroke",
       },
       {
         name: "width",
@@ -275,7 +277,7 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "markerContent",
         type: "ReactNode",
-        defaultValue: "default black dot",
+        defaultValue: "theme-aware dot",
         description: "Custom marker content for auto-rendered airports",
       },
       {
@@ -395,8 +397,9 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "color",
         type: "string",
-        defaultValue: '"#000000"',
-        description: "Route color",
+        defaultValue: "-",
+        description:
+          "Route color; when omitted, uses a theme-aware contrast stroke",
       },
       {
         name: "width",
@@ -431,7 +434,7 @@ export const componentDocs: readonly ComponentDoc[] = [
       {
         name: "markerContent",
         type: "ReactNode",
-        defaultValue: "default black dot",
+        defaultValue: "theme-aware dot",
         description: "Default marker content for start/end airports",
       },
       {

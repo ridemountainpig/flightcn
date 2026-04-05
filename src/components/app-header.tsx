@@ -27,7 +27,7 @@ export function AppHeader({
   return (
     <header
       className={cn(
-        "relative z-[1200] rounded-3xl border border-black/10 bg-white/90 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6",
+        "border-border bg-card/90 text-card-foreground relative z-[1200] rounded-3xl border px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6",
         className,
       )}
     >
@@ -36,7 +36,7 @@ export function AppHeader({
           <Link
             href="/"
             aria-label="Go to homepage"
-            className="flex size-9 items-center justify-center rounded-lg bg-slate-950 text-white shadow-lg sm:size-11"
+            className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg shadow-lg sm:size-11"
           >
             <Image
               src="/favicon.ico"
@@ -48,7 +48,7 @@ export function AppHeader({
           </Link>
           <div className="min-w-0">
             <p className="text-sm font-semibold sm:text-base">{title}</p>
-            <p className="text-[11px] leading-4 text-slate-500 sm:text-xs sm:leading-5">
+            <p className="text-muted-foreground text-[11px] leading-4 sm:text-xs sm:leading-5">
               {subtitle}
             </p>
           </div>
@@ -56,8 +56,8 @@ export function AppHeader({
 
         <SiteNavMenu
           items={appHeaderNavItems}
-          buttonClassName="border-black/10 text-slate-700 hover:bg-slate-100"
-          itemClassName="text-slate-700 hover:bg-slate-100"
+          buttonClassName="border-border text-foreground hover:bg-accent"
+          itemClassName="text-foreground hover:bg-accent"
         />
       </div>
     </header>

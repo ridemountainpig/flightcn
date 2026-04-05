@@ -119,7 +119,11 @@ export const exampleConfigs: readonly ExampleConfig[] = [
       "Batch render multiple routes with shared defaults while still keeping hover states and airport markers visible.",
     code: `<Map>
   <FlightRoutes
-    routes={routes}
+    routes={[
+      { from: "TPE", to: "HND", tripType: "round-trip" },
+      { from: "TPE", to: "ICN" },
+      { from: "TPE", to: "HKG" },
+    ]}
     showAirports
     showLabel
   />
@@ -150,20 +154,21 @@ export const exampleConfigs: readonly ExampleConfig[] = [
     eyebrow: "Animated",
     title: "Round-trip plane animation",
     description:
-      "Animate a plane across the route and let tripType drive the round-trip behavior automatically.",
+      'Animate a plane across the route; use tripType="round-trip" for a return leg, or one-way for a single direction.',
     code: `<Map>
   <FlightRoute
     from="NRT"
     to="TPE"
     showAirports
     showLabel
-    tripType="one-way"
+    tripType="round-trip"
     animate={{ duration: 5000 }}
   />
   <FlightRoute
     from="TPE"
     to="DXB"
     showAirports
+    showLabel
     tripType="one-way"
     animate={{ duration: 8000 }}
   />

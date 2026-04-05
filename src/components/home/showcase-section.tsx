@@ -149,31 +149,33 @@ function ExamplePreview({
         {renderExample(selectedExample.id)}
       </Map>
       {selectedExample.id === "route-hover" && (
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-3xl border border-black/10 bg-white/95 px-4 py-3 shadow-[0_12px_30px_rgba(15,23,42,0.12)] backdrop-blur sm:bottom-4 sm:left-4 sm:max-w-64 sm:px-5 sm:py-4">
-          <p className="text-xs leading-[1.6] font-semibold text-slate-950">
+        <div className="pointer-events-none absolute bottom-2 left-2 z-10 max-w-[min(11.5rem,calc(100%-1rem))] rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-[0_8px_22px_rgba(15,23,42,0.1)] backdrop-blur sm:bottom-4 sm:left-4 sm:max-w-64 sm:rounded-3xl sm:px-5 sm:py-4 sm:shadow-[0_12px_30px_rgba(15,23,42,0.12)]">
+          <p className="text-[11px] leading-snug font-semibold text-slate-950 sm:text-xs sm:leading-[1.6]">
             Taipei (TPE) ↔ Tokyo (HND)
           </p>
-          <div className="my-3 h-px bg-slate-200" />
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs leading-[1.6] text-slate-500">
+          <div className="my-2 h-px bg-slate-200 sm:my-3" />
+          <div className="space-y-1.5 sm:space-y-2.5">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
+              <span className="text-[10px] leading-tight text-slate-500 sm:text-xs sm:leading-[1.6]">
                 Distance
               </span>
-              <span className="text-xs leading-[1.6] text-slate-950">
+              <span className="text-[10px] leading-tight text-slate-950 sm:text-xs sm:leading-[1.6]">
                 2,121 km
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs leading-[1.6] text-slate-500">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
+              <span className="text-[10px] leading-tight text-slate-500 sm:text-xs sm:leading-[1.6]">
                 Est. Time
               </span>
-              <span className="text-xs leading-[1.6] text-slate-950">
+              <span className="text-[10px] leading-tight text-slate-950 sm:text-xs sm:leading-[1.6]">
                 ~2h 30m
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs leading-[1.6] text-slate-500">Type</span>
-              <span className="text-xs leading-[1.6] text-slate-950">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
+              <span className="text-[10px] leading-tight text-slate-500 sm:text-xs sm:leading-[1.6]">
+                Type
+              </span>
+              <span className="text-[10px] leading-tight text-slate-950 sm:text-xs sm:leading-[1.6]">
                 Round Trip
               </span>
             </div>

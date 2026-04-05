@@ -75,7 +75,7 @@ export function AirportSearchPanel() {
 
   if (collapsed) {
     return (
-      <div className="bg-background/90 absolute right-4 bottom-4 z-50 rounded-lg border p-2 shadow-lg backdrop-blur-sm">
+      <div className="bg-card/90 border-border text-card-foreground absolute right-4 bottom-4 z-50 rounded-lg border p-2 shadow-lg backdrop-blur-sm">
         <button
           onClick={() => {
             setCollapsed(false);
@@ -92,7 +92,7 @@ export function AirportSearchPanel() {
 
   return (
     <div className="absolute right-4 bottom-4 left-4 z-50 sm:left-auto">
-      <div className="bg-background/90 w-full overflow-hidden rounded-lg border shadow-lg backdrop-blur-sm sm:w-80 sm:max-w-[calc(100vw-2rem)]">
+      <div className="bg-card/90 border-border text-card-foreground w-full overflow-hidden rounded-lg border shadow-lg backdrop-blur-sm sm:w-80 sm:max-w-[calc(100vw-2rem)]">
         <AirportSearchResults
           query={query}
           results={results}

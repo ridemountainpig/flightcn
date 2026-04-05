@@ -69,7 +69,7 @@ export function SiteNavMenu({
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-black/10 transition-colors sm:size-11",
+          "border-border inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border transition-colors sm:size-11",
           buttonClassName,
         )}
       >
@@ -79,7 +79,7 @@ export function SiteNavMenu({
       {open ? (
         <div
           className={cn(
-            "absolute top-full right-0 mt-2 w-48 rounded-xl border border-black/10 bg-white/95 p-1.5 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur",
+            "bg-popover text-popover-foreground border-border absolute top-full right-0 mt-2 w-48 rounded-xl border p-1.5 shadow-md backdrop-blur",
             panelClassName,
           )}
         >

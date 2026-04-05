@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { type AirportInfo } from "@/registry/flight-airports";
 
 export function CopyableAirportMarker({ airport }: { airport: AirportInfo }) {
+  const flightMapTheme = useCopyableMarkerTheme();
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -62,7 +64,12 @@ export function CopyableAirportMarker({ airport }: { airport: AirportInfo }) {
     >
       <button
         type="button"
-        className="size-2 cursor-pointer rounded-full bg-black"
+        className={cn(
+          "size-2 cursor-pointer rounded-full border shadow-sm",
+          flightMapTheme === "dark"
+            ? "border-neutral-600 bg-neutral-100"
+            : "border-white bg-neutral-950",
+        )}
         onClick={handleCopy}
         aria-label={`Copy ${airport.code} airport code`}
         title={`Copy ${airport.code}`}
@@ -86,4 +93,51 @@ export function CopyableAirportMarker({ airport }: { airport: AirportInfo }) {
       )}
     </div>
   );
+}
+
+type CopyableMarkerTheme = "light" | "dark";
+
+function getDocumentTheme(): CopyableMarkerTheme | null {
+  if (typeof document === "undefined") return null;
+  if (document.documentElement.classList.contains("dark")) return "dark";
+  if (document.documentElement.classList.contains("light")) return "light";
+  return null;
+}
+
+function getSystemTheme(): CopyableMarkerTheme {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+/** Matches Map basemap + html class / system preference; local to this component, not registry. */
+function useCopyableMarkerTheme(): CopyableMarkerTheme {
+  const [theme, setTheme] = useState<CopyableMarkerTheme>(
+    () => getDocumentTheme() ?? getSystemTheme(),
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const docTheme = getDocumentTheme();
+      if (docTheme) setTheme(docTheme);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const onSystem = (e: MediaQueryListEvent) => {
+      if (!getDocumentTheme()) setTheme(e.matches ? "dark" : "light");
+    };
+    mediaQuery.addEventListener("change", onSystem);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener("change", onSystem);
+    };
+  }, []);
+
+  return theme;
 }
