@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { type PropDoc } from "./component-docs-config";
 
@@ -9,8 +10,32 @@ export type SelectControl = {
   options: readonly string[];
 };
 
-export type ControlConfig = SelectControl;
+export type ColorControl = {
+  kind: "color";
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export type ControlConfig = SelectControl | ColorControl;
 export type ControlMap = Partial<Record<string, ControlConfig>>;
+
+function normalizeHexColor(value: string) {
+  const trimmed = value.trim().replace(/^#/, "");
+
+  if (/^[\da-fA-F]{3}$/.test(trimmed)) {
+    return `#${trimmed
+      .split("")
+      .map((char) => `${char}${char}`)
+      .join("")
+      .toLowerCase()}`;
+  }
+
+  if (/^[\da-fA-F]{6}$/.test(trimmed)) {
+    return `#${trimmed.toLowerCase()}`;
+  }
+
+  return null;
+}
 
 function SelectInput({
   value,
@@ -38,6 +63,71 @@ function SelectInput({
         ))}
       </select>
       <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-slate-500" />
+    </div>
+  );
+}
+
+function ColorInput({
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  ariaLabel: string;
+}) {
+  const [draft, setDraft] = useState(value);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
+
+  const commitDraft = () => {
+    const normalized = normalizeHexColor(draft);
+    if (!normalized) {
+      setDraft(value);
+      return;
+    }
+
+    setDraft(normalized);
+    if (normalized !== value) {
+      onChange(normalized);
+    }
+  };
+
+  return (
+    <div className="relative inline-flex w-32">
+      <input
+        value={draft}
+        aria-label={ariaLabel}
+        onChange={(event) => setDraft(event.currentTarget.value)}
+        onBlur={commitDraft}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.currentTarget.blur();
+          }
+        }}
+        placeholder="#0a0a0a"
+        spellCheck={false}
+        className="h-9 w-full rounded-xl border border-black/10 bg-slate-50 px-3 pr-11 text-xs font-semibold text-slate-700 uppercase transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
+      />
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center rounded-r-xl px-2">
+        <span
+          className="size-4 rounded-md border border-black/10 shadow-sm"
+          style={{ backgroundColor: value }}
+        />
+      </div>
+      <input
+        type="color"
+        value={value}
+        aria-label={`${ariaLabel} color picker`}
+        onChange={(event) => {
+          const nextColor = event.currentTarget.value.toLowerCase();
+          setDraft(nextColor);
+          onChange(nextColor);
+        }}
+        className="absolute inset-y-0 right-0 w-10 cursor-pointer opacity-0"
+      />
     </div>
   );
 }
@@ -91,12 +181,20 @@ export function PropsTable({
                 </td>
                 <td className="border-b border-black/8 px-4 py-3 align-middle text-sm text-slate-700">
                   {control ? (
-                    <SelectInput
-                      value={control.value}
-                      options={control.options}
-                      onChange={control.onChange}
-                      ariaLabel={prop.name}
-                    />
+                    control.kind === "select" ? (
+                      <SelectInput
+                        value={control.value}
+                        options={control.options}
+                        onChange={control.onChange}
+                        ariaLabel={prop.name}
+                      />
+                    ) : (
+                      <ColorInput
+                        value={control.value}
+                        onChange={control.onChange}
+                        ariaLabel={prop.name}
+                      />
+                    )
                   ) : (
                     <span className="text-xs text-slate-400">-</span>
                   )}

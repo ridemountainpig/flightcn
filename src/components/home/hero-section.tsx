@@ -46,7 +46,7 @@ export function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
       >
-        flightcn runs inside the mapcn ecosystem.
+        Build flight route maps for mapcn and MapLibre.
       </motion.h1>
       <motion.p
         className="mx-auto mt-4 max-w-3xl px-4 text-sm leading-7 text-slate-600 sm:mt-5 sm:px-0 sm:text-xl sm:leading-8"
@@ -54,7 +54,8 @@ export function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
       >
-        Preview flight routes on live mapcn maps.
+        Render airport markers, great-circle paths, and multi-leg journeys from
+        IATA codes with the flightcn component set.
       </motion.p>
       <motion.div
         initial={{ opacity: 0, y: 16 }}

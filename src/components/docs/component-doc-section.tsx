@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 
 import { mapStyles } from "@/components/home/home-config";
 import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
@@ -32,11 +38,64 @@ const DEFAULT_ROUTE_LIKE: FlightRouteLikePlayground = {
   lineStyle: "solid",
 };
 
+const FLIGHT_ROUTE_COLOR_LIGHT = "#0a0a0a";
+const FLIGHT_ROUTE_COLOR_DARK = "#e8e8e8";
+
+function getThemeAwareRouteColor() {
+  if (typeof window === "undefined") {
+    return FLIGHT_ROUTE_COLOR_LIGHT;
+  }
+
+  if (document.documentElement.classList.contains("dark")) {
+    return FLIGHT_ROUTE_COLOR_DARK;
+  }
+
+  if (document.documentElement.classList.contains("light")) {
+    return FLIGHT_ROUTE_COLOR_LIGHT;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? FLIGHT_ROUTE_COLOR_DARK
+    : FLIGHT_ROUTE_COLOR_LIGHT;
+}
+
+function useThemeAwareRouteColor() {
+  const [color, setColor] = useState(FLIGHT_ROUTE_COLOR_LIGHT);
+
+  useEffect(() => {
+    const syncColor = () => setColor(getThemeAwareRouteColor());
+
+    syncColor();
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const observer = new MutationObserver(syncColor);
+
+    mediaQuery.addEventListener("change", syncColor);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncColor);
+      observer.disconnect();
+    };
+  }, []);
+
+  return color;
+}
+
 function routeLikeControls(
   play: FlightRouteLikePlayground,
+  themeColor: string,
   set: Dispatch<SetStateAction<FlightRouteLikePlayground>>,
 ): ControlMap {
   return {
+    color: {
+      kind: "color",
+      value: play.color ?? themeColor,
+      onChange: (value) => set((prev) => ({ ...prev, color: value })),
+    },
     showAirports: {
       kind: "select",
       value: String(play.showAirports),
@@ -204,6 +263,7 @@ function AirportDocSection({ component }: { component: ComponentDoc }) {
 }
 
 function FlightRouteDocSection({ component }: { component: ComponentDoc }) {
+  const themeColor = useThemeAwareRouteColor();
   const [route, setRoute] =
     useState<FlightRouteLikePlayground>(DEFAULT_ROUTE_LIKE);
 
@@ -214,7 +274,10 @@ function FlightRouteDocSection({ component }: { component: ComponentDoc }) {
 
   const snippet = useMemo(() => buildSnippet(previewArgs), [previewArgs]);
 
-  const controls = useMemo(() => routeLikeControls(route, setRoute), [route]);
+  const controls = useMemo(
+    () => routeLikeControls(route, themeColor, setRoute),
+    [route, themeColor],
+  );
 
   return (
     <DocSectionShell
@@ -227,6 +290,7 @@ function FlightRouteDocSection({ component }: { component: ComponentDoc }) {
 }
 
 function FlightRoutesDocSection({ component }: { component: ComponentDoc }) {
+  const themeColor = useThemeAwareRouteColor();
   const [routes, setRoutes] =
     useState<FlightRouteLikePlayground>(DEFAULT_ROUTE_LIKE);
 
@@ -238,8 +302,8 @@ function FlightRoutesDocSection({ component }: { component: ComponentDoc }) {
   const snippet = useMemo(() => buildSnippet(previewArgs), [previewArgs]);
 
   const controls = useMemo(
-    () => routeLikeControls(routes, setRoutes),
-    [routes],
+    () => routeLikeControls(routes, themeColor, setRoutes),
+    [routes, themeColor],
   );
 
   return (
@@ -257,6 +321,7 @@ function FlightMultiRouteDocSection({
 }: {
   component: ComponentDoc;
 }) {
+  const themeColor = useThemeAwareRouteColor();
   const [multiRoute, setMultiRoute] =
     useState<FlightRouteLikePlayground>(DEFAULT_ROUTE_LIKE);
 
@@ -268,8 +333,8 @@ function FlightMultiRouteDocSection({
   const snippet = useMemo(() => buildSnippet(previewArgs), [previewArgs]);
 
   const controls = useMemo(
-    () => routeLikeControls(multiRoute, setMultiRoute),
-    [multiRoute],
+    () => routeLikeControls(multiRoute, themeColor, setMultiRoute),
+    [multiRoute, themeColor],
   );
 
   return (

@@ -268,12 +268,25 @@ export function ShowcaseSection() {
   return (
     <motion.section
       id="showcase"
-      className="mt-2"
+      className="mt-8"
       variants={sectionReveal}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.18 }}
     >
+      <motion.div className="mb-4 px-1" variants={childReveal}>
+        <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
+          Live Examples
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          Preview airport markers, routes, and multi-leg flight paths
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+          Explore real flightcn usage patterns before installing the component
+          into your own mapcn project.
+        </p>
+      </motion.div>
+
       <div className="rounded-[2rem] border border-black/10 bg-white/80 p-2.5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-4">
         <motion.div
           className="grid min-w-0 gap-3 sm:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,19rem)]"

@@ -8,6 +8,57 @@ import { searchAirports } from "@/lib/flight-airports-search";
 import { allAirports } from "@/components/home/home-config";
 import { type AirportInfo } from "@/registry/flight-airports";
 
+function AirportSearchSummary({ airport }: { airport: AirportInfo | null }) {
+  if (!airport) {
+    return (
+      <div className="border-b px-3 py-3">
+        <p className="text-muted-foreground text-[10px] font-semibold tracking-[0.16em] uppercase">
+          Airport Registry
+        </p>
+        <h1 className="mt-1 text-sm font-semibold">
+          Search airports by IATA code, city, country, or airport name
+        </h1>
+        <p className="text-muted-foreground mt-1 text-xs leading-5">
+          Browse the built-in airport dataset and jump straight to markers on
+          the map.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-b px-3 py-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="bg-muted rounded-full px-2 py-1 text-[10px] font-semibold tracking-[0.16em] uppercase">
+              {airport.code}
+            </span>
+            <span className="text-muted-foreground text-[10px] font-semibold tracking-[0.16em] uppercase">
+              Airport
+            </span>
+          </div>
+          <p className="mt-2 truncate text-sm font-semibold">{airport.name}</p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            {airport.city}, {airport.country}
+          </p>
+        </div>
+        <MapPin className="text-muted-foreground mt-0.5 size-4 shrink-0" />
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div className="bg-muted/50 rounded-md px-2.5 py-2">
+          <p className="text-muted-foreground">Latitude</p>
+          <p className="mt-1 font-medium">{airport.latitude.toFixed(4)}</p>
+        </div>
+        <div className="bg-muted/50 rounded-md px-2.5 py-2">
+          <p className="text-muted-foreground">Longitude</p>
+          <p className="mt-1 font-medium">{airport.longitude.toFixed(4)}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AirportSearchResults({
   query,
   results,
@@ -55,20 +106,33 @@ export function AirportSearchPanel() {
   const { map } = useMap();
   const [query, setQuery] = useState("");
   const [collapsed, setCollapsed] = useState(false);
+  const [selectedAirportCode, setSelectedAirportCode] = useState<string | null>(
+    null,
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const results = useMemo(() => searchAirports(allAirports, query, 8), [query]);
+  const activeAirport = useMemo(() => {
+    if (!query.trim()) return null;
+
+    return (
+      results.find((airport) => airport.code === selectedAirportCode) ??
+      results[0] ??
+      null
+    );
+  }, [query, results, selectedAirportCode]);
 
   const handleSelect = useCallback(
     (airport: AirportInfo) => {
       if (!map) return;
 
+      setSelectedAirportCode(airport.code);
+      setQuery(airport.code);
       map.flyTo({
         center: [airport.longitude, airport.latitude],
         zoom: 10,
         duration: 2000,
       });
-      setQuery("");
     },
     [map],
   );
@@ -93,6 +157,7 @@ export function AirportSearchPanel() {
   return (
     <div className="absolute right-4 bottom-4 left-4 z-50 sm:left-auto">
       <div className="bg-card/90 border-border text-card-foreground w-full overflow-hidden rounded-lg border shadow-lg backdrop-blur-sm sm:w-80 sm:max-w-[calc(100vw-2rem)]">
+        <AirportSearchSummary airport={activeAirport} />
         <AirportSearchResults
           query={query}
           results={results}

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
+import { defaultKeywords, siteConfig } from "@/lib/seo";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -14,52 +16,39 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://flightcn.yencheng.dev"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "flightcn",
-    template: "%s | flightcn",
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Flight route visualizations for mapcn, with airport lookup and route rendering from IATA codes.",
-  applicationName: "flightcn",
-  keywords: [
-    "flightcn",
-    "mapcn",
-    "maplibre",
-    "flight route",
-    "iata",
-    "shadcn registry",
-  ],
-  alternates: {
-    canonical: "/",
-  },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  keywords: [...defaultKeywords],
   authors: [
     {
-      name: "ridemountainpig",
-      url: "https://www.github.com/ridemountainpig",
+      name: siteConfig.creator.name,
+      url: siteConfig.creator.url,
     },
   ],
   openGraph: {
     type: "website",
-    url: "https://flightcn.yencheng.dev",
-    title: "flightcn",
-    description:
-      "Flight route visualizations for mapcn, with airport lookup and route rendering from IATA codes.",
-    siteName: "flightcn",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
     images: [
       {
-        url: "/flightcn-og.png",
-        alt: "flightcn",
+        url: siteConfig.ogImage,
+        alt: siteConfig.name,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "flightcn",
-    description:
-      "Flight route visualizations for mapcn, with airport lookup and route rendering from IATA codes.",
+    title: siteConfig.name,
+    description: siteConfig.description,
     creator: "@ridemountainpig",
-    images: ["/flightcn-og.png"],
+    images: [siteConfig.ogImage],
   },
 };
 

@@ -16,6 +16,20 @@ export function ComponentDocsPage() {
           subtitle="API reference and live component previews"
         />
 
+        <section className="mt-6 rounded-[1.8rem] border border-black/10 bg-white/85 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-6">
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
+            Developer Docs
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+            flightcn API reference and component examples
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+            Browse the flight route, airport marker, multi-route, and waypoint
+            APIs, then preview each component with a live map example before
+            adding it to your mapcn project.
+          </p>
+        </section>
+
         <div className="mt-6 grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
           <aside className="h-fit min-w-0 rounded-[1.5rem] border border-black/10 bg-white/85 p-3 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:sticky lg:top-6">
             <p className="px-2 pb-2 text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">

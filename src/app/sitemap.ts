@@ -1,29 +1,23 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://flightcn.yencheng.dev";
+import { siteConfig } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-
   return [
     {
-      url: `${BASE_URL}/`,
-      lastModified: now,
+      url: `${siteConfig.url}/`,
       priority: 1,
     },
     {
-      url: `${BASE_URL}/docs`,
-      lastModified: now,
+      url: `${siteConfig.url}/docs`,
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/docs/install`,
-      lastModified: now,
+      url: `${siteConfig.url}/docs/install`,
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/airports`,
-      lastModified: now,
+      url: `${siteConfig.url}/airports`,
       priority: 0.7,
     },
   ];

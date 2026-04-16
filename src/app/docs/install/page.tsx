@@ -6,15 +6,52 @@ import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
 import { installCommand } from "@/components/home/home-config";
 import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
+import { JsonLd } from "@/components/seo/json-ld";
+import {
+  absoluteUrl,
+  buildBreadcrumbJsonLd,
+  buildPageMetadata,
+  siteConfig,
+} from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Install Guide",
-  description: "Step-by-step install guide for adding flightcn components.",
-};
+  description:
+    "Follow the step-by-step guide to install flightcn from the shadcn registry and render your first route with mapcn.",
+  path: "/docs/install",
+  keywords: ["install flightcn", "shadcn registry guide", "mapcn setup"],
+});
+
+const installJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: "How to install flightcn from the shadcn registry",
+    description:
+      "Step-by-step installation guide for adding flightcn components to a mapcn project.",
+    url: absoluteUrl("/docs/install"),
+    author: {
+      "@type": "Person",
+      name: siteConfig.creator.name,
+      url: siteConfig.creator.url,
+    },
+    about: {
+      "@type": "SoftwareApplication",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+  },
+  buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Documentation", path: "/docs" },
+    { name: "Install Guide", path: "/docs/install" },
+  ]),
+];
 
 export default function InstallPage() {
   return (
     <main className="min-h-screen bg-stone-100 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.1)_1px,transparent_0)] bg-size-[24px_24px] text-slate-950">
+      <JsonLd id="install-jsonld" data={installJsonLd} />
       <div className="mx-auto max-w-[1520px] px-4 py-6 sm:px-6 lg:px-8">
         <AppHeader
           title="Install Guide"

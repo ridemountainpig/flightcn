@@ -12,6 +12,7 @@ export type AirportPlayground = {
 
 /** Shared shape for FlightRoute, FlightRoutes, and FlightMultiRoute playgrounds */
 export type FlightRouteLikePlayground = {
+  color?: string;
   showAirports: boolean;
   showLabel: boolean;
   hoverEffect: boolean;
@@ -19,6 +20,23 @@ export type FlightRouteLikePlayground = {
   tripType: "one-way" | "round-trip";
   lineStyle: "solid" | "dash" | "dot";
 };
+
+function buildRouteLikeSnippetLines(
+  route: FlightRouteLikePlayground,
+  animateLiteral: string,
+) {
+  return [
+    route.color ? `    color="${route.color}"` : null,
+    `    showAirports={${route.showAirports}}`,
+    `    showLabel={${route.showLabel}}`,
+    `    hoverEffect={${route.hoverEffect}}`,
+    `    tripType="${route.tripType}"`,
+    `    lineStyle="${route.lineStyle}"`,
+    `    animate={${animateLiteral}}`,
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
+}
 
 export type ComponentPreviewArgs =
   | { id: "flight-airport"; airport: AirportPlayground }
@@ -53,6 +71,7 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
         <FlightRoute
           from="TPE"
           to="HND"
+          color={args.route.color}
           showAirports={args.route.showAirports}
           showLabel={args.route.showLabel}
           hoverEffect={args.route.hoverEffect}
@@ -69,6 +88,7 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
             { from: "TPE", to: "SIN" },
             { from: "TPE", to: "BKK" },
           ]}
+          color={args.routes.color}
           showAirports={args.routes.showAirports}
           showLabel={args.routes.showLabel}
           hoverEffect={args.routes.hoverEffect}
@@ -81,6 +101,7 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
       return (
         <FlightMultiRoute
           waypoints={["TPE", "DXB", "ZRH", "JFK"]}
+          color={args.multiRoute.color}
           showAirports={args.multiRoute.showAirports}
           showLabel={args.multiRoute.showLabel}
           hoverEffect={args.multiRoute.hoverEffect}
@@ -108,12 +129,7 @@ export function buildSnippet(args: ComponentPreviewArgs): string {
   <FlightRoute
     from="TPE"
     to="HND"
-    showAirports={${route.showAirports}}
-    showLabel={${route.showLabel}}
-    hoverEffect={${route.hoverEffect}}
-    tripType="${route.tripType}"
-    lineStyle="${route.lineStyle}"
-    animate={${route.animate ? "{ duration: 5000 }" : "false"}}
+${buildRouteLikeSnippetLines(route, route.animate ? "{ duration: 5000 }" : "false")}
   />
 </Map>`;
     }
@@ -126,12 +142,7 @@ export function buildSnippet(args: ComponentPreviewArgs): string {
       { from: "TPE", to: "SIN" },
       { from: "TPE", to: "BKK" },
     ]}
-    showAirports={${routes.showAirports}}
-    showLabel={${routes.showLabel}}
-    hoverEffect={${routes.hoverEffect}}
-    tripType="${routes.tripType}"
-    lineStyle="${routes.lineStyle}"
-    animate={${routes.animate ? "{ duration: 7000 }" : "false"}}
+${buildRouteLikeSnippetLines(routes, routes.animate ? "{ duration: 7000 }" : "false")}
   />
 </Map>`;
     }
@@ -140,12 +151,10 @@ export function buildSnippet(args: ComponentPreviewArgs): string {
       return `<Map center={[28, 28]} zoom={1.2}>
   <FlightMultiRoute
     waypoints={["TPE", "DXB", "ZRH", "JFK"]}
-    showAirports={${multiRoute.showAirports}}
-    showLabel={${multiRoute.showLabel}}
-    hoverEffect={${multiRoute.hoverEffect}}
-    tripType="${multiRoute.tripType}"
-    lineStyle="${multiRoute.lineStyle}"
-    animate={${multiRoute.animate ? "{ duration: 9000 }" : "false"}}
+${buildRouteLikeSnippetLines(
+  multiRoute,
+  multiRoute.animate ? "{ duration: 9000 }" : "false",
+)}
   />
 </Map>`;
     }
