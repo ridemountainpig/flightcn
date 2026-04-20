@@ -2,8 +2,8 @@
 
 ![flightcn](public/flightcn-og.png)
 
-`flightcn` is a flight route visualization component set built for the `mapcn` ecosystem.
-It helps you render airport markers, great-circle flight paths, and multi-leg routes on top of MapLibre-powered maps with a built-in airport dataset.
+`flightcn` is a visualization component set built for the `mapcn` ecosystem.
+It helps you render airport markers, great-circle flight paths, multi-leg routes, and globe-based satellite orbit overlays on top of MapLibre-powered maps.
 
 ## Highlights
 
@@ -11,12 +11,16 @@ It helps you render airport markers, great-circle flight paths, and multi-leg ro
 - Render airports and routes directly from IATA codes like `TPE`, `HND`, and `LAX`
 - Great-circle arc rendering with antimeridian handling
 - Support for single routes, multiple routes, and multi-leg journeys
+- Globe-based satellite orbit overlays with ground tracks and animated markers
+- Custom satellite SVG marker support for orbital visualizations
 - Optional airport labels, hover states, and route animation
 - Built-in airport registry with `code`, `name`, `city`, `country`, `latitude`, and `longitude`
 
 ## Install
 
-Add `flightcn` from the shadcn registry:
+### Flight
+
+Add the flight components from the shadcn registry:
 
 ```bash
 npx shadcn@latest add @flightcn/flight
@@ -30,9 +34,21 @@ Installed files:
 - `components/ui/flight-airports.ts`
 - `components/ui/flight-airports-utils.ts`
 
+### Satellite
+
+Add the satellite overlay component from the shadcn registry:
+
+```bash
+npx shadcn@latest add @flightcn/satellite
+```
+
+Installed files:
+
+- `components/ui/satellite-orbit.tsx`
+
 ## Quick Start
 
-Import `Map` from `mapcn` and `FlightRoute` from `flightcn`, then render a route with airport markers:
+After installing from the shadcn registry, import the generated local `Map` and `FlightRoute` components, then render a route with airport markers:
 
 ```tsx
 import { Map } from "@/components/ui/map";
@@ -67,6 +83,14 @@ Render multiple independent routes in one map. Use this when each route should r
 
 Render a single journey across multiple waypoints. Use this when one trip should connect several legs in sequence.
 
+### `SatelliteOrbit`
+
+Render a single globe-based orbital path with an animated satellite marker, ground track, and optional custom SVG icon.
+
+### `SatelliteOrbits`
+
+Render multiple orbital overlays from one dataset while sharing animation, connector, and label behavior.
+
 ## Airport Data
 
 The built-in dataset is sourced from [OurAirports](https://ourairports.com/data/) and bundled locally in this project.
@@ -82,8 +106,10 @@ Current `AirportInfo` fields:
 
 ## Docs
 
-- Main docs: [flightcn.yencheng.dev/docs](https://flightcn.yencheng.dev/docs)
-- Install guide: [flightcn.yencheng.dev/docs/install](https://flightcn.yencheng.dev/docs/install)
+- Flight docs: [flightcn.yencheng.dev/docs/flight](https://flightcn.yencheng.dev/docs/flight)
+- Satellite docs: [flightcn.yencheng.dev/docs/satellite](https://flightcn.yencheng.dev/docs/satellite)
+- Flight install guide: [flightcn.yencheng.dev/docs/install/flight](https://flightcn.yencheng.dev/docs/install/flight)
+- Satellite install guide: [flightcn.yencheng.dev/docs/install/satellite](https://flightcn.yencheng.dev/docs/install/satellite)
 - Registry homepage: [flightcn.yencheng.dev](https://flightcn.yencheng.dev)
 
 ## Local Development

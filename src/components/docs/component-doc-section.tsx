@@ -23,6 +23,13 @@ import {
 import { type ComponentDoc } from "./component-docs-config";
 import { DocsMapMountWhenVisible } from "./docs-map-mount-when-visible";
 import { PropsTable, type ControlMap } from "./props-table";
+import {
+  DEFAULT_SATELLITE_ORBIT_PLAYGROUND,
+  type SatelliteOrbitPlayground,
+} from "@/components/satellite/satellite-orbit-playground-controls";
+
+const SATELLITE_ICON_SVG_PLACEHOLDER =
+  '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\n  <path d="..." />\n</svg>';
 
 const DEFAULT_AIRPORT: AirportPlayground = {
   showLabel: true,
@@ -39,6 +46,8 @@ const DEFAULT_ROUTE_LIKE: FlightRouteLikePlayground = {
 };
 
 const FLIGHT_ROUTE_COLOR_LIGHT = "#0a0a0a";
+
+const noopViewportChange = () => {};
 const FLIGHT_ROUTE_COLOR_DARK = "#e8e8e8";
 
 function getThemeAwareRouteColor() {
@@ -183,8 +192,9 @@ function DocSectionShell({
               center: component.mapCenter,
               zoom,
             }}
-            onViewportChange={() => {}}
+            onViewportChange={noopViewportChange}
             styles={mapStyles}
+            projection={component.projection}
           >
             {renderComponentPreview(previewArgs)}
           </Map>
@@ -209,7 +219,7 @@ function DocSectionShell({
             {extraTable.title}
           </h4>
           <div className="mt-3">
-            <PropsTable props={extraTable.props} />
+            <PropsTable props={extraTable.props} controls={controls} />
           </div>
         </div>
       ))}
@@ -347,6 +357,321 @@ function FlightMultiRouteDocSection({
   );
 }
 
+function SatelliteOrbitDocSection({ component }: { component: ComponentDoc }) {
+  const themeColor = useThemeAwareRouteColor();
+  const [satellite, setSatellite] = useState<SatelliteOrbitPlayground>(
+    DEFAULT_SATELLITE_ORBIT_PLAYGROUND,
+  );
+
+  const previewArgs = useMemo<ComponentPreviewArgs>(
+    () => ({ id: "satellite-orbit", satellite }),
+    [satellite],
+  );
+
+  const snippet = useMemo(() => buildSnippet(previewArgs), [previewArgs]);
+
+  const controls = useMemo((): ControlMap => {
+    return {
+      inclination: {
+        kind: "number",
+        value: satellite.inclination,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, inclination: value })),
+        step: 0.5,
+      },
+      ascendingNode: {
+        kind: "number",
+        value: satellite.ascendingNode,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, ascendingNode: value })),
+        step: 1,
+      },
+      altitudePx: {
+        kind: "number",
+        value: satellite.altitudePx,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, altitudePx: value })),
+        step: 1,
+      },
+      orbitWidth: {
+        kind: "number",
+        value: satellite.orbitWidth,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, orbitWidth: value })),
+        step: 0.1,
+      },
+      groundTrackWidth: {
+        kind: "number",
+        value: satellite.groundTrackWidth,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, groundTrackWidth: value })),
+        step: 0.1,
+      },
+      orbitColor: {
+        kind: "color",
+        value: satellite.orbitColor || themeColor,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, orbitColor: value })),
+      },
+      orbitGlowColor: {
+        kind: "color",
+        value: satellite.orbitGlowColor || "#0f172a",
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, orbitGlowColor: value })),
+      },
+      groundTrackColor: {
+        kind: "color",
+        value: satellite.groundTrackColor || "#64748b",
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, groundTrackColor: value })),
+      },
+      satelliteConnectorColor: {
+        kind: "color",
+        value: satellite.satelliteConnectorColor || "#64748b",
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            satelliteConnectorColor: value,
+          })),
+      },
+      showGlow: {
+        kind: "select",
+        value: String(satellite.showGlow),
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, showGlow: value === "true" })),
+        options: ["true", "false"],
+      },
+      showConnector: {
+        kind: "select",
+        value: String(satellite.showConnector),
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            showConnector: value === "true",
+          })),
+        options: ["true", "false"],
+      },
+      orbitLineStyle: {
+        kind: "select",
+        value: satellite.orbitLineStyle,
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            orbitLineStyle: value as SatelliteOrbitPlayground["orbitLineStyle"],
+          })),
+        options: ["solid", "dash", "dot"],
+      },
+      groundTrackLineStyle: {
+        kind: "select",
+        value: satellite.groundTrackLineStyle,
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            groundTrackLineStyle:
+              value as SatelliteOrbitPlayground["groundTrackLineStyle"],
+          })),
+        options: ["solid", "dash", "dot"],
+      },
+      connectorLineStyle: {
+        kind: "select",
+        value: satellite.connectorLineStyle,
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            connectorLineStyle:
+              value as SatelliteOrbitPlayground["connectorLineStyle"],
+          })),
+        options: ["solid", "dash", "dot"],
+      },
+      animate: {
+        kind: "select",
+        value: String(satellite.animate),
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, animate: value === "true" })),
+        options: ["true", "false"],
+      },
+      duration: {
+        kind: "number",
+        value: satellite.duration,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, duration: value })),
+        step: 500,
+        disabled: !satellite.animate,
+      },
+      name: {
+        kind: "text",
+        value: satellite.name,
+        onChange: (value) => setSatellite((prev) => ({ ...prev, name: value })),
+      },
+      showLabel: {
+        kind: "select",
+        value: String(satellite.showLabel),
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, showLabel: value === "true" })),
+        options: ["true", "false"],
+      },
+      labelPosition: {
+        kind: "select",
+        value: satellite.labelPosition,
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            labelPosition: value as SatelliteOrbitPlayground["labelPosition"],
+          })),
+        options: ["top", "right", "bottom", "left"],
+        disabled: !satellite.showLabel,
+      },
+      satelliteIconSvg: {
+        kind: "textarea",
+        value: satellite.satelliteIconSvg,
+        onChange: (value) =>
+          setSatellite((prev) => ({ ...prev, satelliteIconSvg: value })),
+        placeholder: SATELLITE_ICON_SVG_PLACEHOLDER,
+      },
+      satelliteIconRotationOffset: {
+        kind: "number",
+        value: satellite.satelliteIconRotationOffset,
+        onChange: (value) =>
+          setSatellite((prev) => ({
+            ...prev,
+            satelliteIconRotationOffset: value,
+          })),
+        step: 1,
+      },
+    };
+  }, [satellite, themeColor]);
+
+  return (
+    <DocSectionShell
+      component={component}
+      snippet={snippet}
+      controls={controls}
+      previewArgs={previewArgs}
+    />
+  );
+}
+
+function SatelliteOrbitsDocSection({ component }: { component: ComponentDoc }) {
+  const [satellites, setSatellites] = useState<SatelliteOrbitPlayground>(
+    DEFAULT_SATELLITE_ORBIT_PLAYGROUND,
+  );
+
+  const previewArgs = useMemo<ComponentPreviewArgs>(
+    () => ({ id: "satellite-orbits", satellites }),
+    [satellites],
+  );
+
+  const snippet = useMemo(() => buildSnippet(previewArgs), [previewArgs]);
+
+  const controls = useMemo((): ControlMap => {
+    return {
+      duration: {
+        kind: "number",
+        value: satellites.duration,
+        onChange: (value) =>
+          setSatellites((prev) => ({ ...prev, duration: value })),
+        step: 500,
+        disabled: !satellites.animate,
+      },
+      altitudePx: {
+        kind: "number",
+        value: satellites.altitudePx,
+        onChange: (value) =>
+          setSatellites((prev) => ({ ...prev, altitudePx: value })),
+        step: 1,
+      },
+      satelliteConnectorColor: {
+        kind: "color",
+        value: satellites.satelliteConnectorColor || "#64748b",
+        onChange: (value) =>
+          setSatellites((prev) => ({
+            ...prev,
+            satelliteConnectorColor: value,
+          })),
+      },
+      satelliteIconSvg: {
+        kind: "textarea",
+        value: satellites.satelliteIconSvg,
+        onChange: (value) =>
+          setSatellites((prev) => ({ ...prev, satelliteIconSvg: value })),
+        placeholder: SATELLITE_ICON_SVG_PLACEHOLDER,
+      },
+      satelliteIconRotationOffset: {
+        kind: "number",
+        value: satellites.satelliteIconRotationOffset,
+        onChange: (value) =>
+          setSatellites((prev) => ({
+            ...prev,
+            satelliteIconRotationOffset: value,
+          })),
+        step: 1,
+      },
+      showGlow: {
+        kind: "select",
+        value: String(satellites.showGlow),
+        onChange: (value) =>
+          setSatellites((prev) => ({ ...prev, showGlow: value === "true" })),
+        options: ["true", "false"],
+      },
+      showConnector: {
+        kind: "select",
+        value: String(satellites.showConnector),
+        onChange: (value) =>
+          setSatellites((prev) => ({
+            ...prev,
+            showConnector: value === "true",
+          })),
+        options: ["true", "false"],
+      },
+      connectorLineStyle: {
+        kind: "select",
+        value: satellites.connectorLineStyle,
+        onChange: (value) =>
+          setSatellites((prev) => ({
+            ...prev,
+            connectorLineStyle:
+              value as SatelliteOrbitPlayground["connectorLineStyle"],
+          })),
+        options: ["solid", "dash", "dot"],
+      },
+      animate: {
+        kind: "select",
+        value: String(satellites.animate),
+        onChange: (value) =>
+          setSatellites((prev) => ({ ...prev, animate: value === "true" })),
+        options: ["true", "false"],
+      },
+      showLabel: {
+        kind: "select",
+        value: String(satellites.showLabel),
+        onChange: (value) =>
+          setSatellites((prev) => ({ ...prev, showLabel: value === "true" })),
+        options: ["true", "false"],
+      },
+      labelPosition: {
+        kind: "select",
+        value: satellites.labelPosition,
+        onChange: (value) =>
+          setSatellites((prev) => ({
+            ...prev,
+            labelPosition: value as SatelliteOrbitPlayground["labelPosition"],
+          })),
+        options: ["top", "right", "bottom", "left"],
+        disabled: !satellites.showLabel,
+      },
+    };
+  }, [satellites]);
+
+  return (
+    <DocSectionShell
+      component={component}
+      snippet={snippet}
+      controls={controls}
+      previewArgs={previewArgs}
+    />
+  );
+}
+
 export function ComponentDocSection({
   component,
 }: {
@@ -361,5 +686,9 @@ export function ComponentDocSection({
       return <FlightRoutesDocSection component={component} />;
     case "flight-multi-route":
       return <FlightMultiRouteDocSection component={component} />;
+    case "satellite-orbit":
+      return <SatelliteOrbitDocSection component={component} />;
+    case "satellite-orbits":
+      return <SatelliteOrbitsDocSection component={component} />;
   }
 }

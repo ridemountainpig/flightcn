@@ -1,3 +1,4 @@
+import type { ProductKey } from "@/components/product-switcher";
 import { type FlightRouteData } from "@/registry/flight";
 import { airports, type AirportInfo } from "@/registry/flight-airports";
 
@@ -6,7 +7,15 @@ export const mapStyles = {
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
 } as const;
 
-export const installCommand = "npx shadcn@latest add @flightcn/flight";
+export const flightInstallCommand = "npx shadcn@latest add @flightcn/flight";
+export const satelliteInstallCommand =
+  "npx shadcn@latest add @flightcn/satellite";
+export const installCommand = flightInstallCommand;
+
+export const installCommandByProduct: Record<ProductKey, string> = {
+  flight: flightInstallCommand,
+  satellite: satelliteInstallCommand,
+};
 
 export const routeExamples: readonly FlightRouteData[] = [
   { from: "TPE", to: "HND", tripType: "round-trip" },
@@ -35,7 +44,7 @@ export const featuredAirportsForSearch: AirportInfo[] =
     (a): a is AirportInfo => a != null,
   );
 
-export type ExampleId =
+export type FlightExampleId =
   | "airport-dot"
   | "flight-route"
   | "route-hover"
@@ -43,6 +52,13 @@ export type ExampleId =
   | "multiple-leg"
   | "animation"
   | "globe";
+
+export type SatelliteExampleId =
+  | "satellite-orbit"
+  | "satellite-orbits"
+  | "satellite-custom-icon";
+
+export type ExampleId = FlightExampleId | SatelliteExampleId;
 
 export type ExampleConfig = {
   id: ExampleId;
@@ -56,7 +72,7 @@ export type ExampleConfig = {
   projection?: { type: "globe" };
 };
 
-export const exampleConfigs: readonly ExampleConfig[] = [
+export const flightExamples: readonly ExampleConfig[] = [
   {
     id: "airport-dot",
     label: "Airport Markers",
@@ -191,3 +207,213 @@ export const exampleConfigs: readonly ExampleConfig[] = [
     projection: { type: "globe" },
   },
 ];
+
+export const satelliteExamples: readonly ExampleConfig[] = [
+  {
+    id: "satellite-orbit",
+    label: "Single Orbit",
+    eyebrow: "Globe Overlay",
+    title: "Animated orbital overlay on the globe",
+    description:
+      "Render an orbital path, ground track, and animated satellite marker to present space or telecom coverage scenarios alongside the mapcn globe.",
+    code: `<Map projection={{ type: "globe" }}>
+  <SatelliteOrbit
+    inclination={51.6}
+    ascendingNode={-28}
+    name="ISS"
+    showLabel
+    animate={{ duration: 12000 }}
+  />
+</Map>`,
+    center: [8, 16],
+    zoom: 1.05,
+    projection: { type: "globe" },
+  },
+  {
+    id: "satellite-orbits",
+    label: "Multiple Orbits",
+    eyebrow: "Orbit Dataset",
+    title: "Multiple orbits from one dataset",
+    description:
+      "Render a constellation of orbital paths from a single array; animation, labels, and marker styling stay shared while each orbit can override inclination and ascending node.",
+    code: `<Map projection={{ type: "globe" }}>
+  <SatelliteOrbits
+    orbits={[
+      { inclination: 51.6, ascendingNode: -28, name: "ISS" },
+      { inclination: 97.4, ascendingNode: 38, name: "NOAA-20" },
+      { inclination: 53, ascendingNode: -120, name: "Starlink" },
+    ]}
+    showLabel
+    animate={{ duration: 12000 }}
+  />
+</Map>`,
+    center: [8, 16],
+    zoom: 1.05,
+    projection: { type: "globe" },
+  },
+  {
+    id: "satellite-custom-icon",
+    label: "Custom Icon",
+    eyebrow: "SVG Icon",
+    title: "Render two custom SVG satellites",
+    description:
+      "Use separate SVG markers per orbit so the same globe scene can mix an ISS silhouette with an asteroid icon instead of reusing one shared marker.",
+    code: `<Map projection={{ type: "globe" }}>
+  <SatelliteOrbit
+    inclination={46}
+    ascendingNode={10}
+    name="ISS"
+    showLabel
+    animate={{ duration: 8000 }}
+    satelliteIconSvg={issSvg}
+    satelliteIconRotationOffset={-90}
+  />
+  <SatelliteOrbit
+    inclination={-18}
+    ascendingNode={116}
+    name="Asteroid"
+    showLabel
+    animate={{ duration: 10000 }}
+    satelliteIconSvg={asteroidSvg}
+  />
+</Map>`,
+    center: [58, 12],
+    zoom: 1.05,
+    projection: { type: "globe" },
+  },
+];
+
+export const examplesByProduct: Record<ProductKey, readonly ExampleConfig[]> = {
+  flight: flightExamples,
+  satellite: satelliteExamples,
+};
+
+export const exampleConfigs: readonly ExampleConfig[] = [
+  ...flightExamples,
+  ...satelliteExamples,
+];
+
+export type HeroCopy = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  ctaPrimary: string;
+  ctaSecondary: string;
+};
+
+export const heroCopy: Record<ProductKey, HeroCopy> = {
+  flight: {
+    eyebrow: "flightcn + mapcn",
+    title: "Build flight route maps for mapcn and MapLibre.",
+    subtitle:
+      "Render airport markers, great-circle paths, and multi-leg journeys from IATA codes with the flightcn component set.",
+    ctaPrimary: "Get Started",
+    ctaSecondary: "View Docs",
+  },
+  satellite: {
+    eyebrow: "flightcn + mapcn",
+    title: "Render orbital overlays on the mapcn globe.",
+    subtitle:
+      "Drop animated orbits, ground tracks, and custom satellite markers onto a MapLibre globe projection with the flightcn satellite component.",
+    ctaPrimary: "Get Started",
+    ctaSecondary: "View Docs",
+  },
+};
+
+export type ShowcaseCopy = {
+  eyebrow: string;
+  title: string;
+  description: string;
+};
+
+export const showcaseCopy: Record<ProductKey, ShowcaseCopy> = {
+  flight: {
+    eyebrow: "Live Examples",
+    title: "Preview airport markers, routes, and multi-leg flight paths",
+    description:
+      "Explore real flightcn usage patterns before installing the component into your own mapcn project.",
+  },
+  satellite: {
+    eyebrow: "Live Examples",
+    title: "Preview orbital paths, ground tracks, and animated satellites",
+    description:
+      "Explore real satellite overlay patterns on the mapcn globe before installing the component into your own project.",
+  },
+};
+
+export type InstallStepsCopy = {
+  heroTitle: string;
+  heroSubtitle: string;
+  step1Title: string;
+  step1Description: string;
+  step2ImportCode: string;
+  step3Title: string;
+  step3RenderCode: string;
+  docsHref: string;
+  docsLabel: string;
+  crossLinkHref: string;
+  crossLinkLabel: string;
+  crossLinkPrefix: string;
+};
+
+export const installSteps: Record<ProductKey, InstallStepsCopy> = {
+  flight: {
+    heroTitle: "Flight Install Guide",
+    heroSubtitle: "Install the route components for mapcn + flightcn",
+    step1Title: "Install the flight components",
+    step1Description:
+      "Use `shadcn add` to pull the flight route components into your current project.",
+    step2ImportCode: `import { Map } from "@/components/ui/map";
+import { FlightRoute } from "@/components/ui/flight";`,
+    step3Title: "Render your first route",
+    step3RenderCode: `export default function Demo() {
+  return (
+    <div className="h-screen w-screen">
+      <Map className="h-full w-full" center={[121.5, 25]} zoom={3}>
+        <FlightRoute from="TPE" to="LAX" showAirports showLabel />
+      </Map>
+    </div>
+  );
+}`,
+    docsHref: "/docs/flight",
+    docsLabel: "flight docs page",
+    crossLinkHref: "/docs/install/satellite",
+    crossLinkLabel: "satellite install guide",
+    crossLinkPrefix: "Need the orbital overlay instead? See the",
+  },
+  satellite: {
+    heroTitle: "Satellite Install Guide",
+    heroSubtitle: "Install the orbital overlay component for mapcn",
+    step1Title: "Install the satellite component",
+    step1Description:
+      "Use `shadcn add` to pull the `SatelliteOrbit` component into your current project.",
+    step2ImportCode: `import { Map } from "@/components/ui/map";
+import { SatelliteOrbit } from "@/components/ui/satellite-orbit";`,
+    step3Title: "Render your first orbit",
+    step3RenderCode: `export default function Demo() {
+  return (
+    <div className="h-screen w-screen">
+      <Map
+        className="h-full w-full"
+        projection={{ type: "globe" }}
+        center={[8, 16]}
+        zoom={1.05}
+      >
+        <SatelliteOrbit
+          inclination={51.6}
+          ascendingNode={-28}
+          name="ISS"
+          showLabel
+          animate={{ duration: 12000 }}
+        />
+      </Map>
+    </div>
+  );
+}`,
+    docsHref: "/docs/satellite",
+    docsLabel: "satellite docs page",
+    crossLinkHref: "/docs/install/flight",
+    crossLinkLabel: "flight install guide",
+    crossLinkPrefix: "Need the route components instead? See the",
+  },
+};

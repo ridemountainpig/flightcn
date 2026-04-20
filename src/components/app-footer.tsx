@@ -1,8 +1,15 @@
 import Link from "next/link";
 
-export function AppFooter() {
+import { cn } from "@/lib/utils";
+
+export function AppFooter({ className }: { className?: string } = {}) {
   return (
-    <footer className="mt-14 border-t border-black/8 py-6 sm:mt-16 sm:py-8">
+    <footer
+      className={cn(
+        "mt-14 border-t border-black/8 py-6 sm:mt-16 sm:py-8",
+        className,
+      )}
+    >
       <div className="flex flex-col gap-3 px-1 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
         <p className="text-sm tracking-wide text-slate-500">
           <span className="font-semibold text-slate-900">flightcn</span>
@@ -18,14 +25,29 @@ export function AppFooter() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-slate-500 sm:justify-end">
-          <Link href="/docs" className="transition-colors hover:text-slate-900">
-            Documentation
-          </Link>
           <Link
-            href="/docs/install"
+            href="/docs/flight"
             className="transition-colors hover:text-slate-900"
           >
-            Install Guide
+            Flight Docs
+          </Link>
+          <Link
+            href="/docs/satellite"
+            className="transition-colors hover:text-slate-900"
+          >
+            Satellite Docs
+          </Link>
+          <Link
+            href="/docs/install/flight"
+            className="transition-colors hover:text-slate-900"
+          >
+            Flight Install
+          </Link>
+          <Link
+            href="/docs/install/satellite"
+            className="transition-colors hover:text-slate-900"
+          >
+            Satellite Install
           </Link>
           <a
             href="https://www.mapcn.dev/"

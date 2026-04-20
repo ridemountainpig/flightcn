@@ -27,6 +27,20 @@
           "target": "components/ui/flight-airports-utils.ts"
         }
       ]
+    },
+    {
+      "name": "satellite",
+      "type": "registry:ui",
+      "title": "Satellite",
+      "description": "A globe-based satellite orbit overlay with animated motion, ground tracks, and custom SVG marker support.",
+      "registryDependencies": ["https://mapcn.dev/r/map.json"],
+      "files": [
+        {
+          "path": "src/registry/satellite-orbit.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/satellite-orbit.tsx"
+        }
+      ]
     }
   ]
 }

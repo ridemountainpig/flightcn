@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 
-import { AirportSearchSection } from "@/components/home/airport-search-section";
 import { AppFooter } from "@/components/app-footer";
-import { HeroSection } from "@/components/home/hero-section";
-import { ShowcaseSection } from "@/components/home/showcase-section";
 import { AppHeader } from "@/components/app-header";
+import { HomeExperience } from "@/components/home/home-experience";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   buildBreadcrumbJsonLd,
@@ -14,11 +12,17 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Flight Route Components for mapcn",
+  title: "Flight Route & Satellite Orbit Components for mapcn",
   description:
-    "Build MapLibre flight route maps with airport markers, animated paths, and an IATA airport dataset using the flightcn shadcn registry package.",
+    "Build MapLibre flight route maps and orbital overlays with airport markers, animated paths, an IATA airport dataset, and satellite orbits using the flightcn shadcn registry package.",
   path: "/",
-  keywords: ["MapLibre flight routes", "airport markers", "React flight map"],
+  keywords: [
+    "MapLibre flight routes",
+    "airport markers",
+    "React flight map",
+    "MapLibre satellite orbit",
+    "mapcn satellite overlay",
+  ],
 });
 
 const homeJsonLd = [
@@ -43,6 +47,10 @@ const homeJsonLd = [
       price: "0",
       priceCurrency: "USD",
     },
+    featureList: [
+      "Flight route components (airport markers, great-circle routes, multi-leg journeys)",
+      "Satellite orbit overlays (orbital paths, ground tracks, animated satellites)",
+    ],
   },
   buildBreadcrumbJsonLd([{ name: "Home", path: "/" }]),
 ];
@@ -54,11 +62,9 @@ export default function Home() {
       <div className="mx-auto max-w-[1520px] px-4 py-6 sm:px-6 lg:px-8">
         <AppHeader
           title="flightcn"
-          subtitle="Flight route visualizations for mapcn"
+          subtitle="Flight route and satellite overlay visualizations for mapcn"
         />
-        <HeroSection />
-        <ShowcaseSection />
-        <AirportSearchSection />
+        <HomeExperience />
         <AppFooter />
       </div>
     </main>

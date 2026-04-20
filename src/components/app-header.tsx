@@ -36,14 +36,14 @@ export function AppHeader({
           <Link
             href="/"
             aria-label="Go to homepage"
-            className="bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-lg shadow-lg sm:size-11"
+            className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-lg shadow-lg sm:size-11"
           >
             <Image
               src="/favicon.ico"
               alt="flightcn icon"
               width={24}
               height={24}
-              className="h-5 w-5 sm:h-7 sm:w-7"
+              className="h-5 w-5 shrink-0 object-contain sm:h-7 sm:w-7"
             />
           </Link>
           <div className="min-w-0">

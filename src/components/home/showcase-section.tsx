@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 
 import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
@@ -11,13 +11,16 @@ import {
   FlightRoute,
   FlightRoutes,
 } from "@/registry/flight";
+import { SatelliteOrbit, SatelliteOrbits } from "@/registry/satellite-orbit";
 import {
-  exampleConfigs,
+  examplesByProduct,
   mapStyles,
   routeExamples,
+  showcaseCopy,
   type ExampleConfig,
   type ExampleId,
 } from "@/components/home/home-config";
+import type { ProductKey } from "@/components/product-switcher";
 import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
 
 const sectionReveal = {
@@ -33,6 +36,73 @@ const childReveal = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0, transition: { duration: 0.45 } },
 };
+
+const CUSTOM_SATELLITE_SVG_PATHS = {
+  asteroid: "/showcase/asteroid.svg",
+  iss: "/showcase/international-space-station.svg",
+} as const;
+
+function CustomSatellitePairExample() {
+  const [svgIcons, setSvgIcons] = useState<{
+    asteroid?: string;
+    iss?: string;
+  }>({});
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadSvgIcons() {
+      try {
+        const [asteroid, iss] = await Promise.all([
+          fetch(CUSTOM_SATELLITE_SVG_PATHS.asteroid).then((response) =>
+            response.text(),
+          ),
+          fetch(CUSTOM_SATELLITE_SVG_PATHS.iss).then((response) =>
+            response.text(),
+          ),
+        ]);
+
+        if (!isCancelled) {
+          setSvgIcons({ asteroid, iss });
+        }
+      } catch {
+        if (!isCancelled) {
+          setSvgIcons({});
+        }
+      }
+    }
+
+    void loadSvgIcons();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  return (
+    <>
+      <SatelliteOrbit
+        inclination={46}
+        ascendingNode={10}
+        name="ISS"
+        showLabel
+        labelPosition="right"
+        animate={{ duration: 8000 }}
+        satelliteIconSvg={svgIcons.iss}
+        satelliteIconRotationOffset={-90}
+      />
+      <SatelliteOrbit
+        inclination={-18}
+        ascendingNode={116}
+        name="Asteroid"
+        showLabel
+        labelPosition="left"
+        animate={{ duration: 10000 }}
+        satelliteIconSvg={svgIcons.asteroid}
+      />
+    </>
+  );
+}
 
 function renderExample(exampleId: ExampleId): ReactNode {
   switch (exampleId) {
@@ -90,6 +160,30 @@ function renderExample(exampleId: ExampleId): ReactNode {
       );
     case "globe":
       return <FlightRoute from="CDG" to="SYD" showAirports showLabel />;
+    case "satellite-orbit":
+      return (
+        <SatelliteOrbit
+          inclination={51.6}
+          ascendingNode={-28}
+          name="ISS"
+          showLabel
+          animate={{ duration: 12000 }}
+        />
+      );
+    case "satellite-orbits":
+      return (
+        <SatelliteOrbits
+          orbits={[
+            { inclination: 51.6, ascendingNode: -28, name: "ISS" },
+            { inclination: 97.4, ascendingNode: 38, name: "NOAA-20" },
+            { inclination: 53, ascendingNode: -120, name: "Starlink" },
+          ]}
+          showLabel
+          animate={{ duration: 12000 }}
+        />
+      );
+    case "satellite-custom-icon":
+      return <CustomSatellitePairExample />;
     default:
       return null;
   }
@@ -187,9 +281,11 @@ function ExamplePreview({
 }
 
 function ExampleSelector({
+  examples,
   selectedExample,
   onSelect,
 }: {
+  examples: readonly ExampleConfig[];
   selectedExample: ExampleConfig;
   onSelect: (exampleId: ExampleId) => void;
 }) {
@@ -203,11 +299,11 @@ function ExampleSelector({
           Examples
         </p>
         <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
-          {exampleConfigs.length}
+          {examples.length}
         </span>
       </div>
       <div className="space-y-2 px-1 sm:px-1">
-        {exampleConfigs.map((example) => {
+        {examples.map((example) => {
           const isActive = example.id === selectedExample.id;
 
           return (
@@ -248,21 +344,18 @@ function ExampleSelector({
   );
 }
 
-export function ShowcaseSection() {
-  const initialExample = exampleConfigs[0];
+export function ShowcaseSection({ product }: { product: ProductKey }) {
+  const examples = useMemo(() => examplesByProduct[product], [product]);
   const [selectedExampleId, setSelectedExampleId] = useState<ExampleId>(
-    initialExample.id,
+    examples[0].id,
   );
+
   const selectedExample =
-    exampleConfigs.find((example) => example.id === selectedExampleId) ??
-    initialExample;
+    examples.find((example) => example.id === selectedExampleId) ?? examples[0];
+  const copy = showcaseCopy[product];
 
   const handleSelectExample = (exampleId: ExampleId) => {
-    const nextExample =
-      exampleConfigs.find((example) => example.id === exampleId) ??
-      initialExample;
-
-    setSelectedExampleId(nextExample.id);
+    setSelectedExampleId(exampleId);
   };
 
   return (
@@ -276,14 +369,13 @@ export function ShowcaseSection() {
     >
       <motion.div className="mb-4 px-1" variants={childReveal}>
         <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-          Live Examples
+          {copy.eyebrow}
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          Preview airport markers, routes, and multi-leg flight paths
+          {copy.title}
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-          Explore real flightcn usage patterns before installing the component
-          into your own mapcn project.
+          {copy.description}
         </p>
       </motion.div>
 
@@ -294,6 +386,7 @@ export function ShowcaseSection() {
         >
           <ExamplePreview selectedExample={selectedExample} />
           <ExampleSelector
+            examples={examples}
             selectedExample={selectedExample}
             onSelect={handleSelectExample}
           />
