@@ -350,6 +350,10 @@ export function ShowcaseSection({ product }: { product: ProductKey }) {
     examples[0].id,
   );
 
+  useEffect(() => {
+    setSelectedExampleId(examples[0].id);
+  }, [product, examples]);
+
   const selectedExample =
     examples.find((example) => example.id === selectedExampleId) ?? examples[0];
   const copy = showcaseCopy[product];

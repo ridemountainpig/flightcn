@@ -10,8 +10,6 @@ export const mapStyles = {
 export const flightInstallCommand = "npx shadcn@latest add @flightcn/flight";
 export const satelliteInstallCommand =
   "npx shadcn@latest add @flightcn/satellite";
-export const installCommand = flightInstallCommand;
-
 export const installCommandByProduct: Record<ProductKey, string> = {
   flight: flightInstallCommand,
   satellite: satelliteInstallCommand,
