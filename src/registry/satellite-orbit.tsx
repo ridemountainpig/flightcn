@@ -417,7 +417,10 @@ type SatelliteOrbitInnerProps = Omit<
   | "groundTrackColor"
   | "satelliteConnectorColor"
 > &
-  ResolvedSatelliteColors;
+  ResolvedSatelliteColors & {
+    frameNow?: number;
+    viewportTick?: number;
+  };
 
 export type SatelliteOrbitData = {
   inclination?: number;
@@ -753,6 +756,8 @@ function SatelliteOrbitInner({
   name,
   showLabel = true,
   labelPosition = "right",
+  frameNow: frameNowProp,
+  viewportTick: viewportTickProp,
 }: SatelliteOrbitInnerProps & {
   name?: string;
   showLabel?: boolean;
@@ -764,10 +769,13 @@ function SatelliteOrbitInner({
   const effectiveDuration =
     animate !== true && animate ? (animate.duration ?? duration) : duration;
 
-  const [frameNow, setFrameNow] = useState(() =>
+  const [frameNowLocal, setFrameNowLocal] = useState(() =>
     typeof performance === "undefined" ? 0 : performance.now(),
   );
-  const [viewportTick, setViewportTick] = useState(0);
+  const [viewportTickLocal, setViewportTickLocal] = useState(0);
+
+  const frameNow = frameNowProp ?? frameNowLocal;
+  const viewportTick = viewportTickProp ?? viewportTickLocal;
 
   const orbitCoordinates = useMemo(
     () => buildOrbitCoordinates(samples, inclination, ascendingNode),
@@ -775,13 +783,13 @@ function SatelliteOrbitInner({
   );
 
   useEffect(() => {
-    if (!isAnimating) return;
+    if (!isAnimating || frameNowProp !== undefined) return;
 
     let animationFrame = 0;
 
     const loop = (now: number) => {
       startTransition(() => {
-        setFrameNow(now);
+        setFrameNowLocal(now);
       });
       animationFrame = window.requestAnimationFrame(loop);
     };
@@ -791,14 +799,14 @@ function SatelliteOrbitInner({
     return () => {
       window.cancelAnimationFrame(animationFrame);
     };
-  }, [isAnimating]);
+  }, [isAnimating, frameNowProp]);
 
   useEffect(() => {
-    if (!map || !isLoaded) return;
+    if (!map || !isLoaded || viewportTickProp !== undefined) return;
 
     const rerender = () => {
       startTransition(() => {
-        setViewportTick((current) => current + 1);
+        setViewportTickLocal((current) => current + 1);
       });
     };
 
@@ -811,7 +819,7 @@ function SatelliteOrbitInner({
         map.off(eventName, rerender);
       }
     };
-  }, [isLoaded, map]);
+  }, [isLoaded, map, viewportTickProp]);
 
   const orbitFrame = useMemo(() => {
     if (!map || !isLoaded) return null;
@@ -944,10 +952,57 @@ function SatelliteOrbits({
   showLabel = true,
   labelPosition = "right",
 }: SatelliteOrbitsProps) {
+  const { map, isLoaded } = useMap();
   const mapTheme = useSatelliteMapTheme();
   const sharedSatelliteColors = resolveOrbitColors(mapTheme, {
     satelliteConnectorColor,
   });
+
+  const isAnimating = Boolean(animate);
+
+  const [frameNow, setFrameNow] = useState(() =>
+    typeof performance === "undefined" ? 0 : performance.now(),
+  );
+  const [viewportTick, setViewportTick] = useState(0);
+
+  useEffect(() => {
+    if (!isAnimating) return;
+
+    let animationFrame = 0;
+
+    const loop = (now: number) => {
+      startTransition(() => {
+        setFrameNow(now);
+      });
+      animationFrame = window.requestAnimationFrame(loop);
+    };
+
+    animationFrame = window.requestAnimationFrame(loop);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+    };
+  }, [isAnimating]);
+
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+
+    const rerender = () => {
+      startTransition(() => {
+        setViewportTick((current) => current + 1);
+      });
+    };
+
+    for (const eventName of VIEWPORT_EVENTS) {
+      map.on(eventName, rerender);
+    }
+
+    return () => {
+      for (const eventName of VIEWPORT_EVENTS) {
+        map.off(eventName, rerender);
+      }
+    };
+  }, [isLoaded, map]);
 
   return (
     <>
@@ -979,6 +1034,8 @@ function SatelliteOrbits({
           name={orbit.name}
           showLabel={showLabel}
           labelPosition={labelPosition}
+          frameNow={frameNow}
+          viewportTick={viewportTick}
         />
       ))}
     </>
