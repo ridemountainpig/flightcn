@@ -219,7 +219,7 @@ function DocSectionShell({
             {extraTable.title}
           </h4>
           <div className="mt-3">
-            <PropsTable props={extraTable.props} controls={controls} />
+            <PropsTable props={extraTable.props} />
           </div>
         </div>
       ))}
