@@ -4,13 +4,12 @@ import {
   FlightRoute,
   FlightRoutes,
 } from "@/registry/flight";
-import { SatelliteOrbits } from "@/registry/satellite-orbit";
+import { SatelliteOrbit, SatelliteOrbits } from "@/registry/satellite-orbit";
 import {
   buildSatelliteOrbitProps,
   buildSatelliteOrbitSnippet,
   type SatelliteOrbitPlayground,
 } from "@/components/satellite/satellite-orbit-playground-controls";
-import { SatelliteOrbit } from "@/registry/satellite-orbit";
 
 export type AirportPlayground = {
   showLabel: boolean;
