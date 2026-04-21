@@ -84,7 +84,10 @@ export function ColorInput({
       <input
         value={isEditing ? draft : value}
         aria-label={ariaLabel}
-        onFocus={() => setIsEditing(true)}
+        onFocus={() => {
+          setDraft(value);
+          setIsEditing(true);
+        }}
         onChange={(event) => setDraft(event.currentTarget.value)}
         onBlur={() => {
           commitDraft();
