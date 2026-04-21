@@ -36,7 +36,7 @@ export function AppHeader({
           <Link
             href="/"
             aria-label="Go to homepage"
-            className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-lg shadow-lg sm:size-11"
+            className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black text-white shadow-lg sm:size-11"
           >
             <Image
               src="/favicon.ico"
