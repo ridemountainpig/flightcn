@@ -163,6 +163,7 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
           animate={sharedProps.animate}
           showLabel={sharedProps.showLabel}
           labelPosition={sharedProps.labelPosition}
+          satelliteIconRotationOffset={sharedProps.satelliteIconRotationOffset}
         />
       );
     }
@@ -244,6 +245,9 @@ ${buildRouteLikeSnippetLines(
         }}`,
         `    showLabel={${satellites.showLabel}}`,
         `    labelPosition="${satellites.labelPosition}"`,
+        satellites.satelliteIconRotationOffset !== undefined
+          ? `    satelliteIconRotationOffset={${satellites.satelliteIconRotationOffset}}`
+          : null,
       ]
         .filter((line): line is string => line !== null)
         .join("\n");

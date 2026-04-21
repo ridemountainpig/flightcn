@@ -346,13 +346,15 @@ function ExampleSelector({
 
 export function ShowcaseSection({ product }: { product: ProductKey }) {
   const examples = useMemo(() => examplesByProduct[product], [product]);
+  const [selectedProduct, setSelectedProduct] = useState(product);
   const [selectedExampleId, setSelectedExampleId] = useState<ExampleId>(
     examples[0].id,
   );
 
-  useEffect(() => {
+  if (selectedProduct !== product) {
+    setSelectedProduct(product);
     setSelectedExampleId(examples[0].id);
-  }, [product, examples]);
+  }
 
   const selectedExample =
     examples.find((example) => example.id === selectedExampleId) ?? examples[0];

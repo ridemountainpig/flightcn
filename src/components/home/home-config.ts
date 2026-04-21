@@ -286,11 +286,6 @@ export const examplesByProduct: Record<ProductKey, readonly ExampleConfig[]> = {
   satellite: satelliteExamples,
 };
 
-export const exampleConfigs: readonly ExampleConfig[] = [
-  ...flightExamples,
-  ...satelliteExamples,
-];
-
 export type HeroCopy = {
   eyebrow: string;
   title: string;
