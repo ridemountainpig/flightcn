@@ -4,6 +4,12 @@ import {
   FlightRoute,
   FlightRoutes,
 } from "@/registry/flight";
+import { SatelliteOrbit, SatelliteOrbits } from "@/registry/satellite-orbit";
+import {
+  buildSatelliteOrbitProps,
+  buildSatelliteOrbitSnippet,
+  type SatelliteOrbitPlayground,
+} from "@/components/satellite/satellite-orbit-playground-controls";
 
 export type AirportPlayground = {
   showLabel: boolean;
@@ -42,7 +48,9 @@ export type ComponentPreviewArgs =
   | { id: "flight-airport"; airport: AirportPlayground }
   | { id: "flight-route"; route: FlightRouteLikePlayground }
   | { id: "flight-routes"; routes: FlightRouteLikePlayground }
-  | { id: "flight-multi-route"; multiRoute: FlightRouteLikePlayground };
+  | { id: "flight-multi-route"; multiRoute: FlightRouteLikePlayground }
+  | { id: "satellite-orbit"; satellite: SatelliteOrbitPlayground }
+  | { id: "satellite-orbits"; satellites: SatelliteOrbitPlayground };
 
 export function renderComponentPreview(args: ComponentPreviewArgs) {
   switch (args.id) {
@@ -110,6 +118,54 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
           lineStyle={args.multiRoute.lineStyle}
         />
       );
+    case "satellite-orbit":
+      return <SatelliteOrbit {...buildSatelliteOrbitProps(args.satellite)} />;
+    case "satellite-orbits": {
+      const sharedProps = buildSatelliteOrbitProps(args.satellites);
+
+      return (
+        <SatelliteOrbits
+          orbits={[
+            {
+              inclination: 51.6,
+              ascendingNode: -28,
+              name: "ISS",
+              orbitColor: "#213448",
+              groundTrackColor: "#213448",
+            },
+            {
+              inclination: 97.4,
+              ascendingNode: 38,
+              name: "NOAA-20",
+              orbitColor: "#547792",
+              groundTrackColor: "#547792",
+            },
+            {
+              inclination: 53,
+              ascendingNode: -120,
+              name: "Starlink",
+              orbitColor: "#94B4C1",
+              groundTrackColor: "#94B4C1",
+            },
+          ]}
+          duration={
+            sharedProps.animate && sharedProps.animate !== true
+              ? sharedProps.animate.duration
+              : undefined
+          }
+          altitudePx={sharedProps.altitudePx}
+          satelliteConnectorColor={sharedProps.satelliteConnectorColor}
+          satelliteIconSvg={sharedProps.satelliteIconSvg}
+          showGlow={sharedProps.showGlow}
+          showConnector={sharedProps.showConnector}
+          connectorLineStyle={sharedProps.connectorLineStyle}
+          animate={sharedProps.animate}
+          showLabel={sharedProps.showLabel}
+          labelPosition={sharedProps.labelPosition}
+          satelliteIconRotationOffset={sharedProps.satelliteIconRotationOffset}
+        />
+      );
+    }
   }
 }
 
@@ -155,6 +211,49 @@ ${buildRouteLikeSnippetLines(
   multiRoute,
   multiRoute.animate ? "{ duration: 9000 }" : "false",
 )}
+  />
+</Map>`;
+    }
+    case "satellite-orbit": {
+      return buildSatelliteOrbitSnippet(args.satellite);
+    }
+    case "satellite-orbits": {
+      const satellites = args.satellites;
+      const sharedLines = [
+        `    orbits={[`,
+        `      { inclination: 51.6, ascendingNode: -28, name: "ISS" },`,
+        `      { inclination: 97.4, ascendingNode: 38, name: "NOAA-20" },`,
+        `      { inclination: 53, ascendingNode: -120, name: "Starlink" },`,
+        `    ]}`,
+        `    duration={${satellites.duration}}`,
+        `    altitudePx={${satellites.altitudePx}}`,
+        satellites.satelliteConnectorColor
+          ? `    satelliteConnectorColor="${satellites.satelliteConnectorColor}"`
+          : null,
+        satellites.satelliteIconSvg
+          ? `    satelliteIconSvg={\`${satellites.satelliteIconSvg
+              .replaceAll("\\", "\\\\")
+              .replaceAll("`", "\\`")
+              .replaceAll("${", "\\${")}\`}`
+          : null,
+        `    showGlow={${satellites.showGlow}}`,
+        `    showConnector={${satellites.showConnector}}`,
+        `    connectorLineStyle="${satellites.connectorLineStyle}"`,
+        `    animate={${
+          satellites.animate ? `{ duration: ${satellites.duration} }` : "false"
+        }}`,
+        `    showLabel={${satellites.showLabel}}`,
+        `    labelPosition="${satellites.labelPosition}"`,
+        satellites.satelliteIconRotationOffset !== undefined
+          ? `    satelliteIconRotationOffset={${satellites.satelliteIconRotationOffset}}`
+          : null,
+      ]
+        .filter((line): line is string => line !== null)
+        .join("\n");
+
+      return `<Map projection={{ type: "globe" }} center={[8, 16]} zoom={1.05}>
+  <SatelliteOrbits
+${sharedLines}
   />
 </Map>`;
     }

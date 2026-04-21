@@ -4,7 +4,7 @@ export const siteConfig = {
   name: "flightcn",
   url: "https://flightcn.yencheng.dev",
   description:
-    "Flight route visualization components for mapcn and MapLibre, with airport lookup, great-circle paths, and multi-leg route rendering from IATA codes.",
+    "Flight route and satellite orbit visualization components for mapcn and MapLibre, with airport lookup, great-circle paths, orbital overlays, and animated globe markers.",
   creator: {
     name: "ridemountainpig",
     url: "https://github.com/ridemountainpig",
@@ -18,7 +18,9 @@ export const defaultKeywords = [
   "mapcn",
   "MapLibre",
   "flight route visualization",
+  "satellite orbit visualization",
   "IATA airport codes",
+  "globe overlay",
   "shadcn registry",
   "React map components",
 ] as const;

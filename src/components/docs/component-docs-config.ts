@@ -10,12 +10,15 @@ export type ComponentDoc = {
     | "flight-airport"
     | "flight-route"
     | "flight-routes"
-    | "flight-multi-route";
+    | "flight-multi-route"
+    | "satellite-orbit"
+    | "satellite-orbits";
   name: string;
   description: string;
   snippet: string;
   mapCenter: [number, number];
   mapZoom: number;
+  projection?: { type: "globe" };
   props: readonly PropDoc[];
   extra?: {
     title: string;
@@ -469,4 +472,351 @@ export const componentDocs: readonly ComponentDoc[] = [
       },
     ],
   },
+] as const;
+
+export const satelliteComponentDoc: ComponentDoc = {
+  id: "satellite-orbit",
+  name: "SatelliteOrbit",
+  description:
+    "Renders a globe-based orbital path with an elevated satellite marker, ground track, and optional animated motion for space or telecom visualizations.",
+  snippet: `<Map projection={{ type: "globe" }} center={[8, 16]} zoom={1.05}>
+  <SatelliteOrbit
+    inclination={51.6}
+    ascendingNode={-28}
+    name="ISS"
+    showLabel
+    animate={{ duration: 12000 }}
+  />
+</Map>`,
+  mapCenter: [8, 16],
+  mapZoom: 1.05,
+  projection: { type: "globe" },
+  props: [
+    {
+      name: "inclination",
+      type: "number",
+      defaultValue: "62",
+      description: "Orbital inclination angle in degrees",
+    },
+    {
+      name: "ascendingNode",
+      type: "number",
+      defaultValue: "-28",
+      description: "Longitude of ascending node in degrees",
+    },
+    {
+      name: "altitudePx",
+      type: "number",
+      defaultValue: "28",
+      description: "Visual elevation of the satellite above the globe",
+    },
+    {
+      name: "orbitWidth",
+      type: "number",
+      defaultValue: "2.2",
+      description: "Orbit stroke width",
+    },
+    {
+      name: "groundTrackWidth",
+      type: "number",
+      defaultValue: "1.4",
+      description: "Ground track stroke width",
+    },
+    {
+      name: "orbitColor",
+      type: "string",
+      defaultValue: "theme-aware",
+      description: "Primary orbit stroke color",
+    },
+    {
+      name: "orbitGlowColor",
+      type: "string",
+      defaultValue: "theme-aware",
+      description: "Orbit glow halo color",
+    },
+    {
+      name: "groundTrackColor",
+      type: "string",
+      defaultValue: "theme-aware",
+      description: "Projected ground track color on the globe surface",
+    },
+    {
+      name: "satelliteConnectorColor",
+      type: "string",
+      defaultValue: "theme-aware",
+      description: "Connector and antenna detail color",
+    },
+    {
+      name: "showGlow",
+      type: "boolean",
+      defaultValue: "true",
+      description: "Whether to render the orbit glow and marker halo",
+    },
+    {
+      name: "showConnector",
+      type: "boolean",
+      defaultValue: "true",
+      description:
+        "Whether to draw the connector from globe surface to satellite",
+    },
+    {
+      name: "orbitLineStyle",
+      type: '"solid" | "dash" | "dot"',
+      defaultValue: '"solid"',
+      description: "Orbit path line style",
+    },
+    {
+      name: "groundTrackLineStyle",
+      type: '"solid" | "dash" | "dot"',
+      defaultValue: '"dash"',
+      description: "Ground track line style",
+    },
+    {
+      name: "connectorLineStyle",
+      type: '"solid" | "dash" | "dot"',
+      defaultValue: '"dash"',
+      description: "Connector line style",
+    },
+    {
+      name: "animate",
+      type: "boolean | SatelliteAnimationConfig",
+      defaultValue: "false",
+      description: "Enable orbital animation",
+    },
+    {
+      name: "duration",
+      type: "number",
+      defaultValue: "16000",
+      description: "Animation duration in milliseconds",
+    },
+    {
+      name: "name",
+      type: "string",
+      defaultValue: "-",
+      description: "Satellite label text",
+    },
+    {
+      name: "showLabel",
+      type: "boolean",
+      defaultValue: "true",
+      description: "Whether to show the satellite label",
+    },
+    {
+      name: "labelPosition",
+      type: '"top" | "bottom" | "left" | "right"',
+      defaultValue: '"right"',
+      description: "Satellite label anchor position",
+    },
+    {
+      name: "satelliteIconSvg",
+      type: "string",
+      defaultValue: "-",
+      description: "Custom satellite icon as an SVG string",
+    },
+    {
+      name: "satelliteIconRotationOffset",
+      type: "number",
+      defaultValue: "0",
+      description: "Rotation offset applied after automatic orbit alignment",
+    },
+  ],
+  extra: [
+    {
+      title: "SatelliteAnimationConfig",
+      props: [
+        {
+          name: "duration",
+          type: "number",
+          defaultValue: "16000",
+          description: "Animation duration in milliseconds",
+        },
+      ],
+    },
+  ],
+};
+
+export const satelliteOrbitsComponentDoc: ComponentDoc = {
+  id: "satellite-orbits",
+  name: "SatelliteOrbits",
+  description:
+    "Renders multiple orbital overlays on the same globe with shared animation and marker styling, while keeping per-orbit path configuration configurable in the orbit dataset.",
+  snippet: `<Map projection={{ type: "globe" }} center={[8, 16]} zoom={1.05}>
+  <SatelliteOrbits
+    orbits={[
+      { inclination: 51.6, ascendingNode: -28, name: "ISS" },
+      { inclination: 97.4, ascendingNode: 38, name: "NOAA-20" },
+      { inclination: 53, ascendingNode: -120, name: "Starlink" },
+    ]}
+    showLabel
+    animate={{ duration: 12000 }}
+  />
+</Map>`,
+  mapCenter: [8, 16],
+  mapZoom: 1.05,
+  projection: { type: "globe" },
+  props: [
+    {
+      name: "orbits",
+      type: "readonly SatelliteOrbitData[]",
+      defaultValue: "-",
+      description: "Orbit dataset array; each item defines one orbital path",
+    },
+    {
+      name: "duration",
+      type: "number",
+      defaultValue: "16000",
+      description: "Shared animation duration in milliseconds",
+    },
+    {
+      name: "samples",
+      type: "number",
+      defaultValue: "300",
+      description: "Shared orbit sampling density",
+    },
+    {
+      name: "altitudePx",
+      type: "number",
+      defaultValue: "28",
+      description: "Shared visual elevation of satellites above the globe",
+    },
+    {
+      name: "satelliteConnectorColor",
+      type: "string",
+      defaultValue: "theme-aware",
+      description: "Shared connector and antenna detail color",
+    },
+    {
+      name: "satelliteIconSvg",
+      type: "string",
+      defaultValue: "-",
+      description: "Shared custom satellite icon as an SVG string",
+    },
+    {
+      name: "satelliteIconRotationOffset",
+      type: "number",
+      defaultValue: "0",
+      description:
+        "Shared rotation offset applied after automatic orbit alignment",
+    },
+    {
+      name: "showGlow",
+      type: "boolean",
+      defaultValue: "true",
+      description: "Whether to render glow halos for all orbits",
+    },
+    {
+      name: "showConnector",
+      type: "boolean",
+      defaultValue: "true",
+      description:
+        "Whether to draw connectors from globe surface to satellites",
+    },
+    {
+      name: "connectorLineStyle",
+      type: '"solid" | "dash" | "dot"',
+      defaultValue: '"dash"',
+      description: "Shared connector line style",
+    },
+    {
+      name: "animate",
+      type: "boolean | SatelliteAnimationConfig",
+      defaultValue: "false",
+      description: "Enable shared orbital animation",
+    },
+    {
+      name: "showLabel",
+      type: "boolean",
+      defaultValue: "true",
+      description: "Whether to show labels for all orbit entries with a name",
+    },
+    {
+      name: "labelPosition",
+      type: '"top" | "bottom" | "left" | "right"',
+      defaultValue: '"right"',
+      description: "Shared label anchor position",
+    },
+  ],
+  extra: [
+    {
+      title: "SatelliteOrbitData",
+      props: [
+        {
+          name: "inclination",
+          type: "number",
+          defaultValue: "62",
+          description: "Per-orbit inclination angle in degrees",
+        },
+        {
+          name: "ascendingNode",
+          type: "number",
+          defaultValue: "-28",
+          description: "Per-orbit ascending node in degrees",
+        },
+        {
+          name: "orbitColor",
+          type: "string",
+          defaultValue: "inherits from theme",
+          description: "Per-orbit orbit stroke color override",
+        },
+        {
+          name: "orbitGlowColor",
+          type: "string",
+          defaultValue: "inherits from theme",
+          description: "Per-orbit glow color override",
+        },
+        {
+          name: "groundTrackColor",
+          type: "string",
+          defaultValue: "inherits from theme",
+          description: "Per-orbit ground track color override",
+        },
+        {
+          name: "orbitWidth",
+          type: "number",
+          defaultValue: "-",
+          description: "Per-orbit orbit stroke width override",
+        },
+        {
+          name: "groundTrackWidth",
+          type: "number",
+          defaultValue: "-",
+          description: "Per-orbit ground track stroke width override",
+        },
+        {
+          name: "orbitLineStyle",
+          type: '"solid" | "dash" | "dot"',
+          defaultValue: '"solid"',
+          description: "Per-orbit orbit line style",
+        },
+        {
+          name: "groundTrackLineStyle",
+          type: '"solid" | "dash" | "dot"',
+          defaultValue: '"dash"',
+          description: "Per-orbit ground track line style",
+        },
+        {
+          name: "name",
+          type: "string",
+          defaultValue: "-",
+          description: "Optional label shown for that orbit entry",
+        },
+      ],
+    },
+    {
+      title: "SatelliteAnimationConfig",
+      props: [
+        {
+          name: "duration",
+          type: "number",
+          defaultValue: "16000",
+          description: "Animation duration in milliseconds",
+        },
+      ],
+    },
+  ],
+};
+
+export const satelliteComponentDocs: readonly ComponentDoc[] = [
+  satelliteComponentDoc,
+  satelliteOrbitsComponentDoc,
 ] as const;
