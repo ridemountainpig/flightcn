@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 const STARFIELD_BACKGROUND =
   "radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.08) 0%, rgba(10,15,28,0) 60%), radial-gradient(1px 1px at 12% 30%, rgba(226,232,240,0.8), transparent 60%), radial-gradient(1px 1px at 28% 70%, rgba(186,230,253,0.7), transparent 60%), radial-gradient(1px 1px at 46% 20%, rgba(255,255,255,0.6), transparent 60%), radial-gradient(1px 1px at 63% 58%, rgba(56,189,248,0.8), transparent 60%), radial-gradient(1px 1px at 78% 32%, rgba(226,232,240,0.7), transparent 60%), radial-gradient(1px 1px at 90% 72%, rgba(186,230,253,0.6), transparent 60%)";
@@ -94,6 +94,7 @@ export function SatelliteCommandCopy({
   codeClassName = "",
 }: SatelliteCommandCopyProps) {
   const satelliteSize = 26;
+  const gradientId = useId();
   const [copied, setCopied] = useState(false);
   const [isOrbiting, setIsOrbiting] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
@@ -177,7 +178,7 @@ export function SatelliteCommandCopy({
             viewBox="0 0 100 20"
           >
             <defs>
-              <linearGradient id="orbit-gradient" x1="0" x2="1" y1="0" y2="0">
+              <linearGradient id={gradientId} x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stopColor="rgba(56,189,248,0)" />
                 <stop offset="15%" stopColor="rgba(56,189,248,0.55)" />
                 <stop offset="85%" stopColor="rgba(56,189,248,0.55)" />
@@ -187,7 +188,7 @@ export function SatelliteCommandCopy({
             <path
               d="M 0 10 Q 25 4, 50 10 T 100 10"
               fill="none"
-              stroke="url(#orbit-gradient)"
+              stroke={`url(#${gradientId})`}
               strokeWidth="0.6"
               strokeDasharray="0.5 2"
               strokeLinecap="round"

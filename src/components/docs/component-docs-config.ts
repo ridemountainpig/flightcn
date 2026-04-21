@@ -584,6 +584,12 @@ export const satelliteComponentDoc: ComponentDoc = {
       description: "Enable orbital animation",
     },
     {
+      name: "duration",
+      type: "number",
+      defaultValue: "16000",
+      description: "Animation duration in milliseconds",
+    },
+    {
       name: "name",
       type: "string",
       defaultValue: "-",
