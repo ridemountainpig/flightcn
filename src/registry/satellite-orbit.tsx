@@ -239,7 +239,7 @@ function lineStyleToDashArray(style: LineStyle): string | undefined {
 }
 
 function sanitizeSvgTree(element: Element) {
-  const blockedTags = new Set(["script", "foreignobject"]);
+  const blockedTags = new Set(["script", "foreignobject", "style"]);
 
   for (const attributeName of element.getAttributeNames()) {
     const normalizedName = attributeName.toLowerCase();
