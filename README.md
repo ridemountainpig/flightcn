@@ -129,3 +129,7 @@ pnpm build
 pnpm registry:build
 pnpm format
 ```
+
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
