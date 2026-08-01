@@ -49,7 +49,13 @@ export type FlightExampleId =
   | "flight-routes"
   | "multiple-leg"
   | "animation"
-  | "globe";
+  | "globe"
+  | "flight-tracker"
+  | "flight-route-label"
+  | "flight-network"
+  | "flight-range"
+  | "aircraft-trail"
+  | "flight-flow";
 
 export type SatelliteExampleId =
   | "satellite-orbit"
@@ -72,21 +78,6 @@ export type ExampleConfig = {
 
 export const flightExamples: readonly ExampleConfig[] = [
   {
-    id: "airport-dot",
-    label: "Airport Markers",
-    eyebrow: "Marker",
-    title: "Standalone airport markers",
-    description:
-      "Render airport dots by IATA code, attach labels, and keep the map focused on a compact regional view.",
-    code: `<Map>
-  <FlightAirport code="TPE" showLabel />
-  <FlightAirport code="HND" showLabel />
-  <FlightAirport code="ICN" showLabel />
-</Map>`,
-    center: [128, 29],
-    zoom: 2.35,
-  },
-  {
     id: "flight-route",
     label: "Direct Route",
     eyebrow: "Single Route",
@@ -105,28 +96,161 @@ export const flightExamples: readonly ExampleConfig[] = [
     zoom: 2.55,
   },
   {
-    id: "route-hover",
-    label: "Route Hover",
-    eyebrow: "Interactive",
-    title: "Hover tooltips on route focus",
+    id: "animation",
+    label: "Animated Flight",
+    eyebrow: "Animated",
+    title: "Round-trip plane animation",
     description:
-      "Hover the route to reveal built-in flight info, including trip type, distance, and estimated duration.",
+      'Animate a plane across the route; use tripType="round-trip" for a return leg, or one-way for a single direction.',
     code: `<Map>
   <FlightRoute
-    from="TPE"
-    to="HND"
+    from="NRT"
+    to="TPE"
     showAirports
     showLabel
-    hoverEffect
     tripType="round-trip"
+    animate={{ duration: 5000 }}
+  />
+  <FlightRoute
+    from="TPE"
+    to="DXB"
+    showAirports
+    showLabel
+    tripType="one-way"
+    animate={{ duration: 8000 }}
   />
 </Map>`,
-    center: [122, 26],
-    zoom: 2.15,
+    center: [120, 18],
+    zoom: 1.95,
+  },
+  {
+    id: "flight-tracker",
+    label: "Flight Tracker",
+    eyebrow: "Live Progress",
+    title: "Track completed and remaining flight progress",
+    description:
+      "Use controlled progress to position a heading-aware aircraft, split the route, and display operational details such as status, altitude, and speed.",
+    code: `<Map>
+  <FlightTracker
+    from="TPE"
+    to="LHR"
+    progress={0.58}
+    altitude={36000}
+    speed={486}
+  >
+    <span className="flex items-center gap-2">
+      <span>CI 081</span>
+      <span className="text-emerald-600">En route</span>
+    </span>
+  </FlightTracker>
+</Map>`,
+    center: [66, 38],
+    zoom: 1.2,
+  },
+  {
+    id: "flight-network",
+    label: "Flight Network",
+    eyebrow: "Weighted Network",
+    title: "Explore weighted airport connections",
+    description:
+      "Scale route width and node size by traffic, then hover an airport to focus its connected routes while the rest of the network fades away.",
+    code: `<Map>
+  <FlightNetwork
+    routes={[
+      { from: "TPE", to: "HND", value: 18 },
+      { from: "TPE", to: "SIN", value: 11 },
+      { from: "TPE", to: "BKK", value: 8 },
+    ]}
+  />
+</Map>`,
+    center: [121, 23],
+    zoom: 1.9,
+  },
+  {
+    id: "flight-range",
+    label: "Flight Range",
+    eyebrow: "Geodesic Coverage",
+    title: "Compare real-world distance bands",
+    description:
+      "Compare aircraft or service range using true geodesic distance. Long ranges distort on flat maps, so globe projection is recommended.",
+    code: `<Map projection={{ type: "globe" }}>
+  <FlightRange
+    origin="TPE"
+    ranges={[
+      { distance: 800, color: "#bfdbfe", opacity: 0.08 },
+      { distance: 1800, color: "#60a5fa", opacity: 0.055 },
+      { distance: 3200, color: "#2563eb", opacity: 0.035 },
+    ]}
+  />
+</Map>`,
+    center: [121.233, 25.0777],
+    zoom: 1.9,
+    projection: { type: "globe" },
+  },
+  {
+    id: "aircraft-trail",
+    label: "Aircraft Trail",
+    eyebrow: "Recorded Track",
+    title: "Follow an aircraft's actual movement history",
+    description:
+      "Inspect a Tokyo-to-Taipei flight's recorded movement with a smooth altitude color scale along the observed track.",
+    code: `<Map>
+  <AircraftTrail
+    positions={positions}
+    altitudeColorStops={[
+      { altitude: 0, color: "#22c55e" },
+      { altitude: 10000, color: "#06b6d4" },
+      { altitude: 24000, color: "#2563eb" },
+      { altitude: 39000, color: "#7c3aed" },
+    ]}
+    startOpacity={0.42}
+    showAircraft
+  />
+</Map>`,
+    center: [130.5, 30.2],
+    zoom: 3.15,
+  },
+  {
+    id: "flight-flow",
+    label: "Flight Flow",
+    eyebrow: "Aircraft Traffic",
+    title: "Show many aircraft sharing the same air corridors",
+    description:
+      "Distribute real aircraft silhouettes by route traffic weight, keep them static for a traffic snapshot, or animate them continuously toward the destination.",
+    code: `<Map>
+  <FlightFlow
+    routes={[
+      { from: "HND", to: "TPE", value: 14 },
+      { from: "ICN", to: "TPE", value: 8 },
+      { from: "HKG", to: "TPE", value: 11 },
+      { from: "BKK", to: "TPE", value: 7 },
+      { from: "MNL", to: "TPE", value: 6 },
+    ]}
+    aircraftCount={30}
+    animate
+  />
+</Map>`,
+    center: [123.5, 25],
+    zoom: 3.05,
+  },
+  {
+    id: "airport-dot",
+    label: "Airport Markers",
+    eyebrow: "Marker",
+    title: "Standalone airport markers",
+    description:
+      "Render airport dots by IATA code, attach labels, and keep the map focused on a compact regional view.",
+    code: `<Map>
+  <FlightAirport code="TPE" showLabel />
+  <FlightAirport code="HND" showLabel />
+  <FlightAirport code="ICN" showLabel />
+</Map>`,
+    center: [128, 29],
+    zoom: 2.35,
   },
   {
     id: "flight-routes",
-    label: "Route Network",
+    label: "Multiple Routes",
     eyebrow: "Batch Routes",
     title: "Multiple routes from one dataset",
     description:
@@ -163,32 +287,47 @@ export const flightExamples: readonly ExampleConfig[] = [
     zoom: 1.2,
   },
   {
-    id: "animation",
-    label: "Animated Flight",
-    eyebrow: "Animated",
-    title: "Round-trip plane animation",
+    id: "flight-route-label",
+    label: "Route Label",
+    eyebrow: "Annotation",
+    title: "Keep flight information attached to the route or aircraft",
     description:
-      'Animate a plane across the route; use tripType="round-trip" for a return leg, or one-way for a single direction.',
+      "Choose a fixed route annotation or pair the label with a moving aircraft so flight numbers and timing remain visible throughout the journey.",
+    code: `<Map>
+  <FlightRoute from="TPE" to="HND" showAirports />
+  <FlightRouteLabel
+    from="TPE"
+    to="HND"
+    mode="aircraft"
+    position={0.08}
+    labelPosition="right"
+    animate={{ duration: 7200 }}
+  >
+    BR 198 · 42 min
+  </FlightRouteLabel>
+</Map>`,
+    center: [122, 26],
+    zoom: 2.15,
+  },
+  {
+    id: "route-hover",
+    label: "Route Hover",
+    eyebrow: "Interactive",
+    title: "Hover tooltips on route focus",
+    description:
+      "Hover the route to reveal built-in flight info, including trip type, distance, and estimated duration.",
     code: `<Map>
   <FlightRoute
-    from="NRT"
-    to="TPE"
-    showAirports
-    showLabel
-    tripType="round-trip"
-    animate={{ duration: 5000 }}
-  />
-  <FlightRoute
     from="TPE"
-    to="DXB"
+    to="HND"
     showAirports
     showLabel
-    tripType="one-way"
-    animate={{ duration: 8000 }}
+    hoverEffect
+    tripType="round-trip"
   />
 </Map>`,
-    center: [120, 18],
-    zoom: 1.95,
+    center: [122, 26],
+    zoom: 2.15,
   },
   {
     id: "globe",
@@ -299,7 +438,7 @@ export const heroCopy: Record<ProductKey, HeroCopy> = {
     eyebrow: "flightcn + mapcn",
     title: "Build flight route maps for mapcn and MapLibre.",
     subtitle:
-      "Render airport markers, great-circle paths, and multi-leg journeys from IATA codes with the flightcn component set.",
+      "Render live flight progress, weighted networks, geodesic ranges, recorded trails, and animated traffic flows from IATA codes.",
     ctaPrimary: "Get Started",
     ctaSecondary: "View Docs",
   },
@@ -322,7 +461,8 @@ export type ShowcaseCopy = {
 export const showcaseCopy: Record<ProductKey, ShowcaseCopy> = {
   flight: {
     eyebrow: "Live Examples",
-    title: "Preview airport markers, routes, and multi-leg flight paths",
+    title:
+      "Preview routes, tracking, networks, ranges, trails, and traffic flow",
     description:
       "Explore real flightcn usage patterns before installing the component into your own mapcn project.",
   },

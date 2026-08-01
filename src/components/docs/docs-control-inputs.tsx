@@ -58,10 +58,12 @@ export function ColorInput({
   value,
   onChange,
   ariaLabel,
+  disabled = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   ariaLabel: string;
+  disabled?: boolean;
 }) {
   const [draft, setDraft] = useState(value);
   const [isEditing, setIsEditing] = useState(false);
@@ -100,7 +102,8 @@ export function ColorInput({
         }}
         placeholder="#0a0a0a"
         spellCheck={false}
-        className="h-9 w-full rounded-xl border border-black/10 bg-slate-50 px-3 pr-11 text-xs font-semibold text-slate-700 uppercase transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none"
+        disabled={disabled}
+        className="h-9 w-full rounded-xl border border-black/10 bg-slate-50 px-3 pr-11 text-xs font-semibold text-slate-700 uppercase transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-40"
       />
       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center rounded-r-xl px-2">
         <span
@@ -112,12 +115,13 @@ export function ColorInput({
         type="color"
         value={value}
         aria-label={`${ariaLabel} color picker`}
+        disabled={disabled}
         onChange={(event) => {
           const nextColor = event.currentTarget.value.toLowerCase();
           setDraft(nextColor);
           onChange(nextColor);
         }}
-        className="absolute inset-y-0 right-0 w-10 cursor-pointer opacity-0"
+        className="absolute inset-y-0 right-0 w-10 cursor-pointer opacity-0 disabled:pointer-events-none"
       />
     </div>
   );

@@ -205,6 +205,8 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
   const onViewportChangeRef = useRef(onViewportChange);
   onViewportChangeRef.current = onViewportChange;
+  const viewportRef = useRef(viewport);
+  viewportRef.current = viewport;
 
   const mapStyles = useMemo(
     () => ({
@@ -350,7 +352,12 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     if (!mapInstance || !isStyleLoaded) return;
 
     mapInstance.setProjection(projection ?? { type: "mercator" });
-  }, [mapInstance, isStyleLoaded, projection]);
+
+    const controlledViewport = viewportRef.current;
+    if (isControlled && controlledViewport) {
+      mapInstance.jumpTo(controlledViewport);
+    }
+  }, [mapInstance, isStyleLoaded, projection, isControlled]);
 
   const contextValue = useMemo(
     () => ({

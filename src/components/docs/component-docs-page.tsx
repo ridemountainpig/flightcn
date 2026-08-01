@@ -35,7 +35,7 @@ const DOCS_COPY: Record<ProductKey, DocsCopy> = {
     eyebrow: "Developer Docs",
     title: "flightcn API reference and component examples",
     description:
-      "Browse the airport marker, flight route, network, and multi-leg APIs, then preview each component with a live map example before adding it to your mapcn project.",
+      "Browse route, tracking, network, range, trail, and traffic-flow APIs, then preview every component on a live map before adding it to your project.",
     sidebarLabel: "Components",
     installHref: "/docs/install/flight",
     installLabel: "flight install guide",

@@ -12,12 +12,14 @@ import {
 export const metadata: Metadata = buildPageMetadata({
   title: "Flight Documentation",
   description:
-    "Read the API reference, props tables, and live examples for the flightcn flight route components (FlightAirport, FlightRoute, FlightRoutes, FlightMultiRoute) built for mapcn.",
+    "Read API references and live examples for flightcn route, tracker, network, range, trail, and traffic-flow components built for mapcn.",
   path: "/docs/flight",
   keywords: [
     "flightcn docs",
     "flight route component API",
     "FlightRoute props",
+    "FlightTracker React component",
+    "MapLibre flight network",
     "airport marker component",
     "mapcn examples",
   ],

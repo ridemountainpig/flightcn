@@ -7,7 +7,7 @@
       "name": "flight",
       "type": "registry:ui",
       "title": "Flight",
-      "description": "A flight route visualization component with airport markers, great-circle arc lines, and a built-in 515-airport database.",
+      "description": "Composable flight map components for routes, live tracking, weighted networks, geodesic ranges, aircraft trails, traffic flow, and a built-in 515-airport database.",
       "dependencies": ["@turf/great-circle", "@turf/bearing"],
       "registryDependencies": ["https://mapcn.dev/r/map.json"],
       "files": [
@@ -25,6 +25,11 @@
           "path": "src/registry/flight-airports-utils.ts",
           "type": "registry:ui",
           "target": "components/ui/flight-airports-utils.ts"
+        },
+        {
+          "path": "src/registry/flight-visualizations.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/flight-visualizations.tsx"
         }
       ]
     },

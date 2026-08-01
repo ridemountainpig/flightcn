@@ -14,7 +14,7 @@ import {
 export const metadata: Metadata = buildPageMetadata({
   title: "Flight Route & Satellite Orbit Components for mapcn",
   description:
-    "Build MapLibre flight route maps and orbital overlays with airport markers, animated paths, an IATA airport dataset, and satellite orbits using the flightcn shadcn registry package.",
+    "Build MapLibre flight tracking, route networks, geodesic range maps, aircraft trails, traffic flows, and satellite overlays with the flightcn shadcn registry package.",
   path: "/",
   keywords: [
     "MapLibre flight routes",
@@ -49,6 +49,7 @@ const homeJsonLd = [
     },
     featureList: [
       "Flight route components (airport markers, great-circle routes, multi-leg journeys)",
+      "Flight tracking, weighted networks, geodesic ranges, recorded trails, and animated traffic flows",
       "Satellite orbit overlays (orbital paths, ground tracks, animated satellites)",
     ],
   },

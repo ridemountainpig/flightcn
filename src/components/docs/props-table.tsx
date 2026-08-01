@@ -48,12 +48,22 @@ export type NumberControl = {
   disabled?: boolean;
 };
 
+export type NumberPairControl = {
+  kind: "number-pair";
+  value: readonly [number, number];
+  onChange: (value: [number, number]) => void;
+  labels?: readonly [string, string];
+  step?: number;
+  disabled?: boolean;
+};
+
 export type ControlConfig =
   | SelectControl
   | ColorControl
   | TextControl
   | TextareaControl
-  | NumberControl;
+  | NumberControl
+  | NumberPairControl;
 export type ControlMap = Partial<Record<string, ControlConfig>>;
 
 export function PropsTable({
@@ -118,6 +128,7 @@ export function PropsTable({
                         value={control.value}
                         onChange={control.onChange}
                         ariaLabel={prop.name}
+                        disabled={control.disabled}
                       />
                     ) : control.kind === "text" ? (
                       <TextInput
@@ -145,6 +156,27 @@ export function PropsTable({
                           onChange={control.onChange}
                           ariaLabel={prop.name}
                           placeholder={control.placeholder}
+                          step={control.step}
+                          disabled={control.disabled}
+                        />
+                      </div>
+                    ) : control.kind === "number-pair" ? (
+                      <div className="grid w-full grid-cols-2 gap-2">
+                        <NumberInput
+                          value={control.value[0]}
+                          onChange={(value) =>
+                            control.onChange([value, control.value[1]])
+                          }
+                          ariaLabel={`${prop.name} ${control.labels?.[0] ?? "x"}`}
+                          step={control.step}
+                          disabled={control.disabled}
+                        />
+                        <NumberInput
+                          value={control.value[1]}
+                          onChange={(value) =>
+                            control.onChange([control.value[0], value])
+                          }
+                          ariaLabel={`${prop.name} ${control.labels?.[1] ?? "y"}`}
                           step={control.step}
                           disabled={control.disabled}
                         />

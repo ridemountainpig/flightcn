@@ -3,7 +3,7 @@
 ![flightcn](public/flightcn-og.png)
 
 `flightcn` is a visualization component set built for the `mapcn` ecosystem.
-It helps you render airport markers, great-circle flight paths, multi-leg routes, and globe-based satellite orbit overlays on top of MapLibre-powered maps.
+It helps you render airport markers, great-circle flight paths, live flight progress, weighted networks, geodesic ranges, aircraft trails, traffic flow, and globe-based satellite orbit overlays on top of MapLibre-powered maps.
 
 ## Highlights
 
@@ -11,6 +11,9 @@ It helps you render airport markers, great-circle flight paths, multi-leg routes
 - Render airports and routes directly from IATA codes like `TPE`, `HND`, and `LAX`
 - Great-circle arc rendering with antimeridian handling
 - Support for single routes, multiple routes, and multi-leg journeys
+- Controlled live-flight tracking with completed and remaining route segments
+- Weighted flight networks, geodesic range bands, and route annotations
+- Recorded aircraft trails with recent-position emphasis and animated traffic flow
 - Globe-based satellite orbit overlays with ground tracks and animated markers
 - Custom satellite SVG marker support for orbital visualizations
 - Optional airport labels, hover states, and route animation
@@ -33,6 +36,7 @@ Installed files:
 - `components/ui/flight.tsx`
 - `components/ui/flight-airports.ts`
 - `components/ui/flight-airports-utils.ts`
+- `components/ui/flight-visualizations.tsx`
 
 ### Satellite
 
@@ -82,6 +86,30 @@ Render multiple independent routes in one map. Use this when each route should r
 ### `FlightMultiRoute`
 
 Render a single journey across multiple waypoints. Use this when one trip should connect several legs in sequence.
+
+### `FlightTracker`
+
+Track one flight with controlled progress, split completed/remaining paths, aircraft heading, and operational details.
+
+### `FlightRouteLabel`
+
+Place fixed labels at a percentage along a great-circle route, or use `mode="aircraft"` to show a plane with a horizontal label that follows it along the route. Supports optional route-aligned rotation and `sm`, `md`, or `lg` sizing.
+
+### `FlightNetwork`
+
+Render a weighted airport network with scalable routes and nodes plus connected-route focus interactions. Each route's optional `value` is a relative weight: higher values produce thicker routes and contribute more to the size of both connected airport nodes. It defaults to `1`.
+
+### `FlightRange`
+
+Draw one or more true geodesic distance bands from an airport or coordinate. Use a globe projection for long ranges when geographic shape matters; Mercator intentionally distorts high-latitude circles.
+
+### `AircraftTrail`
+
+Draw ordered recorded positions as a fading actual flight path with a current-aircraft marker, optional smooth `altitudeColorStops`, and a dashed continuation to a destination or explicit planned waypoints. Automatic destination routes support adjustable `plannedCurvature`.
+
+### `FlightFlow`
+
+Show multiple aircraft sharing weighted routes as either a live animated traffic flow or a static traffic snapshot. Route `value` controls relative aircraft density, while an optional per-route `aircraftCount` sets an exact count.
 
 ### `SatelliteOrbit`
 

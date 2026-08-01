@@ -6,10 +6,16 @@ import { motion } from "framer-motion";
 import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
 import { Map } from "@/components/ui/map";
 import {
+  AircraftTrail,
+  FlightFlow,
   FlightAirport,
   FlightMultiRoute,
+  FlightNetwork,
+  FlightRange,
   FlightRoute,
+  FlightRouteLabel,
   FlightRoutes,
+  FlightTracker,
 } from "@/registry/flight";
 import { SatelliteOrbit, SatelliteOrbits } from "@/registry/satellite-orbit";
 import {
@@ -41,6 +47,42 @@ const CUSTOM_SATELLITE_SVG_PATHS = {
   asteroid: "/showcase/asteroid.svg",
   iss: "/showcase/international-space-station.svg",
 } as const;
+
+const NETWORK_ROUTES = [
+  { from: "TPE", to: "HND", value: 18 },
+  { from: "TPE", to: "SIN", value: 11 },
+  { from: "TPE", to: "BKK", value: 8 },
+  { from: "TPE", to: "HKG", value: 14 },
+] as const;
+
+const TRAIL_POSITIONS = [
+  { longitude: 139.78, latitude: 35.55, altitude: 200 },
+  { longitude: 138.7, latitude: 34.72, altitude: 7200 },
+  { longitude: 137.2, latitude: 33.85, altitude: 14800 },
+  { longitude: 135.4, latitude: 32.95, altitude: 23600 },
+  { longitude: 133.5, latitude: 32.08, altitude: 31800 },
+  { longitude: 131.5, latitude: 31.2, altitude: 37000 },
+  { longitude: 129.5, latitude: 30.25, altitude: 39000 },
+  { longitude: 128.6, latitude: 29.55, altitude: 38500 },
+  { longitude: 127.95, latitude: 28.85, altitude: 35000 },
+  { longitude: 127.45, latitude: 28.15, altitude: 31000 },
+  { longitude: 126.9, latitude: 27.45, altitude: 27000 },
+] as const;
+
+const TRAIL_ALTITUDE_COLOR_STOPS = [
+  { altitude: 0, color: "#22c55e" },
+  { altitude: 10000, color: "#06b6d4" },
+  { altitude: 24000, color: "#2563eb" },
+  { altitude: 39000, color: "#7c3aed" },
+] as const;
+
+const FLOW_ROUTES = [
+  { from: "HND", to: "TPE", value: 14 },
+  { from: "ICN", to: "TPE", value: 8 },
+  { from: "HKG", to: "TPE", value: 11 },
+  { from: "BKK", to: "TPE", value: 7 },
+  { from: "MNL", to: "TPE", value: 6 },
+] as const;
 
 function CustomSatellitePairExample() {
   const [svgIcons, setSvgIcons] = useState<{
@@ -160,6 +202,61 @@ function renderExample(exampleId: ExampleId): ReactNode {
       );
     case "globe":
       return <FlightRoute from="CDG" to="SYD" showAirports showLabel />;
+    case "flight-tracker":
+      return (
+        <FlightTracker
+          from="TPE"
+          to="LHR"
+          progress={0.58}
+          altitude={36000}
+          speed={486}
+        >
+          <span className="flex items-center gap-2">
+            <span>CI 081</span>
+            <span className="text-emerald-600">En route</span>
+          </span>
+        </FlightTracker>
+      );
+    case "flight-route-label":
+      return (
+        <>
+          <FlightRoute from="TPE" to="HND" showAirports />
+          <FlightRouteLabel
+            from="TPE"
+            to="HND"
+            mode="aircraft"
+            position={0.08}
+            size="md"
+            labelPosition="right"
+            animate={{ duration: 7200 }}
+          >
+            BR 198 · 42 min
+          </FlightRouteLabel>
+        </>
+      );
+    case "flight-network":
+      return <FlightNetwork routes={NETWORK_ROUTES} />;
+    case "flight-range":
+      return (
+        <FlightRange
+          origin="TPE"
+          ranges={[
+            { distance: 800, color: "#bfdbfe", opacity: 0.08 },
+            { distance: 1800, color: "#60a5fa", opacity: 0.055 },
+            { distance: 3200, color: "#2563eb", opacity: 0.035 },
+          ]}
+        />
+      );
+    case "aircraft-trail":
+      return (
+        <AircraftTrail
+          positions={TRAIL_POSITIONS}
+          altitudeColorStops={TRAIL_ALTITUDE_COLOR_STOPS}
+          startOpacity={0.42}
+        />
+      );
+    case "flight-flow":
+      return <FlightFlow routes={FLOW_ROUTES} aircraftCount={30} />;
     case "satellite-orbit":
       return (
         <SatelliteOrbit
@@ -227,11 +324,11 @@ function ExamplePreview({
 
   return (
     <motion.div
-      className="relative order-1 min-w-0 overflow-hidden rounded-[1.5rem] border border-black/8 bg-[#ececeb] xl:order-1"
+      className="relative order-1 h-72 min-w-0 overflow-hidden rounded-[1.5rem] border border-black/8 bg-[#ececeb] sm:h-96 lg:h-120 xl:order-1 xl:h-152"
       variants={childReveal}
     >
       <Map
-        className="h-72 w-full sm:h-96 lg:h-120 xl:h-152"
+        className="h-full w-full"
         viewport={{
           center: selectedExample.center,
           zoom,
@@ -291,7 +388,7 @@ function ExampleSelector({
 }) {
   return (
     <motion.div
-      className="order-2 min-w-0 rounded-[1.5rem] border border-black/8 bg-white/92 p-3 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-3 xl:order-2"
+      className="order-2 min-w-0 rounded-[1.5rem] border border-black/8 bg-white/92 p-3 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-3 xl:order-2 xl:flex xl:h-152 xl:flex-col"
       variants={childReveal}
     >
       <div className="flex items-center justify-between px-2 pb-2 sm:px-2">
@@ -302,7 +399,7 @@ function ExampleSelector({
           {examples.length}
         </span>
       </div>
-      <div className="space-y-2 px-1 sm:px-1">
+      <div className="custom-scrollbar max-h-[32rem] space-y-2 overflow-y-auto px-1 pr-1.5 sm:px-1 xl:max-h-none xl:min-h-0 xl:flex-1">
         {examples.map((example) => {
           const isActive = example.id === selectedExample.id;
 
