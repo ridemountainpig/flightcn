@@ -88,7 +88,7 @@ export default function DocsIndexPage() {
         headerTitle="Documentation"
         headerSubtitle="Choose the component family you want to integrate"
         eyebrow="Developer Docs"
-        title="One place to enter the flightcn documentation system"
+        title="Build your next flight map."
         description="Choose the component family you need first, then dive into the API reference, props tables, examples, and install steps that match that product line."
         cards={docsLinks}
       />

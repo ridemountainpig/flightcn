@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DocsNavigation } from "./docs-navigation";
 
 import { AppFooter } from "@/components/app-footer";
 import { AppHeader } from "@/components/app-header";
@@ -33,7 +34,7 @@ const DOCS_COPY: Record<ProductKey, DocsCopy> = {
     headerTitle: "Flight Documentation",
     headerSubtitle: "API reference and live component previews",
     eyebrow: "Developer Docs",
-    title: "flightcn API reference and component examples",
+    title: "Flight components.",
     description:
       "Browse route, tracking, network, range, trail, and traffic-flow APIs, then preview every component on a live map before adding it to your project.",
     sidebarLabel: "Components",
@@ -47,7 +48,7 @@ const DOCS_COPY: Record<ProductKey, DocsCopy> = {
     headerTitle: "Satellite Documentation",
     headerSubtitle: "API reference and live orbital playground",
     eyebrow: "Developer Docs",
-    title: "Satellite orbit overlays for mapcn",
+    title: "Satellite components.",
     description:
       "Explore the dedicated `SatelliteOrbit` and `SatelliteOrbits` APIs with a full globe playground, custom SVG icon support, and orbital styling controls.",
     sidebarLabel: "Satellite",
@@ -70,15 +71,21 @@ export function ComponentDocsPage({ product }: { product: ProductKey }) {
   const copy = DOCS_COPY[product];
 
   return (
-    <main className="min-h-screen bg-stone-100 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.1)_1px,transparent_0)] bg-size-[24px_24px] text-slate-950">
-      <div className="mx-auto max-w-[1520px] px-4 py-6 sm:px-6 lg:px-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen bg-[#fafaf8] text-slate-950"
+    >
+      <div className="site-shell">
         <AppHeader title={copy.headerTitle} subtitle={copy.headerSubtitle} />
 
-        <section className="mt-6 rounded-[1.8rem] border border-black/10 bg-white/85 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-6">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-            {copy.eyebrow}
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+        <section
+          id="page-content"
+          tabIndex={-1}
+          className="mt-10 border-b border-slate-200 pb-8 sm:pb-10"
+        >
+          <p className="section-kicker">{copy.eyebrow}</p>
+          <h1 className="mt-4 text-4xl font-medium tracking-[-0.05em] text-slate-950 sm:text-5xl">
             {copy.title}
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
@@ -89,23 +96,13 @@ export function ComponentDocsPage({ product }: { product: ProductKey }) {
           </div>
         </section>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
-          <aside className="h-fit min-w-0 rounded-[1.5rem] border border-black/10 bg-white/85 p-3 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:sticky lg:top-6">
-            <p className="px-2 pb-2 text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-              {copy.sidebarLabel}
-            </p>
-            <nav className="space-y-2">
-              {components.map((component) => (
-                <a
-                  key={component.id}
-                  href={`#${component.id}`}
-                  className="flex min-h-14 items-center rounded-xl border border-black/8 bg-slate-50/90 px-3 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-                >
-                  {component.name}
-                </a>
-              ))}
-            </nav>
-            <div className="mt-4 border-t border-black/8 px-2 pt-4 text-xs text-slate-500">
+        <div className="mt-8 grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)]">
+          <aside className="h-fit min-w-0 border-b border-slate-200 pb-4 lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:border-0 lg:pr-3">
+            <p className="section-kicker px-2 pb-2">{copy.sidebarLabel}</p>
+            <DocsNavigation
+              items={components.map(({ id, name }) => ({ id, name }))}
+            />
+            <div className="mt-4 border-t border-slate-200 px-2 pt-4 text-xs text-slate-500">
               Need setup help? See the
               <Link
                 href={copy.installHref}
@@ -124,7 +121,7 @@ export function ComponentDocsPage({ product }: { product: ProductKey }) {
             </div>
           </aside>
 
-          <div className="min-w-0 space-y-4">
+          <div className="min-w-0 space-y-8">
             {components.map((component) => (
               <ComponentDocSection key={component.id} component={component} />
             ))}

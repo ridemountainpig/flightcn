@@ -67,8 +67,8 @@ export function CopyableAirportMarker({ airport }: { airport: AirportInfo }) {
         className={cn(
           "size-2 cursor-pointer rounded-full border shadow-sm",
           flightMapTheme === "dark"
-            ? "border-neutral-600 bg-neutral-100"
-            : "border-white bg-neutral-950",
+            ? "border-slate-600 bg-slate-100"
+            : "border-white bg-slate-950",
         )}
         onClick={handleCopy}
         aria-label={`Copy ${airport.code} airport code`}
@@ -76,7 +76,7 @@ export function CopyableAirportMarker({ airport }: { airport: AirportInfo }) {
       />
 
       {copied ? (
-        <div className="bg-foreground text-background absolute bottom-full left-1/2 z-50 mb-2 flex -translate-x-1/2 items-center gap-1 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-md">
+        <div className="pop-in bg-foreground text-background absolute bottom-full left-1/2 z-50 mb-2 flex -translate-x-1/2 items-center gap-1 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-md">
           <Check className="size-3" />
           Copied {airport.code}
         </div>

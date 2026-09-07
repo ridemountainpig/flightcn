@@ -4,13 +4,16 @@ export const siteConfig = {
   name: "flightcn",
   url: "https://flightcn.yencheng.dev",
   description:
-    "Flight route and satellite orbit visualization components for mapcn and MapLibre, with airport lookup, great-circle paths, orbital overlays, and animated globe markers.",
+    "Beautiful flight route, tracking, network and satellite visualizations for React, built with MapLibre and mapcn.",
   creator: {
     name: "ridemountainpig",
     url: "https://github.com/ridemountainpig",
   },
   githubUrl: "https://github.com/ridemountainpig/flightcn",
   ogImage: "/flightcn-og.png",
+  ogImageAlt: "flightcn - flight visualization components for React",
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
 } as const;
 
 export const defaultKeywords = [
@@ -63,7 +66,9 @@ export function buildPageMetadata({
       images: [
         {
           url: siteConfig.ogImage,
-          alt: siteConfig.name,
+          alt: siteConfig.ogImageAlt,
+          width: siteConfig.ogImageWidth,
+          height: siteConfig.ogImageHeight,
         },
       ],
     },

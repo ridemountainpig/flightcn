@@ -88,7 +88,7 @@ export default function InstallIndexPage() {
         headerTitle="Install Guides"
         headerSubtitle="Choose the setup flow that matches the component family"
         eyebrow="Setup"
-        title="Start with the install flow that matches your component family"
+        title="From install to first render."
         description="Each guide walks through the package install command, the import shape, and a minimal starter implementation so you can get to a working map scene quickly."
         cards={installLinks}
       />

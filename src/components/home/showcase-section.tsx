@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
 
+import { useReducedMotion } from "framer-motion";
+import { Play, Square } from "lucide-react";
+import { CopyButton } from "@/components/ui/copy-button";
 import { ShikiCodeBlock } from "@/components/ui/shiki-code-block";
 import { Map } from "@/components/ui/map";
 import {
@@ -28,20 +30,6 @@ import {
 } from "@/components/home/home-config";
 import type { ProductKey } from "@/components/product-switcher";
 import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
-
-const sectionReveal = {
-  hidden: { opacity: 0, y: 24 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, staggerChildren: 0.09 },
-  },
-};
-
-const childReveal = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45 } },
-};
 
 const CUSTOM_SATELLITE_SVG_PATHS = {
   asteroid: "/showcase/asteroid.svg",
@@ -84,7 +72,7 @@ const FLOW_ROUTES = [
   { from: "MNL", to: "TPE", value: 6 },
 ] as const;
 
-function CustomSatellitePairExample() {
+function CustomSatellitePairExample({ animated }: { animated: boolean }) {
   const [svgIcons, setSvgIcons] = useState<{
     asteroid?: string;
     iss?: string;
@@ -129,7 +117,7 @@ function CustomSatellitePairExample() {
         name="ISS"
         showLabel
         labelPosition="right"
-        animate={{ duration: 8000 }}
+        animate={animated ? { duration: 8000 } : false}
         satelliteIconSvg={svgIcons.iss}
         satelliteIconRotationOffset={-90}
       />
@@ -139,14 +127,14 @@ function CustomSatellitePairExample() {
         name="Asteroid"
         showLabel
         labelPosition="left"
-        animate={{ duration: 10000 }}
+        animate={animated ? { duration: 10000 } : false}
         satelliteIconSvg={svgIcons.asteroid}
       />
     </>
   );
 }
 
-function renderExample(exampleId: ExampleId): ReactNode {
+function renderExample(exampleId: ExampleId, animated: boolean): ReactNode {
   switch (exampleId) {
     case "airport-dot":
       return (
@@ -188,7 +176,7 @@ function renderExample(exampleId: ExampleId): ReactNode {
             showAirports
             showLabel
             tripType="round-trip"
-            animate={{ duration: 5000 }}
+            animate={animated ? { duration: 5000 } : false}
           />
           <FlightRoute
             from="TPE"
@@ -196,7 +184,7 @@ function renderExample(exampleId: ExampleId): ReactNode {
             showAirports
             showLabel
             tripType="one-way"
-            animate={{ duration: 8000 }}
+            animate={animated ? { duration: 8000 } : false}
           />
         </>
       );
@@ -228,7 +216,7 @@ function renderExample(exampleId: ExampleId): ReactNode {
             position={0.08}
             size="md"
             labelPosition="right"
-            animate={{ duration: 7200 }}
+            animate={animated ? { duration: 7200 } : false}
           >
             BR 198 · 42 min
           </FlightRouteLabel>
@@ -256,7 +244,13 @@ function renderExample(exampleId: ExampleId): ReactNode {
         />
       );
     case "flight-flow":
-      return <FlightFlow routes={FLOW_ROUTES} aircraftCount={30} />;
+      return (
+        <FlightFlow
+          routes={FLOW_ROUTES}
+          aircraftCount={30}
+          animate={animated}
+        />
+      );
     case "satellite-orbit":
       return (
         <SatelliteOrbit
@@ -264,7 +258,7 @@ function renderExample(exampleId: ExampleId): ReactNode {
           ascendingNode={-28}
           name="ISS"
           showLabel
-          animate={{ duration: 12000 }}
+          animate={animated ? { duration: 12000 } : false}
         />
       );
     case "satellite-orbits":
@@ -276,11 +270,11 @@ function renderExample(exampleId: ExampleId): ReactNode {
             { inclination: 53, ascendingNode: -120, name: "Starlink" },
           ]}
           showLabel
-          animate={{ duration: 12000 }}
+          animate={animated ? { duration: 12000 } : false}
         />
       );
     case "satellite-custom-icon":
-      return <CustomSatellitePairExample />;
+      return <CustomSatellitePairExample animated={animated} />;
     default:
       return null;
   }
@@ -292,26 +286,32 @@ function ExampleDetailsCard({
   selectedExample: ExampleConfig;
 }) {
   return (
-    <motion.div
-      className="order-3 min-w-0 rounded-[1.5rem] border border-black/8 bg-white/92 p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)] xl:order-3 xl:col-span-2"
-      variants={childReveal}
-    >
-      <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-        {selectedExample.eyebrow}
-      </p>
+    <div className="order-3 min-w-0 rounded-xl border border-black/8 bg-white/92 p-4 xl:order-3 xl:col-span-2">
+      <p className="section-kicker">{selectedExample.eyebrow}</p>
       <h2 className="mt-2 text-lg font-semibold text-slate-950 sm:text-xl">
         {selectedExample.title}
       </h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
         {selectedExample.description}
       </p>
-      <div className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-slate-100">
-        <ShikiCodeBlock
-          code={selectedExample.code}
-          className="[&_pre]:text-[11px] sm:[&_pre]:text-xs"
-        />
+      <div className="mt-4 overflow-hidden rounded-xl bg-slate-950 text-slate-100">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 font-mono text-[10px] text-slate-300">
+          <span>EXAMPLE · TSX</span>
+          <CopyButton
+            key={selectedExample.code}
+            text={selectedExample.code}
+            label="Copy example code"
+            className="hover:bg-white/10"
+          />
+        </div>
+        <div className="custom-scrollbar max-w-full overflow-x-auto px-4 py-4">
+          <ShikiCodeBlock
+            code={selectedExample.code}
+            className="[&_pre]:text-[11px] sm:[&_pre]:text-xs"
+          />
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -321,12 +321,19 @@ function ExamplePreview({
   selectedExample: ExampleConfig;
 }) {
   const zoom = useResponsiveZoom(selectedExample.zoom);
+  const reducedMotion = useReducedMotion();
+  const [paused, setPaused] = useState(false);
+  const hasAnimation = [
+    "animation",
+    "flight-route-label",
+    "flight-flow",
+    "satellite-orbit",
+    "satellite-orbits",
+    "satellite-custom-icon",
+  ].includes(selectedExample.id);
 
   return (
-    <motion.div
-      className="relative order-1 h-72 min-w-0 overflow-hidden rounded-[1.5rem] border border-black/8 bg-[#ececeb] sm:h-96 lg:h-120 xl:order-1 xl:h-152"
-      variants={childReveal}
-    >
+    <div className="relative order-1 h-72 min-w-0 overflow-hidden rounded-xl border border-black/8 bg-[#ececeb] sm:h-96 lg:h-120 xl:order-1 xl:h-152">
       <Map
         className="h-full w-full"
         viewport={{
@@ -337,8 +344,24 @@ function ExamplePreview({
         styles={mapStyles}
         projection={selectedExample.projection}
       >
-        {renderExample(selectedExample.id)}
+        {renderExample(selectedExample.id, !paused && !reducedMotion)}
       </Map>
+      {hasAnimation ? (
+        <button
+          type="button"
+          onClick={() => setPaused((previous) => !previous)}
+          disabled={!!reducedMotion}
+          aria-pressed={paused}
+          className="pressable absolute top-3 right-3 flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-sm hover:bg-slate-50"
+        >
+          {paused || reducedMotion ? <Play size={13} /> : <Square size={13} />}
+          {reducedMotion
+            ? "Reduced motion"
+            : paused
+              ? "Play animation"
+              : "Stop animation"}
+        </button>
+      ) : null}
       {selectedExample.id === "route-hover" && (
         <div className="pointer-events-none absolute bottom-2 left-2 z-10 max-w-[min(11.5rem,calc(100%-1rem))] rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-[0_8px_22px_rgba(15,23,42,0.1)] backdrop-blur sm:bottom-4 sm:left-4 sm:max-w-64 sm:rounded-3xl sm:px-5 sm:py-4 sm:shadow-[0_12px_30px_rgba(15,23,42,0.12)]">
           <p className="text-[11px] leading-snug font-semibold text-slate-950 sm:text-xs sm:leading-[1.6]">
@@ -373,7 +396,7 @@ function ExamplePreview({
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -386,58 +409,87 @@ function ExampleSelector({
   selectedExample: ExampleConfig;
   onSelect: (exampleId: ExampleId) => void;
 }) {
+  const groups = [
+    {
+      name: "Routes",
+      ids: [
+        "flight-route",
+        "animation",
+        "airport-dot",
+        "flight-routes",
+        "multiple-leg",
+        "route-hover",
+        "globe",
+        "flight-route-label",
+      ],
+    },
+    { name: "Tracking", ids: ["flight-tracker", "flight-flow"] },
+    { name: "Networks", ids: ["flight-network", "flight-range"] },
+    { name: "Trails", ids: ["aircraft-trail"] },
+    {
+      name: "Satellite",
+      ids: ["satellite-orbit", "satellite-orbits", "satellite-custom-icon"],
+    },
+  ];
   return (
-    <motion.div
-      className="order-2 min-w-0 rounded-[1.5rem] border border-black/8 bg-white/92 p-3 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-3 xl:order-2 xl:flex xl:h-152 xl:flex-col"
-      variants={childReveal}
-    >
+    <div className="order-2 min-w-0 rounded-xl border border-black/8 bg-white/92 p-3 sm:p-3 xl:order-2 xl:flex xl:h-152 xl:flex-col">
       <div className="flex items-center justify-between px-2 pb-2 sm:px-2">
-        <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-          Examples
-        </p>
+        <p className="section-kicker">Examples</p>
         <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
           {examples.length}
         </span>
       </div>
       <div className="custom-scrollbar max-h-[32rem] space-y-2 overflow-y-auto px-1 pr-1.5 sm:px-1 xl:max-h-none xl:min-h-0 xl:flex-1">
-        {examples.map((example) => {
-          const isActive = example.id === selectedExample.id;
-
+        {groups.map((group) => {
+          const items = examples.filter((example) =>
+            group.ids.includes(example.id),
+          );
+          if (!items.length) return null;
           return (
-            <motion.button
-              key={example.id}
-              type="button"
-              onClick={() => onSelect(example.id)}
-              className={`flex w-full items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left transition-colors sm:gap-3 sm:px-3 sm:py-3 ${
-                isActive
-                  ? "border-slate-900 bg-slate-950 text-white"
-                  : "border-black/8 bg-slate-50/90 text-slate-700 hover:bg-slate-100"
-              }`}
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.99 }}
-            >
-              <span
-                className={`size-2 shrink-0 rounded-full ${
-                  isActive ? "bg-emerald-400" : "bg-slate-300"
-                }`}
-              />
-              <span className="min-w-0">
-                <span className="block text-sm font-medium">
-                  {example.label}
-                </span>
-                <span
-                  className={`mt-1 block text-xs ${
-                    isActive ? "text-slate-300" : "text-slate-500"
-                  }`}
-                >
-                  {example.eyebrow}
-                </span>
-              </span>
-            </motion.button>
+            <div key={group.name}>
+              <p className="px-3 pt-4 pb-2 text-[10px] font-semibold tracking-widest text-slate-500 uppercase">
+                {group.name}
+              </p>
+              {items.map((example) => {
+                const isActive = example.id === selectedExample.id;
+
+                return (
+                  <button
+                    key={example.id}
+                    type="button"
+                    onClick={() => onSelect(example.id)}
+                    aria-pressed={isActive}
+                    className={`flex w-full items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 text-left transition-colors sm:gap-3 sm:px-3 sm:py-2 ${
+                      isActive
+                        ? "border-orange-200 bg-orange-50 text-orange-900"
+                        : "border-transparent text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <span
+                      className={`size-2 shrink-0 rounded-full ${
+                        isActive ? "bg-orange-600" : "bg-slate-300"
+                      }`}
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-medium">
+                        {example.label}
+                      </span>
+                      <span
+                        className={`mt-1 block text-xs ${
+                          isActive ? "text-orange-800" : "text-slate-500"
+                        }`}
+                      >
+                        {example.eyebrow}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -462,31 +514,20 @@ export function ShowcaseSection({ product }: { product: ProductKey }) {
   };
 
   return (
-    <motion.section
+    <section
       id="showcase"
-      className="mt-8"
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.18 }}
+      className="mt-4 scroll-mt-6 border-t border-slate-200 pt-12 sm:pt-16"
     >
-      <motion.div className="mb-4 px-1" variants={childReveal}>
-        <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-          {copy.eyebrow}
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          {copy.title}
-        </h2>
+      <div className="mb-8">
+        <p className="section-kicker">{copy.eyebrow}</p>
+        <h2 className="section-title mt-4">{copy.title}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
           {copy.description}
         </p>
-      </motion.div>
+      </div>
 
-      <div className="rounded-[2rem] border border-black/10 bg-white/80 p-2.5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-4">
-        <motion.div
-          className="grid min-w-0 gap-3 sm:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,19rem)]"
-          variants={sectionReveal}
-        >
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100/60 p-2 sm:p-3">
+        <div className="grid min-w-0 gap-3 sm:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,19rem)]">
           <ExamplePreview selectedExample={selectedExample} />
           <ExampleSelector
             examples={examples}
@@ -494,8 +535,8 @@ export function ShowcaseSection({ product }: { product: ProductKey }) {
             onSelect={handleSelectExample}
           />
           <ExampleDetailsCard selectedExample={selectedExample} />
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

@@ -436,18 +436,18 @@ export type HeroCopy = {
 export const heroCopy: Record<ProductKey, HeroCopy> = {
   flight: {
     eyebrow: "flightcn + mapcn",
-    title: "Build flight route maps for mapcn and MapLibre.",
+    title: "Put your flight data in motion.",
     subtitle:
-      "Render live flight progress, weighted networks, geodesic ranges, recorded trails, and animated traffic flows from IATA codes.",
-    ctaPrimary: "Get Started",
+      "Routes, live tracking, networks, trails and satellite orbits — built with MapLibre and mapcn. Start with two IATA codes.",
+    ctaPrimary: "Explore Examples",
     ctaSecondary: "View Docs",
   },
   satellite: {
     eyebrow: "flightcn + mapcn",
-    title: "Render orbital overlays on the mapcn globe.",
+    title: "A new perspective on every orbit.",
     subtitle:
       "Drop animated orbits, ground tracks, and custom satellite markers onto a MapLibre globe projection with the flightcn satellite component.",
-    ctaPrimary: "Get Started",
+    ctaPrimary: "Explore Examples",
     ctaSecondary: "View Docs",
   },
 };
@@ -461,10 +461,8 @@ export type ShowcaseCopy = {
 export const showcaseCopy: Record<ProductKey, ShowcaseCopy> = {
   flight: {
     eyebrow: "Live Examples",
-    title:
-      "Preview routes, tracking, networks, ranges, trails, and traffic flow",
-    description:
-      "Explore real flightcn usage patterns before installing the component into your own mapcn project.",
+    title: "One toolkit. Every flight perspective.",
+    description: "Pick a use case. Explore the map. Take the code.",
   },
   satellite: {
     eyebrow: "Live Examples",

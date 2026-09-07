@@ -9,6 +9,7 @@ const createHighlighter = createBundledHighlighter({
     tsx: () => import("@shikijs/langs/tsx"),
   },
   themes: {
+    "github-light": () => import("@shikijs/themes/github-light"),
     "material-theme-darker": () =>
       import("@shikijs/themes/material-theme-darker"),
   },

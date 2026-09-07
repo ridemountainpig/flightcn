@@ -1,5 +1,8 @@
 "use client";
 
+import { useReducedMotion } from "framer-motion";
+import { CopyButton } from "@/components/ui/copy-button";
+
 import {
   useEffect,
   useMemo,
@@ -264,23 +267,22 @@ function DocSectionShell({
   previewArgs: ComponentPreviewArgs;
 }) {
   const zoom = useResponsiveZoom(component.mapZoom);
+  const reducedMotion = useReducedMotion();
 
   return (
     <section
       id={component.id}
-      className="min-w-0 scroll-mt-6 rounded-[1.8rem] border border-black/10 bg-white/85 p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-4"
+      className="min-w-0 scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-7"
     >
-      <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
-        Component
-      </p>
-      <h2 className="mt-2 text-xl font-semibold text-slate-950 sm:text-2xl">
+      <p className="section-kicker">Component</p>
+      <h2 className="mt-3 font-mono text-xl font-medium tracking-tight text-slate-950 sm:text-2xl">
         {component.name}
       </h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
         {component.description}
       </p>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-black/8 bg-[#ececeb]">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-[#ececeb]">
         <DocsMapMountWhenVisible>
           <Map
             className="h-80 w-full sm:h-96"
@@ -292,14 +294,31 @@ function DocSectionShell({
             styles={mapStyles}
             projection={component.projection}
           >
-            {renderComponentPreview(previewArgs)}
+            {renderComponentPreview(previewArgs, !reducedMotion)}
           </Map>
         </DocsMapMountWhenVisible>
       </div>
 
-      <div className="mt-4 max-w-full overflow-x-auto rounded-2xl bg-slate-950 px-4 py-3 text-xs leading-6 text-slate-100">
-        <ShikiCodeBlock code={snippet} />
+      <div className="mt-4 overflow-hidden rounded-xl bg-slate-950 text-slate-100">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 font-mono text-[10px] text-slate-300">
+          <span>USAGE · TSX</span>
+          <CopyButton
+            key={snippet}
+            text={snippet}
+            label={`Copy ${component.name} example`}
+            className="hover:bg-white/10"
+          />
+        </div>
+        <div className="custom-scrollbar max-w-full overflow-x-auto px-4 py-4 text-xs leading-6">
+          <ShikiCodeBlock code={snippet} />
+        </div>
       </div>
+
+      {reducedMotion ? (
+        <p className="mt-3 text-xs text-slate-500">
+          Preview animations are off to respect your reduced motion preference.
+        </p>
+      ) : null}
 
       <h3 className="mt-5 text-lg font-semibold text-slate-900">Props</h3>
       <div className="mt-3">

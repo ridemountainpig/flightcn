@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProductDiagram } from "./product-diagram";
 import type { LucideIcon } from "lucide-react";
 import { ArrowUpRight } from "lucide-react";
 
@@ -31,17 +32,23 @@ export function DocsHubPage({
   cards: readonly [HubCard, HubCard];
 }) {
   return (
-    <main className="min-h-screen bg-stone-100 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.1)_1px,transparent_0)] bg-size-[24px_24px] text-slate-950">
-      <div className="mx-auto flex min-h-screen max-w-[1520px] flex-col px-4 py-6 sm:px-6 lg:px-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen bg-[#fafaf8] text-slate-950"
+    >
+      <div className="site-shell flex min-h-screen flex-col">
         <AppHeader title={headerTitle} subtitle={headerSubtitle} />
 
-        <section className="mt-6 flex-1">
-          <div className="overflow-hidden rounded-[2rem] border border-black/10 bg-white/85 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-            <div className="p-6 sm:p-8 lg:p-10">
-              <p className="text-[11px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
-                {eyebrow}
-              </p>
-              <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+        <section
+          id="page-content"
+          tabIndex={-1}
+          className="mx-auto mt-8 w-full max-w-6xl flex-1"
+        >
+          <div className="overflow-hidden">
+            <div className="hero-entry py-6 sm:py-8 lg:py-10">
+              <p className="section-kicker">{eyebrow}</p>
+              <h1 className="mt-5 max-w-4xl text-4xl font-medium tracking-[-0.05em] text-slate-950 sm:text-6xl">
                 {title}
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-[15px]">
@@ -49,7 +56,7 @@ export function DocsHubPage({
               </p>
             </div>
 
-            <div className="grid gap-px border-t border-black/8 bg-black/8 lg:grid-cols-2">
+            <div className="grid gap-5 lg:grid-cols-2">
               {cards.map((card) => {
                 const Icon = card.icon;
 
@@ -57,19 +64,18 @@ export function DocsHubPage({
                   <Link
                     key={card.href}
                     href={card.href}
-                    className="group flex h-full flex-col bg-white/90 p-6 transition-colors hover:bg-white sm:p-8"
+                    className="hub-card hero-entry group flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"
                   >
+                    <ProductDiagram satellite={card.label === "Satellite"} />
                     <div className="flex flex-1 flex-col">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className="text-[11px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
-                            {card.label}
-                          </p>
+                          <p className="section-kicker">{card.label}</p>
                           <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
                             {card.title}
                           </h2>
                         </div>
-                        <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-black/10 bg-white/80 shadow-sm">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 shadow-sm">
                           <Icon className="size-5 shrink-0 text-slate-900" />
                         </div>
                       </div>
@@ -91,9 +97,9 @@ export function DocsHubPage({
                       </div>
                     </div>
 
-                    <div className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
+                    <div className="mt-8 inline-flex items-center gap-2 border-t border-slate-100 pt-5 text-sm font-semibold text-orange-800">
                       {card.ctaLabel}
-                      <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ArrowUpRight className="link-arrow size-4" />
                     </div>
                   </Link>
                 );

@@ -2,20 +2,11 @@
 
 import Link from "next/link";
 import { Orbit, Plane } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
 export type ProductKey = "flight" | "satellite";
-
 export const PRODUCT_KEYS: readonly ProductKey[] = ["flight", "satellite"];
-
-type ProductMeta = {
-  key: ProductKey;
-  label: string;
-  description: string;
-};
-
-export const PRODUCT_META: Record<ProductKey, ProductMeta> = {
+export const PRODUCT_META = {
   flight: {
     key: "flight",
     label: "Flight",
@@ -26,34 +17,30 @@ export const PRODUCT_META: Record<ProductKey, ProductMeta> = {
     label: "Satellite",
     description: "Orbital paths, ground tracks, and animated satellites.",
   },
-};
+} as const;
 
 function ProductIcon({ product }: { product: ProductKey }) {
   const Icon = product === "flight" ? Plane : Orbit;
-  return <Icon className="size-4" />;
+  return <Icon className="size-4" aria-hidden="true" />;
 }
 
-type BaseProps = {
-  size?: "sm" | "md";
-  className?: string;
-};
+type BaseProps = { size?: "sm" | "md"; className?: string };
+const container =
+  "product-switcher relative inline-grid grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-slate-100/80 p-1";
+const item =
+  "relative z-10 inline-flex items-center justify-center gap-2 rounded-lg font-medium text-slate-500 data-[active=true]:text-slate-950";
+const sizes = { sm: "px-3 py-2 text-xs", md: "px-5 py-2.5 text-sm" };
 
-const baseContainerClass =
-  "inline-flex rounded-full border border-black/10 bg-white/85 p-1 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-sm";
-
-function itemClass({
-  size,
-  isActive,
-}: {
-  size: "sm" | "md";
-  isActive: boolean;
-}) {
-  return cn(
-    "inline-flex items-center gap-2 rounded-full font-medium transition-colors",
-    size === "sm" ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm sm:px-5",
-    isActive
-      ? "bg-slate-950 text-white shadow-sm"
-      : "text-slate-600 hover:text-slate-900",
+function Indicator({ value }: { value: ProductKey }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="product-indicator absolute inset-y-1 left-1 w-[calc(50%-6px)] rounded-lg bg-white shadow-[0_1px_4px_#20252214]"
+      style={{
+        transform:
+          value === "flight" ? "translateX(0)" : "translateX(calc(100% + 4px))",
+      }}
+    />
   );
 }
 
@@ -68,27 +55,24 @@ export function ProductSwitcher({
 }) {
   return (
     <div
-      className={cn(baseContainerClass, className)}
-      role="tablist"
+      className={cn(container, className)}
+      role="group"
       aria-label="Choose product"
     >
-      {PRODUCT_KEYS.map((key) => {
-        const isActive = value === key;
-        const meta = PRODUCT_META[key];
-        return (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => onChange(key)}
-            className={itemClass({ size, isActive })}
-          >
-            <ProductIcon product={key} />
-            <span>{meta.label}</span>
-          </button>
-        );
-      })}
+      <Indicator value={value} />
+      {PRODUCT_KEYS.map((key) => (
+        <button
+          key={key}
+          type="button"
+          aria-pressed={value === key}
+          data-active={value === key}
+          onClick={() => onChange(key)}
+          className={cn(item, sizes[size])}
+        >
+          <ProductIcon product={key} />
+          <span>{PRODUCT_META[key].label}</span>
+        </button>
+      ))}
     </div>
   );
 }
@@ -103,30 +87,23 @@ export function ProductSwitcherLinks({
   hrefs: Record<ProductKey, string>;
 }) {
   return (
-    <div
-      className={cn(baseContainerClass, className)}
-      role="tablist"
-      aria-label="Choose product"
+    <nav
+      className={cn(container, className)}
+      aria-label="Product documentation"
     >
-      {PRODUCT_KEYS.map((key) => {
-        const isActive = value === key;
-        const meta = PRODUCT_META[key];
-        return (
-          <Link
-            key={key}
-            href={hrefs[key]}
-            role="tab"
-            aria-selected={isActive}
-            aria-current={isActive ? "page" : undefined}
-            scroll={false}
-            prefetch
-            className={itemClass({ size, isActive })}
-          >
-            <ProductIcon product={key} />
-            <span>{meta.label}</span>
-          </Link>
-        );
-      })}
-    </div>
+      <Indicator value={value} />
+      {PRODUCT_KEYS.map((key) => (
+        <Link
+          key={key}
+          href={hrefs[key]}
+          aria-current={value === key ? "page" : undefined}
+          data-active={value === key}
+          className={cn(item, sizes[size])}
+        >
+          <ProductIcon product={key} />
+          <span>{PRODUCT_META[key].label}</span>
+        </Link>
+      ))}
+    </nav>
   );
 }

@@ -12,7 +12,7 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Flight Route & Satellite Orbit Components for mapcn",
+  title: "Beautiful Flight Visualizations for React",
   description:
     "Build MapLibre flight tracking, route networks, geodesic range maps, aircraft trails, traffic flows, and satellite overlays with the flightcn shadcn registry package.",
   path: "/",
@@ -35,6 +35,7 @@ const homeJsonLd = [
     operatingSystem: "Web",
     description: siteConfig.description,
     url: siteConfig.url,
+    image: `${siteConfig.url}${siteConfig.ogImage}`,
     creator: {
       "@type": "Person",
       name: siteConfig.creator.name,
@@ -58,12 +59,16 @@ const homeJsonLd = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-stone-100 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.1)_1px,transparent_0)] bg-size-[24px_24px] text-slate-950">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen bg-[#fafaf8] text-slate-950"
+    >
       <JsonLd id="home-jsonld" data={homeJsonLd} />
-      <div className="mx-auto max-w-[1520px] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="site-shell">
         <AppHeader
           title="flightcn"
-          subtitle="Flight route and satellite overlay visualizations for mapcn"
+          subtitle="Flight visualization components for React"
         />
         <HomeExperience />
         <AppFooter />

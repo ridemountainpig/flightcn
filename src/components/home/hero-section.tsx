@@ -1,20 +1,35 @@
 "use client";
 
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles } from "lucide-react";
-
-import { InstallCommandCopy } from "@/components/home/install-command-copy";
-import { SatelliteCommandCopy } from "@/components/home/satellite-command-copy";
-import {
-  heroCopy,
-  installCommandByProduct,
-} from "@/components/home/home-config";
+import { ArrowUpRight, ArrowRight } from "lucide-react";
+import { InstallCommandCopy } from "./install-command-copy";
+import { SatelliteCommandCopy } from "./satellite-command-copy";
+import { heroCopy, installCommandByProduct } from "./home-config";
 import {
   ProductSwitcher,
   type ProductKey,
 } from "@/components/product-switcher";
+
+const HeroRouteDemo = dynamic(
+  () => import("./hero-route-demo").then((m) => m.HeroRouteDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[510px] animate-pulse rounded-2xl bg-slate-100" />
+    ),
+  },
+);
+
+const HeroSatelliteDemo = dynamic(
+  () => import("./hero-satellite-demo").then((m) => m.HeroSatelliteDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[510px] animate-pulse rounded-2xl bg-slate-100" />
+    ),
+  },
+);
 
 export function HeroSection({
   product,
@@ -24,116 +39,56 @@ export function HeroSection({
   onProductChange: (next: ProductKey) => void;
 }) {
   const copy = heroCopy[product];
-  const installCommand = installCommandByProduct[product];
   const CommandCopy =
-    product === "satellite" ? SatelliteCommandCopy : InstallCommandCopy;
-
+    product === "flight" ? InstallCommandCopy : SatelliteCommandCopy;
   return (
-    <motion.section
-      className="px-0 py-12 text-center sm:px-8 sm:py-16"
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
+    <section
+      id="page-content"
+      tabIndex={-1}
+      className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16 lg:py-20"
     >
-      <motion.div
-        className="flex h-fit flex-wrap items-center justify-center gap-1.5 px-4 pb-4 sm:gap-2"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.1, ease: "easeOut" }}
-      >
-        <Image
-          src="/flightcn-icon.png"
-          alt="flightcn icon"
-          width={20}
-          height={20}
-          className="w-4 sm:w-5"
-        />
-        <p className="text-[10px] font-semibold tracking-[0.16em] text-slate-500 uppercase sm:text-[11px] sm:tracking-[0.2em]">
-          {copy.eyebrow}
-        </p>
-        <Image
-          src="/mapcn-icon.svg"
-          alt="mapcn icon"
-          width={20}
-          height={20}
-          className="w-4 sm:w-5"
-        />
-      </motion.div>
-
-      <motion.div
-        className="mt-2 flex justify-center"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.15, ease: "easeOut" }}
-      >
+      <div className="hero-entry min-w-0">
+        <p className="section-kicker mb-7">Open source · Built for React</p>
         <ProductSwitcher value={product} onChange={onProductChange} />
-      </motion.div>
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={product}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-        >
-          <h1 className="mx-auto mt-6 max-w-4xl text-3xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-            {copy.title}
-          </h1>
-          <p className="mx-auto mt-4 max-w-3xl px-4 text-sm leading-7 text-slate-600 sm:mt-5 sm:px-0 sm:text-xl sm:leading-8">
-            {copy.subtitle}
-          </p>
-          <CommandCopy
-            command={installCommand}
-            className="mx-auto mt-8 w-full max-w-2xl backdrop-blur-sm lg:max-w-152"
-          />
-        </motion.div>
-      </AnimatePresence>
-
-      <motion.div
-        className="mt-7 grid w-full gap-2.5 px-4 sm:mx-auto sm:max-w-md sm:grid-cols-2 sm:gap-3 sm:px-0"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5, ease: "easeOut" }}
-      >
-        <motion.a
-          href="#showcase"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
-          whileHover={{ y: -1.5 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {copy.ctaPrimary}
-          <Send className="size-4" />
-        </motion.a>
-        <motion.div
-          className="w-full"
-          whileHover={{ y: -1.5 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <h1 className="mt-7 max-w-xl text-[44px] leading-[1.02] font-medium tracking-[-0.06em] text-slate-950 sm:text-[60px] xl:text-[76px]">
+          {copy.title}
+        </h1>
+        <p className="mt-5 max-w-md text-base leading-7 text-slate-500">
+          {product === "flight"
+            ? "Bring your flight data to life. Routes, tracking and networks, starting with two airport codes."
+            : copy.subtitle}
+        </p>
+        <div className="mt-7 flex items-center gap-6 text-sm font-medium">
           <Link
-            href={product === "satellite" ? "/docs/satellite" : "/docs/flight"}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/75 px-5 py-3 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-white"
+            href={
+              product === "flight"
+                ? "/docs/install/flight"
+                : "/docs/install/satellite"
+            }
+            className="pressable inline-flex items-center gap-3 rounded-xl bg-slate-950 px-5 py-3.5 text-white hover:bg-slate-800"
           >
-            <Sparkles className="size-4" />
-            {copy.ctaSecondary}
+            Start building <ArrowRight size={16} />
           </Link>
-        </motion.div>
-      </motion.div>
-
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 text-sm text-slate-600">
-        <Link href="/docs/flight" className="hover:text-slate-950">
-          Flight Docs
-        </Link>
-        <Link href="/docs/satellite" className="hover:text-slate-950">
-          Satellite Docs
-        </Link>
-        <Link href="/docs/install/flight" className="hover:text-slate-950">
-          Flight Install
-        </Link>
-        <Link href="/docs/install/satellite" className="hover:text-slate-950">
-          Satellite Install
-        </Link>
+          <a
+            href="#showcase"
+            className="inline-flex items-center gap-1 text-slate-600 hover:text-orange-700"
+          >
+            Examples <ArrowUpRight size={15} className="link-arrow" />
+          </a>
+        </div>
+        <CommandCopy
+          command={installCommandByProduct[product]}
+          className="mt-7 w-full max-w-lg"
+        />
+        <p className="mt-3 text-xs text-slate-500">
+          Built with MapLibre & mapcn. Copy the components. Make them yours.
+        </p>
       </div>
-    </motion.section>
+      <div className="hero-entry min-w-0">
+        <div key={product} className="demo-swap">
+          {product === "flight" ? <HeroRouteDemo /> : <HeroSatelliteDemo />}
+        </div>
+      </div>
+    </section>
   );
 }

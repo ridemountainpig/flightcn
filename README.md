@@ -1,9 +1,16 @@
-# flightcn
+# Beautiful flight visualizations for React.
 
-![flightcn](public/flightcn-og.png)
+Routes, live tracking, networks, trails and satellite orbits — built with MapLibre and mapcn.
 
-`flightcn` is a visualization component set built for the `mapcn` ecosystem.
-It helps you render airport markers, great-circle flight paths, live flight progress, weighted networks, geodesic ranges, aircraft trails, traffic flow, and globe-based satellite orbit overlays on top of MapLibre-powered maps.
+[Documentation](https://flightcn.yencheng.dev/docs/flight) · [Examples](https://flightcn.yencheng.dev/#showcase) · [Try a route](https://flightcn.yencheng.dev/#try-route) · [Star on GitHub](https://github.com/ridemountainpig/flightcn)
+
+```bash
+npx shadcn@latest add @flightcn/flight
+```
+
+![Animated TPE to HND route rendered with FlightCN](public/demos/flight-route.gif)
+
+FlightCN gives you flight visualization components you own. Start with two IATA codes, add airport labels, animate an aircraft, or build a complete route network.
 
 ## Highlights
 
@@ -97,6 +104,8 @@ Place fixed labels at a percentage along a great-circle route, or use `mode="air
 
 ### `FlightNetwork`
 
+![Weighted global flight network with connected-route focus rendered with FlightCN](public/demos/flight-network.gif)
+
 Render a weighted airport network with scalable routes and nodes plus connected-route focus interactions. Each route's optional `value` is a relative weight: higher values produce thicker routes and contribute more to the size of both connected airport nodes. It defaults to `1`.
 
 ### `FlightRange`
@@ -104,6 +113,8 @@ Render a weighted airport network with scalable routes and nodes plus connected-
 Draw one or more true geodesic distance bands from an airport or coordinate. Use a globe projection for long ranges when geographic shape matters; Mercator intentionally distorts high-latitude circles.
 
 ### `AircraftTrail`
+
+![Recorded aircraft trail replay with altitude gradient rendered with FlightCN](public/demos/aircraft-trail.gif)
 
 Draw ordered recorded positions as a fading actual flight path with a current-aircraft marker, optional smooth `altitudeColorStops`, and a dashed continuation to a destination or explicit planned waypoints. Automatic destination routes support adjustable `plannedCurvature`.
 

@@ -321,8 +321,8 @@ function ControlSection({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-black/8 bg-white px-4 py-3 shadow-sm">
-      <p className="mb-2.5 text-[11px] font-semibold tracking-widest text-slate-400 uppercase">
+    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+      <p className="mb-2.5 text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
         {title}
       </p>
       <div className="space-y-2.5">{children}</div>
@@ -448,12 +448,12 @@ function ColorRow({
               type="color"
               value={value}
               onChange={(event) => onChange(event.target.value)}
-              className="h-5 w-8 cursor-pointer rounded border border-black/10"
+              className="h-5 w-8 cursor-pointer rounded border border-slate-200"
             />
             <button
               type="button"
               onClick={() => onChange("")}
-              className="text-[10px] text-slate-400 hover:text-slate-700"
+              className="text-[10px] text-slate-500 hover:text-slate-700"
             >
               auto
             </button>
@@ -488,7 +488,7 @@ function InputRow({
         type="text"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="rounded border border-black/10 bg-white px-2 py-1 text-xs text-slate-900 focus:border-slate-400 focus:outline-none"
+        className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 focus:border-slate-400 focus:outline-none"
       />
     </div>
   );
@@ -513,7 +513,7 @@ function TextAreaRow({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         spellCheck={false}
-        className="min-h-36 rounded-xl border border-black/10 bg-white px-3 py-2 font-mono text-xs leading-5 text-slate-700 focus:border-slate-400 focus:outline-none"
+        className="min-h-36 rounded-xl border border-slate-200 bg-white px-3 py-2 font-mono text-xs leading-5 text-slate-700 focus:border-slate-400 focus:outline-none"
       />
     </label>
   );

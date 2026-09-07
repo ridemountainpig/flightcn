@@ -1,22 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-
+import { DropdownMenu } from "radix-ui";
 import { cn } from "@/lib/utils";
 
-export type SiteNavItem = {
-  label: string;
-  href: string;
-  external?: boolean;
-};
-
+export type SiteNavItem = { label: string; href: string; external?: boolean };
 export const defaultSiteNavItems: SiteNavItem[] = [
   { label: "Home", href: "/" },
   { label: "Documentation", href: "/docs" },
   { label: "Install Guide", href: "/docs/install" },
   { label: "Airports", href: "/airports" },
+  { label: "Satellite playground", href: "/satellite-demo" },
 ];
 
 export function SiteNavMenu({
@@ -34,89 +30,55 @@ export function SiteNavMenu({
   menuLabel?: string;
   iconClassName?: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open]);
-
+  const pathname = usePathname();
   return (
-    <div ref={menuRef} className="relative">
-      <button
-        type="button"
-        aria-label={menuLabel}
-        aria-expanded={open}
-        onClick={() => setOpen((prev) => !prev)}
-        className={cn(
-          "border-border inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border transition-colors sm:size-11",
-          buttonClassName,
-        )}
-      >
-        <Menu className={cn("size-4", iconClassName)} />
-      </button>
-
-      {open ? (
-        <div
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          type="button"
+          aria-label={menuLabel}
           className={cn(
-            "bg-popover text-popover-foreground border-border absolute top-full right-0 mt-2 w-48 rounded-xl border p-1.5 shadow-md backdrop-blur",
+            "pressable inline-flex size-11 items-center justify-center rounded-xl border border-slate-200 bg-white",
+            buttonClassName,
+          )}
+        >
+          <Menu className={cn("size-4", iconClassName)} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          sideOffset={8}
+          collisionPadding={16}
+          className={cn(
+            "nav-popover z-[1300] w-60 rounded-2xl border border-slate-200 bg-white p-2 text-slate-950 shadow-xl shadow-slate-900/10",
             panelClassName,
           )}
         >
-          {items.map((item) => {
-            const commonClassName = cn(
-              "block rounded-lg px-3 py-2 text-sm transition-colors",
-              itemClassName,
-            );
-
-            if (item.external) {
-              return (
+          {items.map((item) => (
+            <DropdownMenu.Item key={item.href} asChild>
+              {item.external ? (
                 <a
-                  key={item.href}
                   href={item.href}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => setOpen(false)}
-                  className={commonClassName}
+                  className={cn("nav-menu-item", itemClassName)}
+                >
+                  {item.label} ↗
+                </a>
+              ) : (
+                <Link
+                  href={item.href}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                  className={cn("nav-menu-item", itemClassName)}
                 >
                   {item.label}
-                </a>
-              );
-            }
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={commonClassName}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      ) : null}
-    </div>
+                </Link>
+              )}
+            </DropdownMenu.Item>
+          ))}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }

@@ -133,24 +133,6 @@
 }
 
 @layer utilities {
-  .app-grid-bg {
-    background-color: #f5f5f4;
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      rgba(15, 23, 42, 0.1) 1px,
-      transparent 0
-    );
-    background-size: 24px 24px;
-  }
-
-  .app-page-shell {
-    @apply mx-auto max-w-[1520px] px-4 py-6 sm:px-6 lg:px-8;
-  }
-
-  .app-glass-card {
-    @apply rounded-[1.8rem] border border-black/10 bg-white/85 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl;
-  }
-
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: rgb(51 65 85 / 0.7) transparent;
@@ -170,4 +152,439 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: rgb(15 23 42 / 0.82);
   }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Flightcn: quiet cartographic surfaces, instrument-like labels, flight orange. */
+@theme {
+  --color-slate-50: #f5f6f3;
+  --color-slate-100: #eff1ec;
+  --color-slate-200: #dfe3db;
+  --color-slate-300: #c6cdc2;
+  --color-slate-400: #8b9588;
+  --color-slate-500: #667160;
+  --color-slate-600: #515c4e;
+  --color-slate-700: #3f493c;
+  --color-slate-800: #30392e;
+  --color-slate-900: #242c23;
+  --color-slate-950: #1d241c;
+  /* Burnt flight orange, anchored at 600 = --ring (#c65d24) and 700 = #a84918. */
+  --color-orange-50: #fcf4eb;
+  --color-orange-100: #f7e2cb;
+  --color-orange-200: #f0cda6;
+  --color-orange-300: #e5ab74;
+  --color-orange-400: #d78440;
+  --color-orange-500: #cc6c2b;
+  --color-orange-600: #c65d24;
+  --color-orange-700: #a84918;
+  --color-orange-800: #8b3d16;
+  --color-orange-900: #723418;
+  --color-orange-950: #3e1b0c;
+}
+
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --background: #fafaf8;
+  --foreground: #1d241c;
+  --ring: #c65d24;
+  scroll-behavior: auto;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-geist-sans), sans-serif;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled),
+  [role="button"] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+  :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid #c65d24;
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: #f6d8bc;
+    color: #1d241c;
+  }
+  h1,
+  h2 {
+    text-wrap: balance;
+  }
+  input,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
+
+.site-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding: 0 32px;
+}
+.section-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #667160;
+}
+.section-kicker::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: #c65d24;
+}
+.section-title {
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.15;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+.pressable {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.pressable:active:not(:disabled):not(:focus-visible) {
+  transform: scale(0.97);
+}
+.product-indicator {
+  transition: transform 250ms var(--ease-in-out);
+}
+.copy-glyph {
+  display: grid;
+  width: 16px;
+  height: 16px;
+}
+.copy-glyph > svg {
+  grid-area: 1 / 1;
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+.copy-glyph > svg:last-child {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.copy-button[data-copied="true"] .copy-glyph > svg:first-child {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.copy-button[data-copied="true"] .copy-glyph > svg:last-child {
+  opacity: 1;
+  transform: scale(1);
+}
+.copy-button[data-copied="true"] {
+  color: #427444;
+}
+.app-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+/* Current page quotes the section-kicker line. */
+.app-nav-link[aria-current="page"] {
+  color: #a84918;
+  font-weight: 500;
+}
+.app-nav-link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: #c65d24;
+  transform: translateX(-50%);
+}
+@media (hover: hover) and (pointer: fine) {
+  .app-nav-link:hover {
+    background: #e6e9e1;
+    color: #1d241c;
+  }
+  .app-nav-link[aria-current="page"]:hover {
+    background: #f7e2cb;
+    color: #a84918;
+  }
+  .app-logo-plane {
+    transition: transform 200ms var(--ease-out);
+  }
+  .group:hover > .app-logo-plane {
+    transform: rotate(-8deg);
+  }
+}
+.nav-menu-item {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.nav-menu-item[data-highlighted] {
+  background: #eff1ec;
+}
+.nav-menu-item[aria-current="page"] {
+  background: #fff2e7;
+  color: #a84918;
+}
+.nav-popover {
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+@starting-style {
+  .nav-popover {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+.hero-entry {
+  animation: hero-arrive 500ms var(--ease-out) both;
+}
+.hero-entry:nth-child(2) {
+  animation-delay: 60ms;
+}
+@keyframes hero-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.demo-swap {
+  animation: demo-swap 250ms var(--ease-out) both;
+}
+/* Occasional-frequency entrances: status cards, inline errors. */
+.fade-rise {
+  animation: fade-rise 200ms var(--ease-out) both;
+}
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Click-feedback confirmations (copied bubble). */
+.pop-in {
+  animation: pop-in 150ms var(--ease-out) both;
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.collapse-chevron {
+  transition: transform 200ms var(--ease-out);
+}
+@keyframes demo-swap {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hub-card {
+  position: relative;
+  overflow: hidden;
+}
+.hub-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px #c65d24;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.hub-card:focus-visible::after {
+  opacity: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hub-card:hover::after {
+    opacity: 1;
+  }
+  .link-arrow {
+    transition: transform 160ms var(--ease-out);
+  }
+  a:hover > .link-arrow {
+    transform: translate(2px, -2px);
+  }
+}
+html[data-input="keyboard"]
+  :is(
+    .pressable,
+    .product-indicator,
+    .copy-glyph > svg,
+    .nav-popover,
+    .link-arrow,
+    .demo-swap,
+    .fade-rise,
+    .pop-in,
+    .collapse-chevron,
+    .app-logo-plane
+  ) {
+  transition: none;
+  animation: none;
+}
+html[data-input="keyboard"] .nav-popover {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-entry,
+  .demo-swap,
+  .fade-rise,
+  .pop-in {
+    animation-name: hero-fade;
+    animation-duration: 150ms;
+    animation-delay: 0ms;
+  }
+  .collapse-chevron {
+    transition: none;
+  }
+  .app-logo-plane {
+    transition: none;
+    transform: none !important;
+  }
+  .product-indicator,
+  .pressable,
+  .link-arrow {
+    transition-property: color, background-color;
+  }
+  .pressable:active:not(:disabled):not(:focus-visible),
+  a:hover > .link-arrow {
+    transform: none;
+  }
+  .copy-glyph > svg {
+    transition-property: opacity;
+    transform: none !important;
+  }
+  .nav-popover {
+    transition-property: opacity;
+    transform: none;
+  }
+  .animate-pulse,
+  .animate-spin {
+    animation: none;
+  }
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (max-width: 639px) {
+  .site-shell {
+    padding-inline: 20px;
+  }
+}
+
+/* Property controls stay beside their explanation on narrow screens. */
+@media (max-width: 767px) {
+  .props-table {
+    min-width: 0;
+  }
+  .props-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .props-table tbody,
+  .props-table tr,
+  .props-table td {
+    display: block;
+  }
+  .props-table tr {
+    padding: 12px 0;
+    border-bottom: 1px solid #dfe3db;
+  }
+  .props-table tr:last-child {
+    border-bottom: 0;
+  }
+  .props-table td {
+    border: 0;
+    padding: 6px 16px;
+    overflow-wrap: anywhere;
+  }
+  .props-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: #667160;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .props-table td:first-child {
+    font-size: 16px;
+  }
+  .props-table td:first-child::before {
+    display: none;
+  }
+  .props-table input,
+  .props-table select,
+  .props-table textarea {
+    font-size: 16px;
+    min-height: 40px;
+  }
+}
+/* Press-in lands fast; release settles a touch softer. */
+.pressable {
+  transition-duration: 160ms;
+}
+.pressable:active {
+  transition-duration: 100ms;
 }

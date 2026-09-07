@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+import { InteractionPreferences } from "@/components/ui/interaction-preferences";
 
 import { defaultKeywords, siteConfig } from "@/lib/seo";
 
@@ -30,6 +31,10 @@ export const metadata: Metadata = {
       url: siteConfig.creator.url,
     },
   ],
+  icons: {
+    icon: [{ url: "/flightcn-icon.svg", type: "image/svg+xml" }],
+    apple: "/flightcn-icon.png",
+  },
   openGraph: {
     type: "website",
     url: siteConfig.url,
@@ -39,7 +44,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: siteConfig.ogImage,
-        alt: siteConfig.name,
+        alt: siteConfig.ogImageAlt,
+        width: siteConfig.ogImageWidth,
+        height: siteConfig.ogImageHeight,
       },
     ],
   },
@@ -55,7 +62,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f5f5f4",
+  themeColor: "#fafaf8",
 };
 
 export default function RootLayout({
@@ -68,6 +75,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <InteractionPreferences />
+        <a
+          href="#page-content"
+          className="fixed top-3 left-3 z-[2000] -translate-y-24 rounded-lg bg-slate-950 px-4 py-3 text-sm text-white focus:translate-y-0"
+        >
+          Skip to content
+        </a>
         <GoogleAnalytics gaId="G-D5P23L59BL" />
         {children}
       </body>

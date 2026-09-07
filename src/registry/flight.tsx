@@ -259,14 +259,29 @@ function generateArcGeometry(
     const arc = greatCircle(from, to, { npoints });
     const geometry = arc.geometry;
 
-    // greatCircle returns MultiLineString for routes crossing the antimeridian.
-    // We preserve the type so MapLibre renders the gap correctly instead of
-    // drawing a straight line across the entire map.
+    // Some arc versions split at sampled points without adding the seam
+    // intersection. Extend both segments to the same latitude at ±180°.
+    // Keep the split so Mercator never draws a line across the whole world.
     if (geometry.type === "MultiLineString") {
-      return {
-        type: "MultiLineString",
-        coordinates: geometry.coordinates as [number, number][][],
-      };
+      const segments = geometry.coordinates.map((segment) =>
+        segment.map(([lng, lat]) => [lng, lat] as [number, number]),
+      );
+      for (let i = 1; i < segments.length; i++) {
+        const previous = segments[i - 1];
+        const next = segments[i];
+        const end = previous[previous.length - 1];
+        const start = next[0];
+        if (!end || !start || Math.abs(end[0] - start[0]) <= 180) continue;
+        const seam = end[0] > 0 ? 180 : -180;
+        const unwrappedStart = start[0] + (seam > 0 ? 360 : -360);
+        const span = unwrappedStart - end[0];
+        if (span === 0) continue;
+        const fraction = (seam - end[0]) / span;
+        const latitude = end[1] + fraction * (start[1] - end[1]);
+        if (end[0] !== seam) previous.push([seam, latitude]);
+        if (start[0] !== -seam) next.unshift([-seam, latitude]);
+      }
+      return { type: "MultiLineString", coordinates: segments };
     }
 
     return {

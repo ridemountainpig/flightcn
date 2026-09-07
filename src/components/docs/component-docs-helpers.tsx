@@ -198,7 +198,10 @@ export type ComponentPreviewArgs =
   | { id: "satellite-orbit"; satellite: SatelliteOrbitPlayground }
   | { id: "satellite-orbits"; satellites: SatelliteOrbitPlayground };
 
-export function renderComponentPreview(args: ComponentPreviewArgs) {
+export function renderComponentPreview(
+  args: ComponentPreviewArgs,
+  allowMotion = true,
+) {
   switch (args.id) {
     case "flight-airport":
       return (
@@ -230,7 +233,9 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
           showLabel={args.route.showLabel}
           hoverEffect={args.route.hoverEffect}
           tripType={args.route.tripType}
-          animate={args.route.animate ? { duration: 5000 } : false}
+          animate={
+            allowMotion && args.route.animate ? { duration: 5000 } : false
+          }
           lineStyle={args.route.lineStyle}
         />
       );
@@ -247,7 +252,9 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
           showLabel={args.routes.showLabel}
           hoverEffect={args.routes.hoverEffect}
           tripType={args.routes.tripType}
-          animate={args.routes.animate ? { duration: 7000 } : false}
+          animate={
+            allowMotion && args.routes.animate ? { duration: 7000 } : false
+          }
           lineStyle={args.routes.lineStyle}
         />
       );
@@ -260,7 +267,9 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
           showLabel={args.multiRoute.showLabel}
           hoverEffect={args.multiRoute.hoverEffect}
           tripType={args.multiRoute.tripType}
-          animate={args.multiRoute.animate ? { duration: 9000 } : false}
+          animate={
+            allowMotion && args.multiRoute.animate ? { duration: 9000 } : false
+          }
           lineStyle={args.multiRoute.lineStyle}
         />
       );
@@ -301,7 +310,9 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
             size={args.routeLabel.size}
             labelPosition={args.routeLabel.labelPosition}
             animate={
-              args.routeLabel.mode === "aircraft" && args.routeLabel.animate
+              allowMotion &&
+              args.routeLabel.mode === "aircraft" &&
+              args.routeLabel.animate
                 ? {
                     duration: args.routeLabel.duration,
                     loop: args.routeLabel.loop,
@@ -370,7 +381,7 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
           routeColor={args.flow.routeColor}
           routeOpacity={args.flow.routeOpacity}
           routeWidth={args.flow.routeWidth}
-          animate={args.flow.animate}
+          animate={allowMotion && args.flow.animate}
           aircraftCount={args.flow.aircraftCount}
           aircraftSize={args.flow.aircraftSize}
           duration={args.flow.duration}
@@ -378,9 +389,19 @@ export function renderComponentPreview(args: ComponentPreviewArgs) {
         />
       );
     case "satellite-orbit":
-      return <SatelliteOrbit {...buildSatelliteOrbitProps(args.satellite)} />;
+      return (
+        <SatelliteOrbit
+          {...buildSatelliteOrbitProps({
+            ...args.satellite,
+            animate: allowMotion && args.satellite.animate,
+          })}
+        />
+      );
     case "satellite-orbits": {
-      const sharedProps = buildSatelliteOrbitProps(args.satellites);
+      const sharedProps = buildSatelliteOrbitProps({
+        ...args.satellites,
+        animate: allowMotion && args.satellites.animate,
+      });
 
       return (
         <SatelliteOrbits

@@ -8,10 +8,16 @@ import { cn } from "@/lib/utils";
 type ShikiCodeBlockProps = {
   code: string;
   className?: string;
+  theme?: "material-theme-darker" | "github-light";
 };
 
-export function ShikiCodeBlock({ code, className }: ShikiCodeBlockProps) {
+export function ShikiCodeBlock({
+  code,
+  className,
+  theme = "material-theme-darker",
+}: ShikiCodeBlockProps) {
   const [highlight, setHighlight] = useState<{
+    theme: string;
     code: string;
     html: string;
   } | null>(null);
@@ -23,9 +29,9 @@ export function ShikiCodeBlock({ code, className }: ShikiCodeBlockProps) {
       try {
         const out = await codeToHtml(code, {
           lang: "tsx",
-          theme: "material-theme-darker",
+          theme,
         });
-        if (!cancelled) setHighlight({ code, html: out });
+        if (!cancelled) setHighlight({ code, theme, html: out });
       } catch {
         if (!cancelled) setHighlight(null);
       }
@@ -34,14 +40,21 @@ export function ShikiCodeBlock({ code, className }: ShikiCodeBlockProps) {
     return () => {
       cancelled = true;
     };
-  }, [code]);
+  }, [code, theme]);
 
-  const html = highlight?.code === code ? highlight.html : null;
+  const html =
+    highlight?.code === code && highlight.theme === theme
+      ? highlight.html
+      : null;
 
   if (html === null) {
     return (
       <pre
-        className={cn("font-mono text-xs leading-6 text-slate-100", className)}
+        className={cn(
+          "font-mono text-xs leading-6",
+          theme === "github-light" ? "text-slate-800" : "text-slate-100",
+          className,
+        )}
       >
         <code>{code}</code>
       </pre>

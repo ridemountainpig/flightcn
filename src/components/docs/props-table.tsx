@@ -74,23 +74,41 @@ export function PropsTable({
   controls?: ControlMap;
 }) {
   return (
-    <div className="max-w-full overflow-x-auto rounded-2xl border border-black/10 [scrollbar-color:rgb(51_65_85/0.7)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700/70 [&::-webkit-scrollbar-thumb]:bg-clip-padding [&::-webkit-scrollbar-thumb:hover]:bg-slate-900/82 [&::-webkit-scrollbar-track]:bg-transparent">
-      <table className="w-full min-w-[860px] border-collapse bg-white text-left">
+    <div className="custom-scrollbar max-w-full overflow-x-auto rounded-2xl border border-slate-200">
+      <table
+        role="table"
+        className="props-table w-full min-w-[860px] border-collapse bg-white text-left"
+      >
         <thead className="bg-slate-100/80 text-xs uppercase">
           <tr>
-            <th className="border-b border-black/10 px-4 py-3 font-semibold tracking-wide text-slate-700">
+            <th
+              scope="col"
+              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+            >
               Prop
             </th>
-            <th className="border-b border-black/10 px-4 py-3 font-semibold tracking-wide text-slate-700">
+            <th
+              scope="col"
+              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+            >
               Type
             </th>
-            <th className="border-b border-black/10 px-4 py-3 font-semibold tracking-wide text-slate-700">
+            <th
+              scope="col"
+              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+            >
               Default
             </th>
-            <th className="border-b border-black/10 px-4 py-3 font-semibold tracking-wide text-slate-700">
+            <th
+              scope="col"
+              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+            >
               Description
             </th>
-            <th className="border-b border-black/10 px-4 py-3 font-semibold tracking-wide text-slate-700">
+            <th
+              scope="col"
+              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+            >
               Playground
             </th>
           </tr>
@@ -101,19 +119,34 @@ export function PropsTable({
 
             return (
               <tr key={prop.name}>
-                <td className="border-b border-black/8 px-4 py-3 align-middle text-sm font-medium text-slate-900">
+                <td
+                  data-label="Property"
+                  className="border-b border-slate-200 px-4 py-3 align-middle text-sm font-medium text-slate-900"
+                >
                   <code>{prop.name}</code>
                 </td>
-                <td className="border-b border-black/8 px-4 py-3 align-middle text-xs text-slate-700">
+                <td
+                  data-label="Type"
+                  className="border-b border-slate-200 px-4 py-3 align-middle text-xs text-slate-700"
+                >
                   <code>{prop.type}</code>
                 </td>
-                <td className="border-b border-black/8 px-4 py-3 align-middle text-xs text-slate-700">
+                <td
+                  data-label="Default"
+                  className="border-b border-slate-200 px-4 py-3 align-middle text-xs text-slate-700"
+                >
                   <code>{prop.defaultValue}</code>
                 </td>
-                <td className="border-b border-black/8 px-4 py-3 align-middle text-sm text-slate-700">
+                <td
+                  data-label="Description"
+                  className="border-b border-slate-200 px-4 py-3 align-middle text-sm text-slate-700"
+                >
                   {prop.description}
                 </td>
-                <td className="border-b border-black/8 px-4 py-3 align-middle text-sm text-slate-700">
+                <td
+                  data-label="Playground"
+                  className="border-b border-slate-200 px-4 py-3 align-middle text-sm text-slate-700"
+                >
                   {control ? (
                     control.kind === "select" ? (
                       <SelectInput
@@ -182,10 +215,10 @@ export function PropsTable({
                         />
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-400">-</span>
+                      <span className="text-xs text-slate-500">-</span>
                     )
                   ) : (
-                    <span className="text-xs text-slate-400">-</span>
+                    <span className="text-xs text-slate-500">-</span>
                   )}
                 </td>
               </tr>
