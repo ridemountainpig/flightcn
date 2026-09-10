@@ -1,6 +1,6 @@
 "use client";
 
-import MapLibreGL from "maplibre-gl";
+import * as MapLibreGL from "maplibre-gl";
 import {
   useCallback,
   useEffect,
@@ -884,7 +884,7 @@ function FlightRoute({
     if (!isLoaded || !map || !map.getLayer(layerId)) return;
 
     map.setPaintProperty(layerId, "line-color", resolvedRouteColor);
-    map.setPaintProperty(layerId, "line-dasharray", resolvedDash ?? null);
+    map.setPaintProperty(layerId, "line-dasharray", resolvedDash ?? undefined);
     map.setPaintProperty(layerId, "line-width", width);
     map.setPaintProperty(layerId, "line-opacity", opacity);
     map.setLayoutProperty(layerId, "line-cap", resolvedDash ? "butt" : "round");
