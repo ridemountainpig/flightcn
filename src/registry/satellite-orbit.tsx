@@ -1,6 +1,6 @@
 "use client";
 
-import MapLibreGL from "maplibre-gl";
+import * as MapLibreGL from "maplibre-gl";
 import { memo, startTransition, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 

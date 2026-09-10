@@ -2,7 +2,7 @@
 
 import bearing from "@turf/bearing";
 import greatCircle from "@turf/great-circle";
-import MapLibreGL from "maplibre-gl";
+import * as MapLibreGL from "maplibre-gl";
 import {
   useCallback,
   useEffect,
@@ -60,6 +60,12 @@ type OverlayImageResource = {
   create: () => ImageData;
   pixelRatio?: number;
 };
+
+// Overlay layers keep paint/layout as open-ended records, while maplibre-gl v6
+// types the setters per property key; derive the parameter types so dynamic
+// updates compile against both v5 and v6.
+type SetPaintPropertyArgs = Parameters<MapLibreGL.Map["setPaintProperty"]>;
+type SetLayoutPropertyArgs = Parameters<MapLibreGL.Map["setLayoutProperty"]>;
 
 const EMPTY_COLLECTION: GeoJsonCollection = {
   type: "FeatureCollection",
@@ -327,12 +333,20 @@ function useGeoJsonOverlay(
       if (!map.getLayer(layer.id)) continue;
       if (layer.paint) {
         for (const [property, value] of Object.entries(layer.paint)) {
-          map.setPaintProperty(layer.id, property, value);
+          map.setPaintProperty(
+            layer.id,
+            property as SetPaintPropertyArgs[1],
+            value as SetPaintPropertyArgs[2],
+          );
         }
       }
       if (layer.layout) {
         for (const [property, value] of Object.entries(layer.layout)) {
-          map.setLayoutProperty(layer.id, property, value);
+          map.setLayoutProperty(
+            layer.id,
+            property as SetLayoutPropertyArgs[1],
+            value as SetLayoutPropertyArgs[2],
+          );
         }
       }
       if (layer.filter) map.setFilter(layer.id, layer.filter);
