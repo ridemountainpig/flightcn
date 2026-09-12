@@ -109,7 +109,7 @@ export function DeparturesBoard() {
   );
 
   return (
-    <div className="grid min-h-[480px] w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:grid-cols-[360px_1fr]">
+    <div className="grid min-h-[480px] w-full min-w-0 grid-cols-1 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:grid-cols-[360px_1fr]">
       <aside className="flex min-h-0 flex-col border-b border-slate-200 lg:border-r lg:border-b-0">
         <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
           <p className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-slate-500">

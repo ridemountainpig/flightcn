@@ -81,7 +81,9 @@ export function BlockCard({ block }: { block: BlockConfig }) {
         </div>
       </div>
 
-      <div className="mt-4">
+      {/* On phones the preview, code, and install rows bleed 8px into the
+          card padding so the maps get more usable width. */}
+      <div className="-mx-2 mt-4 sm:mx-0">
         {/* While the Code tab is open (or the block scrolls far away) the
             map unmounts via DocsMapMountWhenVisible, releasing its WebGL
             context — browsers cap live contexts per page. */}
@@ -116,7 +118,7 @@ export function BlockCard({ block }: { block: BlockConfig }) {
 
       <InstallCommandCopy
         item={block.installItem}
-        className="mt-4 bg-slate-50"
+        className="-mx-2 mt-4 bg-slate-50 sm:mx-0"
       />
     </section>
   );

@@ -91,7 +91,7 @@ export function FlightOpsOverview() {
           </div>
         ))}
       </dl>
-      <div className="grid min-h-0 flex-1 lg:grid-cols-[1fr_300px]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[1fr_300px]">
         <div className="relative min-h-[320px]">
           <Map
             theme="light"
