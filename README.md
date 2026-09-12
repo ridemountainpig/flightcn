@@ -1,14 +1,29 @@
-# Beautiful flight visualizations for React.
+<h1 align="center">Beautiful flight visualizations for React.</h1>
 
-Routes, live tracking, networks, trails and satellite orbits — built with MapLibre and mapcn.
+<p align="center">
+  Routes, live tracking, networks, trails and satellite orbits — built with MapLibre and mapcn.
+</p>
 
-[Documentation](https://flightcn.yencheng.dev/docs/flight) · [Playground](https://flightcn.yencheng.dev/playground) · [Satellite Playground](https://flightcn.yencheng.dev/satellite-playground) · [Blocks](https://flightcn.yencheng.dev/blocks) · [Examples](https://flightcn.yencheng.dev/#showcase) · [Star on GitHub](https://github.com/ridemountainpig/flightcn)
+<p align="center">
+  <a href="https://github.com/ridemountainpig/flightcn/stargazers"><img src="https://shieldcn.dev/github/stars/ridemountainpig/flightcn.svg?variant=secondary" alt="GitHub stars" /></a>
+  <a href="./LICENSE"><img src="https://shieldcn.dev/github/license/ridemountainpig/flightcn.svg?variant=secondary" alt="License: MIT" /></a>
+</p>
+
+<p align="center">
+  <a href="https://flightcn.yencheng.dev/docs/flight"><img src="https://shieldcn.dev/badge/documentation.svg?variant=secondary" alt="Documentation" /></a>
+  <a href="https://flightcn.yencheng.dev/playground"><img src="https://shieldcn.dev/badge/playground.svg?variant=secondary" alt="Playground" /></a>
+  <a href="https://flightcn.yencheng.dev/satellite-playground"><img src="https://shieldcn.dev/badge/satellite_playground.svg?variant=secondary" alt="Satellite Playground" /></a>
+  <a href="https://flightcn.yencheng.dev/blocks"><img src="https://shieldcn.dev/badge/blocks.svg?variant=secondary" alt="Blocks" /></a>
+  <a href="https://flightcn.yencheng.dev/#showcase"><img src="https://shieldcn.dev/badge/examples.svg?variant=secondary" alt="Examples" /></a>
+</p>
 
 ```bash
 npx shadcn@latest add @flightcn/flight
 ```
 
-![Animated TPE to HND route rendered with flightcn](public/demos/flight-route.gif)
+<p align="center">
+  <img src="public/demos/flight-route.gif" alt="Animated TPE to HND route rendered with flightcn" />
+</p>
 
 flightcn gives you flight visualization components you own. Start with two IATA codes, add airport labels, animate an aircraft, or build a complete route network.
 
