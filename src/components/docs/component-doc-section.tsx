@@ -140,13 +140,7 @@ function booleanControl(
   onChange: (value: boolean) => void,
   disabled = false,
 ): ControlConfig {
-  return {
-    kind: "select",
-    value: String(value),
-    onChange: (nextValue) => onChange(nextValue === "true"),
-    options: ["true", "false"],
-    disabled,
-  };
+  return { kind: "toggle", value, onChange, disabled };
 }
 
 function getThemeAwareRouteColor() {
@@ -204,34 +198,18 @@ function routeLikeControls(
       value: play.color ?? themeColor,
       onChange: (value) => set((prev) => ({ ...prev, color: value })),
     },
-    showAirports: {
-      kind: "select",
-      value: String(play.showAirports),
-      onChange: (value) =>
-        set((prev) => ({ ...prev, showAirports: value === "true" })),
-      options: ["true", "false"],
-    },
-    showLabel: {
-      kind: "select",
-      value: String(play.showLabel),
-      onChange: (value) =>
-        set((prev) => ({ ...prev, showLabel: value === "true" })),
-      options: ["true", "false"],
-    },
-    hoverEffect: {
-      kind: "select",
-      value: String(play.hoverEffect),
-      onChange: (value) =>
-        set((prev) => ({ ...prev, hoverEffect: value === "true" })),
-      options: ["true", "false"],
-    },
-    animate: {
-      kind: "select",
-      value: String(play.animate),
-      onChange: (value) =>
-        set((prev) => ({ ...prev, animate: value === "true" })),
-      options: ["true", "false"],
-    },
+    showAirports: booleanControl(play.showAirports, (value) =>
+      set((prev) => ({ ...prev, showAirports: value })),
+    ),
+    showLabel: booleanControl(play.showLabel, (value) =>
+      set((prev) => ({ ...prev, showLabel: value })),
+    ),
+    hoverEffect: booleanControl(play.hoverEffect, (value) =>
+      set((prev) => ({ ...prev, hoverEffect: value })),
+    ),
+    animate: booleanControl(play.animate, (value) =>
+      set((prev) => ({ ...prev, animate: value })),
+    ),
     tripType: {
       kind: "select",
       value: play.tripType,
@@ -354,16 +332,9 @@ function AirportDocSection({ component }: { component: ComponentDoc }) {
 
   const controls = useMemo((): ControlMap => {
     return {
-      showLabel: {
-        kind: "select",
-        value: String(airport.showLabel),
-        onChange: (value) =>
-          setAirport((prev) => ({
-            ...prev,
-            showLabel: value === "true",
-          })),
-        options: ["true", "false"],
-      },
+      showLabel: booleanControl(airport.showLabel, (value) =>
+        setAirport((prev) => ({ ...prev, showLabel: value })),
+      ),
       labelPosition: {
         kind: "select",
         value: airport.labelPosition,
@@ -549,23 +520,12 @@ function SatelliteOrbitDocSection({ component }: { component: ComponentDoc }) {
             satelliteConnectorColor: value,
           })),
       },
-      showGlow: {
-        kind: "select",
-        value: String(satellite.showGlow),
-        onChange: (value) =>
-          setSatellite((prev) => ({ ...prev, showGlow: value === "true" })),
-        options: ["true", "false"],
-      },
-      showConnector: {
-        kind: "select",
-        value: String(satellite.showConnector),
-        onChange: (value) =>
-          setSatellite((prev) => ({
-            ...prev,
-            showConnector: value === "true",
-          })),
-        options: ["true", "false"],
-      },
+      showGlow: booleanControl(satellite.showGlow, (value) =>
+        setSatellite((prev) => ({ ...prev, showGlow: value })),
+      ),
+      showConnector: booleanControl(satellite.showConnector, (value) =>
+        setSatellite((prev) => ({ ...prev, showConnector: value })),
+      ),
       orbitLineStyle: {
         kind: "select",
         value: satellite.orbitLineStyle,
@@ -598,13 +558,9 @@ function SatelliteOrbitDocSection({ component }: { component: ComponentDoc }) {
           })),
         options: ["solid", "dash", "dot"],
       },
-      animate: {
-        kind: "select",
-        value: String(satellite.animate),
-        onChange: (value) =>
-          setSatellite((prev) => ({ ...prev, animate: value === "true" })),
-        options: ["true", "false"],
-      },
+      animate: booleanControl(satellite.animate, (value) =>
+        setSatellite((prev) => ({ ...prev, animate: value })),
+      ),
       duration: {
         kind: "number",
         value: satellite.duration,
@@ -618,13 +574,9 @@ function SatelliteOrbitDocSection({ component }: { component: ComponentDoc }) {
         value: satellite.name,
         onChange: (value) => setSatellite((prev) => ({ ...prev, name: value })),
       },
-      showLabel: {
-        kind: "select",
-        value: String(satellite.showLabel),
-        onChange: (value) =>
-          setSatellite((prev) => ({ ...prev, showLabel: value === "true" })),
-        options: ["true", "false"],
-      },
+      showLabel: booleanControl(satellite.showLabel, (value) =>
+        setSatellite((prev) => ({ ...prev, showLabel: value })),
+      ),
       labelPosition: {
         kind: "select",
         value: satellite.labelPosition,
@@ -721,23 +673,12 @@ function SatelliteOrbitsDocSection({ component }: { component: ComponentDoc }) {
           })),
         step: 1,
       },
-      showGlow: {
-        kind: "select",
-        value: String(satellites.showGlow),
-        onChange: (value) =>
-          setSatellites((prev) => ({ ...prev, showGlow: value === "true" })),
-        options: ["true", "false"],
-      },
-      showConnector: {
-        kind: "select",
-        value: String(satellites.showConnector),
-        onChange: (value) =>
-          setSatellites((prev) => ({
-            ...prev,
-            showConnector: value === "true",
-          })),
-        options: ["true", "false"],
-      },
+      showGlow: booleanControl(satellites.showGlow, (value) =>
+        setSatellites((prev) => ({ ...prev, showGlow: value })),
+      ),
+      showConnector: booleanControl(satellites.showConnector, (value) =>
+        setSatellites((prev) => ({ ...prev, showConnector: value })),
+      ),
       connectorLineStyle: {
         kind: "select",
         value: satellites.connectorLineStyle,
@@ -749,20 +690,12 @@ function SatelliteOrbitsDocSection({ component }: { component: ComponentDoc }) {
           })),
         options: ["solid", "dash", "dot"],
       },
-      animate: {
-        kind: "select",
-        value: String(satellites.animate),
-        onChange: (value) =>
-          setSatellites((prev) => ({ ...prev, animate: value === "true" })),
-        options: ["true", "false"],
-      },
-      showLabel: {
-        kind: "select",
-        value: String(satellites.showLabel),
-        onChange: (value) =>
-          setSatellites((prev) => ({ ...prev, showLabel: value === "true" })),
-        options: ["true", "false"],
-      },
+      animate: booleanControl(satellites.animate, (value) =>
+        setSatellites((prev) => ({ ...prev, animate: value })),
+      ),
+      showLabel: booleanControl(satellites.showLabel, (value) =>
+        setSatellites((prev) => ({ ...prev, showLabel: value })),
+      ),
       labelPosition: {
         kind: "select",
         value: satellites.labelPosition,

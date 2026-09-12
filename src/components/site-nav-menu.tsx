@@ -4,15 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
+import { PLAYGROUND_HREFS } from "@/components/product-links";
 import { cn } from "@/lib/utils";
 
 export type SiteNavItem = { label: string; href: string; external?: boolean };
 export const defaultSiteNavItems: SiteNavItem[] = [
   { label: "Home", href: "/" },
+  { label: "Flight playground", href: PLAYGROUND_HREFS.flight },
+  { label: "Blocks", href: "/blocks" },
   { label: "Documentation", href: "/docs" },
   { label: "Install Guide", href: "/docs/install" },
   { label: "Airports", href: "/airports" },
-  { label: "Satellite playground", href: "/satellite-demo" },
+  { label: "Satellite playground", href: PLAYGROUND_HREFS.satellite },
 ];
 
 export function SiteNavMenu({

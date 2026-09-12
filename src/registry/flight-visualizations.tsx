@@ -35,7 +35,8 @@ type GeoJsonFeature = {
   geometry:
     | RouteGeometry
     | { type: "Point"; coordinates: Coordinates }
-    | { type: "Polygon"; coordinates: Coordinates[][] };
+    | { type: "Polygon"; coordinates: Coordinates[][] }
+    | { type: "MultiPolygon"; coordinates: Coordinates[][][] };
 };
 
 type GeoJsonCollection = {
@@ -222,7 +223,22 @@ function coordinatesToGeometry(coordinates: Coordinates[]): RouteGeometry {
     const segment = segments[segments.length - 1];
     const previous = segment[segment.length - 1];
     if (previous && Math.abs(normalized[0] - previous[0]) > 180) {
-      segments.push([normalized]);
+      // Interpolate the latitude where the path crosses the antimeridian and
+      // extend both segments to ±180° so the split leaves no visible gap.
+      const seam = previous[0] > 0 ? 180 : -180;
+      const unwrapped = normalized[0] + (seam > 0 ? 360 : -360);
+      const span = unwrapped - previous[0];
+      const seamLatitude =
+        span === 0
+          ? previous[1]
+          : previous[1] +
+            ((seam - previous[0]) / span) * (normalized[1] - previous[1]);
+      if (previous[0] !== seam) segment.push([seam, seamLatitude]);
+      segments.push(
+        normalized[0] === -seam
+          ? [normalized]
+          : [[-seam, seamLatitude], normalized],
+      );
     } else {
       segment.push(normalized);
     }
@@ -1095,17 +1111,24 @@ export type FlightRangeProps = {
   steps?: number;
 };
 
-function geodesicCircle(
+const EARTH_RADIUS_KM = 6371;
+
+/**
+ * Raw geodesic circle vertices with longitudes unwrapped for continuity
+ * (values may exceed ±180°). The ring is open — the first point is not
+ * repeated at the end.
+ */
+function geodesicCirclePoints(
   center: Coordinates,
   distanceKm: number,
   steps: number,
 ): Coordinates[] {
-  const angularDistance = distanceKm / 6371;
+  const angularDistance = distanceKm / EARTH_RADIUS_KM;
   const latitude = (center[1] * Math.PI) / 180;
   const longitude = (center[0] * Math.PI) / 180;
   const coordinates: Coordinates[] = [];
 
-  for (let index = 0; index <= steps; index += 1) {
+  for (let index = 0; index < steps; index += 1) {
     const angle = (index / steps) * Math.PI * 2;
     const destinationLatitude = Math.asin(
       Math.sin(latitude) * Math.cos(angularDistance) +
@@ -1118,12 +1141,162 @@ function geodesicCircle(
         Math.cos(angularDistance) -
           Math.sin(latitude) * Math.sin(destinationLatitude),
       );
-    coordinates.push([
-      normalizeLongitude((destinationLongitude * 180) / Math.PI),
-      (destinationLatitude * 180) / Math.PI,
-    ]);
+
+    let lng = (destinationLongitude * 180) / Math.PI;
+    const previous = coordinates[coordinates.length - 1];
+    if (previous) {
+      while (lng - previous[0] > 180) lng -= 360;
+      while (lng - previous[0] < -180) lng += 360;
+    } else {
+      lng = normalizeLongitude(lng);
+    }
+    coordinates.push([lng, (destinationLatitude * 180) / Math.PI]);
   }
   return coordinates;
+}
+
+/** Sutherland–Hodgman clip of a closed ring against a vertical half-plane. */
+function clipRingByLongitude(
+  ring: Coordinates[],
+  seam: number,
+  keepWestOfSeam: boolean,
+): Coordinates[] {
+  const inside = (lng: number) => (keepWestOfSeam ? lng <= seam : lng >= seam);
+  const clipped: Coordinates[] = [];
+  for (let index = 0; index < ring.length; index += 1) {
+    const current = ring[index];
+    const next = ring[(index + 1) % ring.length];
+    const currentInside = inside(current[0]);
+    if (currentInside) clipped.push(current);
+    if (currentInside !== inside(next[0]) && next[0] !== current[0]) {
+      const t = (seam - current[0]) / (next[0] - current[0]);
+      clipped.push([seam, current[1] + (next[1] - current[1]) * t]);
+    }
+  }
+  return clipped;
+}
+
+function closeRing(ring: Coordinates[]): Coordinates[] {
+  if (ring.length === 0) return ring;
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  if (first[0] === last[0] && first[1] === last[1]) return ring;
+  return [...ring, first];
+}
+
+/**
+ * Split a ring with unwrapped longitudes into closed rings that stay within
+ * the canonical [-180, 180] range, cutting at the antimeridian when needed.
+ */
+function splitRingAtAntimeridian(ring: Coordinates[]): Coordinates[][] {
+  const longitudes = ring.map((point) => point[0]);
+  const minLongitude = Math.min(...longitudes);
+  const maxLongitude = Math.max(...longitudes);
+  if (maxLongitude <= 180 && minLongitude >= -180) return [closeRing(ring)];
+
+  const seam = maxLongitude > 180 ? 180 : -180;
+  const shift = seam > 0 ? -360 : 360;
+  const mainRing = clipRingByLongitude(ring, seam, seam > 0);
+  const overflowRing = clipRingByLongitude(ring, seam, seam < 0).map(
+    (point): Coordinates => [point[0] + shift, point[1]],
+  );
+
+  const rings: Coordinates[][] = [];
+  if (mainRing.length >= 3) rings.push(closeRing(mainRing));
+  if (overflowRing.length >= 3) rings.push(closeRing(overflowRing));
+  return rings;
+}
+
+/**
+ * Build render-safe geometry for a geodesic circle: fill polygons split at
+ * the antimeridian (or closed over an enclosed pole) plus an outline that
+ * follows only the circle itself — never the artificial seam edges.
+ */
+function geodesicCircleGeometry(
+  center: Coordinates,
+  distanceKm: number,
+  steps: number,
+): {
+  polygons: Coordinates[][][];
+  outline: RouteGeometry;
+} {
+  // Just under half the circumference — an antipodal circle degenerates.
+  const maxDistanceKm = Math.PI * EARTH_RADIUS_KM * 0.995;
+  const distance = Math.min(distanceKm, maxDistanceKm);
+  const ring = geodesicCirclePoints(center, distance, steps);
+  const distanceToNorthPole =
+    ((90 - center[1]) * Math.PI * EARTH_RADIUS_KM) / 180;
+  const distanceToSouthPole =
+    ((90 + center[1]) * Math.PI * EARTH_RADIUS_KM) / 180;
+  if (distance > distanceToNorthPole && distance > distanceToSouthPole) {
+    // Both poles are within range: the reachable region is the whole globe
+    // minus a cap around the antipode. Build two hemispheric polygons that
+    // meet along the cap's centre meridian so the cap becomes a hole.
+    const capRadiusKm = Math.PI * EARTH_RADIUS_KM - distance;
+    const capCenter: Coordinates = [
+      normalizeLongitude(center[0] + 180),
+      -center[1],
+    ];
+    const capRing = geodesicCirclePoints(capCenter, capRadiusKm, steps);
+    const half = Math.floor(capRing.length / 2);
+    const top = capRing[0];
+    const bottom = capRing[half];
+    const eastRing: Coordinates[] = [
+      [top[0], 90],
+      ...capRing.slice(0, half + 1),
+      [bottom[0], -90],
+      [top[0] + 180, -90],
+      [top[0] + 180, 90],
+    ];
+    const westRing: Coordinates[] = [
+      [bottom[0], -90],
+      ...capRing.slice(half),
+      top,
+      [top[0], 90],
+      [top[0] - 180, 90],
+      [top[0] - 180, -90],
+    ];
+    return {
+      polygons: [eastRing, westRing].flatMap((ring) =>
+        splitRingAtAntimeridian(ring).map((part) => [part]),
+      ),
+      outline: coordinatesToGeometry(closeRing(capRing)),
+    };
+  }
+
+  const enclosedPoleLatitude =
+    distance > distanceToNorthPole
+      ? 90
+      : distance > distanceToSouthPole
+        ? -90
+        : null;
+
+  if (enclosedPoleLatitude !== null) {
+    // The circle wraps every meridian — close the region over the pole.
+    const sorted = ring
+      .map((point): Coordinates => [normalizeLongitude(point[0]), point[1]])
+      .sort((a, b) => a[0] - b[0]);
+    const edgeLatitude = (sorted[0][1] + sorted[sorted.length - 1][1]) / 2;
+    const boundary: Coordinates[] = [
+      [-180, edgeLatitude],
+      ...sorted,
+      [180, edgeLatitude],
+    ];
+    const polygonRing = closeRing([
+      ...boundary,
+      [180, enclosedPoleLatitude],
+      [-180, enclosedPoleLatitude],
+    ]);
+    return {
+      polygons: [[polygonRing]],
+      outline: { type: "LineString", coordinates: boundary },
+    };
+  }
+
+  return {
+    polygons: splitRingAtAntimeridian(ring).map((part) => [part]),
+    outline: coordinatesToGeometry(closeRing(ring)),
+  };
 }
 
 /** True geodesic range bands measured in kilometres from an airport or point. */
@@ -1152,20 +1325,32 @@ function FlightRange({
     const sorted = [...ranges].sort((a, b) => b.distance - a.distance);
     return {
       type: "FeatureCollection",
-      features: sorted.map((range, index) => ({
-        type: "Feature",
-        properties: {
-          color: range.color ?? ["#cbd5e1", "#94a3b8", "#475569"][index % 3],
-          opacity: range.opacity ?? 0.065,
-          distance: range.distance,
-        },
-        geometry: {
-          type: "Polygon",
-          coordinates: [
-            geodesicCircle(originCoordinates, range.distance, steps),
-          ],
-        },
-      })),
+      features: sorted.flatMap((range, index): GeoJsonFeature[] => {
+        const color =
+          range.color ?? ["#cbd5e1", "#94a3b8", "#475569"][index % 3];
+        const circle = geodesicCircleGeometry(
+          originCoordinates,
+          range.distance,
+          steps,
+        );
+        return [
+          {
+            type: "Feature",
+            properties: {
+              kind: "band",
+              color,
+              opacity: range.opacity ?? 0.065,
+              distance: range.distance,
+            },
+            geometry: { type: "MultiPolygon", coordinates: circle.polygons },
+          },
+          {
+            type: "Feature",
+            properties: { kind: "outline", color, distance: range.distance },
+            geometry: circle.outline,
+          },
+        ];
+      }),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originCoordinates, rangeSignature, steps]);
@@ -1175,6 +1360,7 @@ function FlightRange({
         id: fillLayerId,
         source: sourceId,
         type: "fill",
+        filter: ["==", ["get", "kind"], "band"],
         paint: {
           "fill-color": ["get", "color"],
           "fill-opacity": ["get", "opacity"],
@@ -1184,6 +1370,7 @@ function FlightRange({
         id: outlineLayerId,
         source: sourceId,
         type: "line",
+        filter: ["==", ["get", "kind"], "outline"],
         paint: {
           "line-color": ["get", "color"],
           "line-opacity": 0.72,
@@ -1598,11 +1785,15 @@ function AircraftTrail({
       const futureCoordinates = plannedPositions.map(
         (point): Coordinates => [point.longitude, point.latitude],
       );
-      const first = futureCoordinates[0];
-      const startsAtLatestPosition =
-        Math.abs(first[0] - latestPosition[0]) < 0.000001 &&
-        Math.abs(first[1] - latestPosition[1]) < 0.000001;
-      return startsAtLatestPosition
+      // Accept paths touching the latest position at either end. A reversed
+      // path (destination → latest position) keeps the dash phase anchored at
+      // the fixed destination, so the dashes stay visually static while the
+      // aircraft advances.
+      const touchesLatestPosition = (coordinate: Coordinates) =>
+        Math.abs(coordinate[0] - latestPosition[0]) < 0.000001 &&
+        Math.abs(coordinate[1] - latestPosition[1]) < 0.000001;
+      return touchesLatestPosition(futureCoordinates[0]) ||
+        touchesLatestPosition(futureCoordinates[futureCoordinates.length - 1])
         ? futureCoordinates
         : [latestPosition, ...futureCoordinates];
     }

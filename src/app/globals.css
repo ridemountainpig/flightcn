@@ -135,7 +135,8 @@
 @layer utilities {
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgb(51 65 85 / 0.7) transparent;
+    scrollbar-color: color-mix(in srgb, var(--color-slate-700) 70%, transparent)
+      transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
@@ -143,14 +144,22 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgb(51 65 85 / 0.7);
+    background-color: color-mix(
+      in srgb,
+      var(--color-slate-700) 70%,
+      transparent
+    );
     border: 2px solid transparent;
     border-radius: 9999px;
     background-clip: padding-box;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(15 23 42 / 0.82);
+    background-color: color-mix(
+      in srgb,
+      var(--color-slate-900) 82%,
+      transparent
+    );
   }
 }
 
@@ -262,6 +271,54 @@
   line-height: 1.15;
   letter-spacing: -0.045em;
   font-weight: 500;
+}
+/* Footer quotes the map frame: a graticule ruler stands in for the top border. */
+.footer-ruler {
+  position: relative;
+  height: 9px;
+  border-top: 1px solid #e2e8f0;
+  background-image: repeating-linear-gradient(
+    to right,
+    #d9ddd3 0 1px,
+    transparent 1px 10px
+  );
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+}
+.footer-ruler::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 18px;
+  height: 1px;
+  background: #c65d24;
+}
+.footer-ruler::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    #b7bfb1 0 1px,
+    transparent 1px 60px
+  );
+  background-size: 100% 9px;
+  background-repeat: no-repeat;
+}
+.footer-heading {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #667160;
+}
+.footer-coords {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #8b948a;
 }
 .pressable {
   transition:
@@ -563,9 +620,10 @@ html[data-input="keyboard"] .nav-popover {
     display: block;
     margin-bottom: 4px;
     color: #667160;
+    font-family: var(--font-geist-mono), monospace;
     font-size: 10px;
     font-weight: 500;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
   .props-table td:first-child {

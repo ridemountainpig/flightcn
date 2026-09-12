@@ -33,6 +33,13 @@ type PageMetadataOptions = {
   description: string;
   path: string;
   keywords?: readonly string[];
+  /**
+   * Page-specific OG/Twitter card image; falls back to the site-wide one.
+   * Required even for pages with an opengraph-image.tsx file convention —
+   * the images set here override the file-based ones, so point at that
+   * route explicitly (e.g. "/playground/opengraph-image").
+   */
+  ogImage?: { url: string; alt: string };
 };
 
 export function absoluteUrl(path: string) {
@@ -44,11 +51,16 @@ export function buildPageMetadata({
   description,
   path,
   keywords = [],
+  ogImage,
 }: PageMetadataOptions): Metadata {
   const openGraphTitle =
     title === siteConfig.name
       ? siteConfig.name
       : `${title} | ${siteConfig.name}`;
+  const image = ogImage ?? {
+    url: siteConfig.ogImage,
+    alt: siteConfig.ogImageAlt,
+  };
 
   return {
     title,
@@ -65,8 +77,8 @@ export function buildPageMetadata({
       siteName: siteConfig.name,
       images: [
         {
-          url: siteConfig.ogImage,
-          alt: siteConfig.ogImageAlt,
+          url: image.url,
+          alt: image.alt,
           width: siteConfig.ogImageWidth,
           height: siteConfig.ogImageHeight,
         },
@@ -77,7 +89,7 @@ export function buildPageMetadata({
       title: openGraphTitle,
       description,
       creator: "@ridemountainpig",
-      images: [siteConfig.ogImage],
+      images: [image.url],
     },
   };
 }

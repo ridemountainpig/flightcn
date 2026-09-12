@@ -46,6 +46,204 @@
           "target": "components/ui/satellite-orbit.tsx"
         }
       ]
+    },
+    {
+      "name": "flight-route-picker",
+      "type": "registry:block",
+      "title": "Flight Route Picker",
+      "description": "Search airports, explore featured routes, and arrange multiple stopovers to compare flight legs, distance and estimated time in the air.",
+      "dependencies": ["lucide-react", "maplibre-gl"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/flight-route-picker/flight-route-picker.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/flight-route-picker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "flight-tracker-dashboard",
+      "type": "registry:block",
+      "title": "Flight Tracker Dashboard",
+      "description": "Live flight progress on the map beside an operations card with altitude, speed, remaining distance, and a playback scrubber.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/flight-tracker-dashboard/flight-tracker-dashboard.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/flight-tracker-dashboard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "airline-network-dashboard",
+      "type": "registry:block",
+      "title": "Airline Network Dashboard",
+      "description": "Weighted hub-and-spoke route network with a ranked destination sidebar and two-way airport highlighting.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/airline-network-dashboard/airline-network-dashboard.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/airline-network-dashboard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "airport-search-map",
+      "type": "registry:block",
+      "title": "Airport Search Map",
+      "description": "Searchable panel over the built-in 500+ airport database with fly-to markers on selection.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/airport-search-map/airport-search-map.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/airport-search-map.tsx"
+        }
+      ]
+    },
+    {
+      "name": "aircraft-trail-replay",
+      "type": "registry:block",
+      "title": "Aircraft Trail Replay",
+      "description": "Recorded flight track replay with an altitude-graded trail, dashed planned continuation, and a playback scrubber.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/aircraft-trail-replay/aircraft-trail-replay.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/aircraft-trail-replay.tsx"
+        }
+      ]
+    },
+    {
+      "name": "flight-ops-overview",
+      "type": "registry:block",
+      "title": "Flight Ops Overview",
+      "description": "Operations dashboard with live KPI cards, a multi-flight tracking map, and an en-route sidebar that focuses flights on selection.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/flight-ops-overview/flight-ops-overview.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/flight-ops-overview.tsx"
+        }
+      ]
+    },
+    {
+      "name": "live-traffic-flow",
+      "type": "registry:block",
+      "title": "Live Traffic Flow",
+      "description": "Animated aircraft flowing along weighted global corridors with density presets and toggleable route guides.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/live-traffic-flow/live-traffic-flow.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/live-traffic-flow.tsx"
+        }
+      ]
+    },
+    {
+      "name": "departures-board",
+      "type": "registry:block",
+      "title": "Departures Board",
+      "description": "Status-filterable departure list that draws the selected flight on the map \u2014 live progress for airborne flights, dashed routes for the rest.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/departures-board/departures-board.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/departures-board.tsx"
+        }
+      ]
+    },
+    {
+      "name": "aircraft-range-explorer",
+      "type": "registry:block",
+      "title": "Aircraft Range Explorer",
+      "description": "Compare aircraft reach from a departure airport, with labeled 75% and maximum-range boundaries and a live destination count.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/aircraft-range-explorer/aircraft-range-explorer.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/aircraft-range-explorer.tsx"
+        }
+      ]
+    },
+    {
+      "name": "network-coverage-grid",
+      "type": "registry:block",
+      "title": "Network Coverage Grid",
+      "description": "Region-filtered airport coverage map above a stats card grid with two-way selection between cards and markers.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/network-coverage-grid/network-coverage-grid.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/network-coverage-grid.tsx"
+        }
+      ]
+    },
+    {
+      "name": "satellite-orbit-tracker",
+      "type": "registry:block",
+      "title": "Satellite Orbit Tracker",
+      "description": "Multi-satellite orbit constellation on a globe with per-satellite visibility toggles and orbital metadata.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@flightcn/satellite",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/satellite-orbit-tracker/satellite-orbit-tracker.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/satellite-orbit-tracker.tsx"
+        }
+      ]
     }
   ]
 }

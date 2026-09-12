@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
- * Defers mounting children until the block is near the viewport so multiple
- * MapLibre instances on the docs page do not all initialize at once.
+ * Mounts children only while the block is near the viewport, and unmounts
+ * them again once it scrolls far away. Browsers cap the number of live
+ * WebGL contexts per page (~16 in Chrome, fewer in Safari); keeping every
+ * MapLibre instance mounted after first view exceeds that cap on map-heavy
+ * pages and blanks the oldest canvases.
  */
 export function DocsMapMountWhenVisible({
   children,
@@ -17,6 +20,7 @@ export function DocsMapMountWhenVisible({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [lastHeight, setLastHeight] = useState<number | null>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -26,10 +30,15 @@ export function DocsMapMountWhenVisible({
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.disconnect();
+        } else {
+          // Remember the rendered height so swapping in the placeholder
+          // does not collapse the slot and shift the scroll position.
+          const height = el.offsetHeight;
+          if (height > 0) setLastHeight(height);
+          setVisible(false);
         }
       },
-      { rootMargin: "240px 0px", threshold: 0 },
+      { rootMargin: "600px 0px", threshold: 0 },
     );
 
     observer.observe(el);
@@ -46,6 +55,7 @@ export function DocsMapMountWhenVisible({
             placeholderClassName ??
             "flex h-80 w-full items-center justify-center bg-[#d9d8d6] text-sm text-slate-500 sm:h-96"
           }
+          style={lastHeight !== null ? { minHeight: lastHeight } : undefined}
           aria-hidden
         >
           Map preview loads when in view

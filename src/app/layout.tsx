@@ -82,9 +82,9 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <GoogleAnalytics gaId="G-D5P23L59BL" />
         {children}
       </body>
+      <GoogleAnalytics gaId="G-D5P23L59BL" />
     </html>
   );
 }

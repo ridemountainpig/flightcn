@@ -2,19 +2,20 @@
 
 Routes, live tracking, networks, trails and satellite orbits — built with MapLibre and mapcn.
 
-[Documentation](https://flightcn.yencheng.dev/docs/flight) · [Examples](https://flightcn.yencheng.dev/#showcase) · [Try a route](https://flightcn.yencheng.dev/#try-route) · [Star on GitHub](https://github.com/ridemountainpig/flightcn)
+[Documentation](https://flightcn.yencheng.dev/docs/flight) · [Playground](https://flightcn.yencheng.dev/playground) · [Satellite Playground](https://flightcn.yencheng.dev/satellite-playground) · [Blocks](https://flightcn.yencheng.dev/blocks) · [Examples](https://flightcn.yencheng.dev/#showcase) · [Star on GitHub](https://github.com/ridemountainpig/flightcn)
 
 ```bash
 npx shadcn@latest add @flightcn/flight
 ```
 
-![Animated TPE to HND route rendered with FlightCN](public/demos/flight-route.gif)
+![Animated TPE to HND route rendered with flightcn](public/demos/flight-route.gif)
 
-FlightCN gives you flight visualization components you own. Start with two IATA codes, add airport labels, animate an aircraft, or build a complete route network.
+flightcn gives you flight visualization components you own. Start with two IATA codes, add airport labels, animate an aircraft, or build a complete route network.
 
 ## Highlights
 
 - Built to work with `mapcn`
+- Type-compatible with both maplibre-gl v5 and v6
 - Render airports and routes directly from IATA codes like `TPE`, `HND`, and `LAX`
 - Great-circle arc rendering with antimeridian handling
 - Support for single routes, multiple routes, and multi-leg journeys
@@ -25,6 +26,8 @@ FlightCN gives you flight visualization components you own. Start with two IATA 
 - Custom satellite SVG marker support for orbital visualizations
 - Optional airport labels, hover states, and route animation
 - Built-in airport registry with `code`, `name`, `city`, `country`, `latitude`, and `longitude`
+- 11 prebuilt blocks — dashboards, route pickers, traffic flows, and orbit trackers — installable with one shadcn command
+- Interactive [playground](https://flightcn.yencheng.dev/playground) for composing visualizations and copying the generated React code
 
 ## Install
 
@@ -104,7 +107,7 @@ Place fixed labels at a percentage along a great-circle route, or use `mode="air
 
 ### `FlightNetwork`
 
-![Weighted global flight network with connected-route focus rendered with FlightCN](public/demos/flight-network.gif)
+![Weighted global flight network with connected-route focus rendered with flightcn](public/demos/flight-network.gif)
 
 Render a weighted airport network with scalable routes and nodes plus connected-route focus interactions. Each route's optional `value` is a relative weight: higher values produce thicker routes and contribute more to the size of both connected airport nodes. It defaults to `1`.
 
@@ -114,7 +117,7 @@ Draw one or more true geodesic distance bands from an airport or coordinate. Use
 
 ### `AircraftTrail`
 
-![Recorded aircraft trail replay with altitude gradient rendered with FlightCN](public/demos/aircraft-trail.gif)
+![Recorded aircraft trail replay with altitude gradient rendered with flightcn](public/demos/aircraft-trail.gif)
 
 Draw ordered recorded positions as a fading actual flight path with a current-aircraft marker, optional smooth `altitudeColorStops`, and a dashed continuation to a destination or explicit planned waypoints. Automatic destination routes support adjustable `plannedCurvature`.
 
@@ -129,6 +132,32 @@ Render a single globe-based orbital path with an animated satellite marker, grou
 ### `SatelliteOrbits`
 
 Render multiple orbital overlays from one dataset while sharing animation, connector, and label behavior.
+
+## Blocks
+
+Prebuilt, full-page examples composed from flightcn components. Browse them at [flightcn.yencheng.dev/blocks](https://flightcn.yencheng.dev/blocks), then install any block with the shadcn CLI:
+
+```bash
+npx shadcn@latest add @flightcn/flight-tracker-dashboard
+```
+
+| Block                       | Description                                                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `flight-route-picker`       | Search airports, explore featured routes, and arrange multi-stop journeys with distance and time estimates |
+| `flight-tracker-dashboard`  | Live flight progress beside an operations card with altitude, speed, and a playback scrubber               |
+| `airline-network-dashboard` | Weighted hub-and-spoke network with a ranked destination sidebar and two-way highlighting                  |
+| `airport-search-map`        | Searchable panel over the built-in airport database with fly-to markers                                    |
+| `aircraft-trail-replay`     | Recorded track replay with an altitude-graded trail and dashed planned continuation                        |
+| `flight-ops-overview`       | Operations dashboard with live KPI cards, a multi-flight map, and an en-route sidebar                      |
+| `live-traffic-flow`         | Animated aircraft flowing along weighted global corridors with density presets                             |
+| `departures-board`          | Status-filterable departure list that draws the selected flight on the map                                 |
+| `aircraft-range-explorer`   | Compare aircraft reach from a departure airport with labeled range boundaries                              |
+| `network-coverage-grid`     | Region-filtered coverage map with two-way selection between stat cards and markers                         |
+| `satellite-orbit-tracker`   | Multi-satellite constellation on a globe with visibility toggles and orbital metadata                      |
+
+## Playground
+
+Compose visualizations live at [flightcn.yencheng.dev/playground](https://flightcn.yencheng.dev/playground) — stack routes, trackers, networks, and trails on one map, tune every prop, and copy the generated React code. Share any composition with a copyable view-only link, or tune orbits in the [satellite playground](https://flightcn.yencheng.dev/satellite-playground).
 
 ## Airport Data
 
@@ -149,6 +178,9 @@ Current `AirportInfo` fields:
 - Satellite docs: [flightcn.yencheng.dev/docs/satellite](https://flightcn.yencheng.dev/docs/satellite)
 - Flight install guide: [flightcn.yencheng.dev/docs/install/flight](https://flightcn.yencheng.dev/docs/install/flight)
 - Satellite install guide: [flightcn.yencheng.dev/docs/install/satellite](https://flightcn.yencheng.dev/docs/install/satellite)
+- Blocks: [flightcn.yencheng.dev/blocks](https://flightcn.yencheng.dev/blocks)
+- Playground: [flightcn.yencheng.dev/playground](https://flightcn.yencheng.dev/playground)
+- Satellite playground: [flightcn.yencheng.dev/satellite-playground](https://flightcn.yencheng.dev/satellite-playground)
 - Registry homepage: [flightcn.yencheng.dev](https://flightcn.yencheng.dev)
 
 ## Local Development

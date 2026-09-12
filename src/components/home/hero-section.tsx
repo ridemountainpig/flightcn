@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { InstallCommandCopy } from "./install-command-copy";
 import { SatelliteCommandCopy } from "./satellite-command-copy";
-import { heroCopy, installCommandByProduct } from "./home-config";
+import { heroCopy, installItemByProduct } from "./home-config";
 import {
   ProductSwitcher,
   type ProductKey,
@@ -77,7 +77,7 @@ export function HeroSection({
           </a>
         </div>
         <CommandCopy
-          command={installCommandByProduct[product]}
+          item={installItemByProduct[product]}
           className="mt-7 w-full max-w-lg"
         />
         <p className="mt-3 text-xs text-slate-500">

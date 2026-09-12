@@ -7,6 +7,13 @@ import {
   TextareaInput,
 } from "./docs-control-inputs";
 
+export type ToggleControl = {
+  kind: "toggle";
+  value: boolean;
+  onChange: (value: boolean) => void;
+  disabled?: boolean;
+};
+
 export type SelectControl = {
   kind: "select";
   value: string;
@@ -58,6 +65,7 @@ export type NumberPairControl = {
 };
 
 export type ControlConfig =
+  | ToggleControl
   | SelectControl
   | ColorControl
   | TextControl
@@ -79,35 +87,35 @@ export function PropsTable({
         role="table"
         className="props-table w-full min-w-[860px] border-collapse bg-white text-left"
       >
-        <thead className="bg-slate-100/80 text-xs uppercase">
+        <thead className="bg-slate-100/80 uppercase">
           <tr>
             <th
               scope="col"
-              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+              className="border-b border-slate-200 px-4 py-3 font-mono text-[10px] font-medium tracking-widest text-slate-500"
             >
               Prop
             </th>
             <th
               scope="col"
-              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+              className="border-b border-slate-200 px-4 py-3 font-mono text-[10px] font-medium tracking-widest text-slate-500"
             >
               Type
             </th>
             <th
               scope="col"
-              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+              className="border-b border-slate-200 px-4 py-3 font-mono text-[10px] font-medium tracking-widest text-slate-500"
             >
               Default
             </th>
             <th
               scope="col"
-              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+              className="border-b border-slate-200 px-4 py-3 font-mono text-[10px] font-medium tracking-widest text-slate-500"
             >
               Description
             </th>
             <th
               scope="col"
-              className="border-b border-slate-200 px-4 py-3 font-semibold tracking-wide text-slate-700"
+              className="border-b border-slate-200 px-4 py-3 font-mono text-[10px] font-medium tracking-widest text-slate-500"
             >
               Playground
             </th>
@@ -148,7 +156,18 @@ export function PropsTable({
                   className="border-b border-slate-200 px-4 py-3 align-middle text-sm text-slate-700"
                 >
                   {control ? (
-                    control.kind === "select" ? (
+                    control.kind === "toggle" ? (
+                      <input
+                        type="checkbox"
+                        checked={control.value}
+                        aria-label={prop.name}
+                        disabled={control.disabled}
+                        onChange={(event) =>
+                          control.onChange(event.target.checked)
+                        }
+                        className="size-4 accent-slate-900 disabled:pointer-events-none disabled:opacity-40"
+                      />
+                    ) : control.kind === "select" ? (
                       <SelectInput
                         value={control.value}
                         options={control.options}

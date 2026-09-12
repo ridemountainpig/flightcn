@@ -1437,7 +1437,32 @@ function DefaultAirplaneIcon({ size = 24 }: { size?: number }) {
   );
 }
 
-/** Interpolate a position along coordinates at progress t (0-1). */
+/**
+ * Cached cumulative arc lengths, keyed by coordinate array identity.
+ * Coordinate arrays are memoized by the animation markers, so the cache is
+ * computed once per route and reused on every animation frame.
+ */
+const cumulativeArcLengths = new WeakMap<[number, number][], number[]>();
+
+function getCumulativeArcLengths(coords: [number, number][]): number[] {
+  let lengths = cumulativeArcLengths.get(coords);
+  if (!lengths) {
+    lengths = new Array<number>(coords.length).fill(0);
+    for (let i = 1; i < coords.length; i += 1) {
+      lengths[i] = lengths[i - 1] + haversineDistance(coords[i - 1], coords[i]);
+    }
+    cumulativeArcLengths.set(coords, lengths);
+  }
+  return lengths;
+}
+
+/**
+ * Interpolate a position along coordinates at progress t (0-1).
+ * Parameterized by arc length so the aircraft moves at constant speed even
+ * when vertices are unevenly spaced — the antimeridian seam points inserted
+ * by generateArcGeometry create zero- and half-length segments that would
+ * otherwise make index-based interpolation visibly stall mid-flight.
+ */
 function interpolatePosition(
   coords: [number, number][],
   t: number,
@@ -1446,15 +1471,38 @@ function interpolatePosition(
   if (t <= 0) return coords[0];
   if (t >= 1) return coords[coords.length - 1];
 
-  const totalSegments = coords.length - 1;
-  const exactIndex = t * totalSegments;
-  const i = Math.floor(exactIndex);
-  const frac = exactIndex - i;
+  const cumulative = getCumulativeArcLengths(coords);
+  const total = cumulative[cumulative.length - 1];
 
-  if (i >= totalSegments) return coords[coords.length - 1];
+  // Degenerate path (all points identical) — fall back to index spacing.
+  if (total <= Number.EPSILON) {
+    const exactIndex = t * (coords.length - 1);
+    const i = Math.min(Math.floor(exactIndex), coords.length - 2);
+    const frac = exactIndex - i;
+    const a = coords[i];
+    const b = coords[i + 1];
+    return [a[0] + (b[0] - a[0]) * frac, a[1] + (b[1] - a[1]) * frac];
+  }
 
+  const target = t * total;
+  // Binary search for the first vertex at or beyond the target distance.
+  // Because cumulative[low - 1] < target <= cumulative[low], the segment
+  // span is always positive — zero-length segments are skipped naturally.
+  let low = 1;
+  let high = coords.length - 1;
+  while (low < high) {
+    const mid = (low + high) >> 1;
+    if (cumulative[mid] < target) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+  const i = low - 1;
+  const span = cumulative[low] - cumulative[i];
+  const frac = span > 0 ? (target - cumulative[i]) / span : 0;
   const a = coords[i];
-  const b = coords[i + 1];
+  const b = coords[low];
   return [a[0] + (b[0] - a[0]) * frac, a[1] + (b[1] - a[1]) * frac];
 }
 
@@ -1485,10 +1533,18 @@ function calculateMarkerRotation(
   const normalizedFrom = normalizeLngLat(from);
   const normalizedTo = normalizeLngLat(to);
 
+  // Unwrap `to` relative to `from` so the pair stays continuous across the
+  // antimeridian — projecting independently normalized points puts them in
+  // different world copies and momentarily flips the computed heading.
+  let continuousToLng = normalizedTo[0];
+  while (continuousToLng - normalizedFrom[0] > 180) continuousToLng -= 360;
+  while (continuousToLng - normalizedFrom[0] < -180) continuousToLng += 360;
+  const continuousTo: [number, number] = [continuousToLng, normalizedTo[1]];
+
   if (map) {
     try {
       const fromPoint = map.project(normalizedFrom);
-      const toPoint = map.project(normalizedTo);
+      const toPoint = map.project(continuousTo);
       const dx = toPoint.x - fromPoint.x;
       const dy = toPoint.y - fromPoint.y;
 
@@ -2019,11 +2075,42 @@ function FlightMultiLegAnimationMarker({
   );
 }
 
+/**
+ * Clamps the map's minimum zoom so a single world spans the viewport width,
+ * preventing repeated world copies when zooming out on a map rendered with
+ * `renderWorldCopies`. Render inside <Map>; set `enabled` to false to lift
+ * the clamp (e.g. while a globe projection is active).
+ */
+function SingleWorldZoomLimit({ enabled = true }: { enabled?: boolean }) {
+  const { map, isLoaded } = useMap();
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+    if (!enabled) {
+      map.setMinZoom(0);
+      return;
+    }
+    const updateMinZoom = () => {
+      const width = map.getContainer().clientWidth;
+      if (width <= 0) return;
+      // MapLibre zoom is defined against a 512px world at zoom 0.
+      map.setMinZoom(Math.max(Math.log2(width / 512), 0));
+    };
+    updateMinZoom();
+    map.on("resize", updateMinZoom);
+    return () => {
+      map.off("resize", updateMinZoom);
+      map.setMinZoom(0);
+    };
+  }, [map, isLoaded, enabled]);
+  return null;
+}
+
 export {
   FlightAirport,
   FlightRoute,
   FlightRoutes,
   FlightMultiRoute,
+  SingleWorldZoomLimit,
   airports,
   resolveAirport,
   getAirportInfo,

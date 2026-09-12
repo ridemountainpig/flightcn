@@ -6,7 +6,11 @@ import { useReducedMotion } from "framer-motion";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Map, useMap } from "@/components/ui/map";
 import { LngLatBounds } from "maplibre-gl";
-import { FlightRoute, generateArcCoordinates } from "@/registry/flight";
+import {
+  FlightRoute,
+  generateArcCoordinates,
+  SingleWorldZoomLimit,
+} from "@/registry/flight";
 import {
   getAirportInfo,
   resolveAirport,
@@ -177,6 +181,7 @@ export function HeroRouteDemo() {
           scrollZoom={false}
           renderWorldCopies
         >
+          <SingleWorldZoomLimit />
           <RouteCamera
             from={route.from}
             to={route.to}

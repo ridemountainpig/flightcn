@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Orbit, Plane } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type ProductKey = "flight" | "satellite";
+import { type ProductKey } from "./product-links";
+
+export { PLAYGROUND_HREFS, type ProductKey } from "./product-links";
 export const PRODUCT_KEYS: readonly ProductKey[] = ["flight", "satellite"];
 export const PRODUCT_META = {
   flight: {

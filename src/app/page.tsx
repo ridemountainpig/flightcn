@@ -11,19 +11,24 @@ import {
   websiteJsonLd,
 } from "@/lib/seo";
 
-export const metadata: Metadata = buildPageMetadata({
-  title: "Beautiful Flight Visualizations for React",
-  description:
-    "Build MapLibre flight tracking, route networks, geodesic range maps, aircraft trails, traffic flows, and satellite overlays with the flightcn shadcn registry package.",
-  path: "/",
-  keywords: [
-    "MapLibre flight routes",
-    "airport markers",
-    "React flight map",
-    "MapLibre satellite orbit",
-    "mapcn satellite overlay",
-  ],
-});
+export const metadata: Metadata = {
+  ...buildPageMetadata({
+    title: "Beautiful Flight Visualizations for React",
+    description:
+      "Build MapLibre flight tracking, route networks, geodesic ranges, aircraft trails, traffic flows, and satellite overlays with the flightcn shadcn registry.",
+    path: "/",
+    keywords: [
+      "MapLibre flight routes",
+      "airport markers",
+      "React flight map",
+      "MapLibre satellite orbit",
+      "mapcn satellite overlay",
+    ],
+  }),
+  // The root layout's title.template does not apply to its own segment, so
+  // the brand is spelled out here to keep "flightcn" in the homepage title.
+  title: { absolute: "flightcn — Beautiful Flight Visualizations for React" },
+};
 
 const homeJsonLd = [
   websiteJsonLd,

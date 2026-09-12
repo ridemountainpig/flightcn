@@ -7,12 +7,11 @@ export const mapStyles = {
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
 } as const;
 
-export const flightInstallCommand = "npx shadcn@latest add @flightcn/flight";
-export const satelliteInstallCommand =
-  "npx shadcn@latest add @flightcn/satellite";
-export const installCommandByProduct: Record<ProductKey, string> = {
-  flight: flightInstallCommand,
-  satellite: satelliteInstallCommand,
+export const flightInstallItem = "@flightcn/flight";
+export const satelliteInstallItem = "@flightcn/satellite";
+export const installItemByProduct: Record<ProductKey, string> = {
+  flight: flightInstallItem,
+  satellite: satelliteInstallItem,
 };
 
 export const routeExamples: readonly FlightRouteData[] = [

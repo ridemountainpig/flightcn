@@ -1,7 +1,22 @@
 "use client";
 
-import { type Dispatch, type ReactNode, type SetStateAction } from "react";
+import {
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
+import { ChevronDown, RotateCcw, Satellite } from "lucide-react";
 
+import {
+  ColorRow,
+  SegmentedRow,
+  SliderRow,
+  TextRow,
+  ToggleRow,
+} from "@/components/playground/playground-inputs";
+import { ShareLinkButton } from "@/components/playground/share-link-button";
+import { cn } from "@/lib/utils";
 import {
   type LineStyle,
   type SatelliteOrbitProps,
@@ -138,13 +153,32 @@ ${lines}
 </Map>`;
 }
 
+export const LINE_STYLES: readonly LineStyle[] = ["solid", "dash", "dot"];
+export const LABEL_POSITIONS: readonly SatelliteLabelPosition[] = [
+  "top",
+  "right",
+  "bottom",
+  "left",
+];
+
+/** Orbit basics stay open; styling detail starts collapsed so the panel opens short. */
+const DEFAULT_OPEN_SECTIONS = ["Orbit", "Animation", "Label"];
+
 export function SatelliteOrbitControls({
   value,
   onChange,
+  onReset,
+  getShareUrl,
 }: {
   value: SatelliteOrbitPlayground;
   onChange: Dispatch<SetStateAction<SatelliteOrbitPlayground>>;
+  onReset?: () => void;
+  getShareUrl?: () => string;
 }) {
+  const [openSections, setOpenSections] = useState<string[]>(
+    DEFAULT_OPEN_SECTIONS,
+  );
+
   const update = <K extends keyof SatelliteOrbitPlayground>(
     key: K,
     nextValue: SatelliteOrbitPlayground[K],
@@ -155,341 +189,301 @@ export function SatelliteOrbitControls({
     }));
   };
 
+  const sectionProps = (title: string) => ({
+    title,
+    open: openSections.includes(title),
+    onToggle: () =>
+      setOpenSections((current) =>
+        current.includes(title)
+          ? current.filter((entry) => entry !== title)
+          : [...current, title],
+      ),
+  });
+
+  const customColors = [
+    value.orbitColor,
+    value.orbitGlowColor,
+    value.groundTrackColor,
+    value.satelliteConnectorColor,
+  ].filter(Boolean).length;
+
   return (
-    <div className="flex w-full flex-col gap-3 lg:w-72 lg:shrink-0">
-      <ControlSection title="Orbit">
-        <SliderRow
-          label="Inclination"
-          value={value.inclination}
-          min={-90}
-          max={90}
-          step={0.5}
-          onChange={(nextValue) => update("inclination", nextValue)}
-        />
-        <SliderRow
-          label="Ascending Node"
-          value={value.ascendingNode}
-          min={-180}
-          max={180}
-          step={1}
-          onChange={(nextValue) => update("ascendingNode", nextValue)}
-        />
-      </ControlSection>
+    <div className="flex w-full min-w-0 flex-col gap-3 lg:w-96 lg:shrink-0">
+      <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div className="mb-2.5 flex items-center justify-between gap-2">
+          <p className="flex items-center gap-1.5 font-mono text-[10px] font-medium tracking-widest text-slate-500 uppercase">
+            <Satellite size={12} aria-hidden="true" /> Orbit
+          </p>
+          <span className="flex items-center gap-1.5">
+            {onReset ? (
+              <button
+                type="button"
+                onClick={onReset}
+                title="Reset the orbit to its default configuration"
+                className="pressable inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100"
+              >
+                <RotateCcw size={12} aria-hidden="true" />
+                Reset
+              </button>
+            ) : null}
+            {getShareUrl ? (
+              <ShareLinkButton
+                getUrl={getShareUrl}
+                title="Copy a view-only link — the globe without the editor panels"
+              />
+            ) : null}
+          </span>
+        </div>
 
-      <ControlSection title="Animation">
-        <ToggleRow
-          label="Animate"
-          checked={value.animate}
-          onChange={(nextValue) => update("animate", nextValue)}
-        />
-        <SliderRow
-          label="Duration (ms)"
-          value={value.duration}
-          min={1000}
-          max={30000}
-          step={500}
-          onChange={(nextValue) => update("duration", nextValue)}
-          disabled={!value.animate}
-        />
-      </ControlSection>
+        <div className="space-y-2">
+          <CollapsibleSection
+            {...sectionProps("Orbit")}
+            summary={`${value.inclination}° incl · ${value.ascendingNode}° node`}
+          >
+            <SliderRow
+              label="Inclination"
+              value={value.inclination}
+              min={-90}
+              max={90}
+              step={0.5}
+              onChange={(nextValue) => update("inclination", nextValue)}
+            />
+            <SliderRow
+              label="Ascending Node"
+              value={value.ascendingNode}
+              min={-180}
+              max={180}
+              step={1}
+              onChange={(nextValue) => update("ascendingNode", nextValue)}
+            />
+          </CollapsibleSection>
 
-      <ControlSection title="Label">
-        <InputRow
-          label="Name"
-          value={value.name}
-          onChange={(nextValue) => update("name", nextValue)}
-        />
-        <ToggleRow
-          label="Show Label"
-          checked={value.showLabel}
-          onChange={(nextValue) => update("showLabel", nextValue)}
-        />
-        <LabelPositionRow
-          label="Position"
-          value={value.labelPosition}
-          onChange={(nextValue) => update("labelPosition", nextValue)}
-          disabled={!value.showLabel}
-        />
-      </ControlSection>
+          <CollapsibleSection
+            {...sectionProps("Animation")}
+            summary={
+              value.animate ? `${value.duration} ms per orbit` : "Paused"
+            }
+          >
+            <ToggleRow
+              label="Animate"
+              checked={value.animate}
+              onChange={(nextValue) => update("animate", nextValue)}
+            />
+            <SliderRow
+              label="Duration (ms)"
+              value={value.duration}
+              min={1000}
+              max={30000}
+              step={500}
+              onChange={(nextValue) => update("duration", nextValue)}
+              disabled={!value.animate}
+            />
+          </CollapsibleSection>
 
-      <ControlSection title="Appearance">
-        <SliderRow
-          label="Altitude (px)"
-          value={value.altitudePx}
-          min={5}
-          max={100}
-          step={1}
-          onChange={(nextValue) => update("altitudePx", nextValue)}
-        />
-        <SliderRow
-          label="Orbit Width"
-          value={value.orbitWidth}
-          min={0.5}
-          max={8}
-          step={0.1}
-          onChange={(nextValue) => update("orbitWidth", nextValue)}
-        />
-        <SliderRow
-          label="Ground Track Width"
-          value={value.groundTrackWidth}
-          min={0.5}
-          max={5}
-          step={0.1}
-          onChange={(nextValue) => update("groundTrackWidth", nextValue)}
-        />
-        <ToggleRow
-          label="Show Glow"
-          checked={value.showGlow}
-          onChange={(nextValue) => update("showGlow", nextValue)}
-        />
-        <ToggleRow
-          label="Show Connector"
-          checked={value.showConnector}
-          onChange={(nextValue) => update("showConnector", nextValue)}
-        />
-      </ControlSection>
+          <CollapsibleSection
+            {...sectionProps("Label")}
+            summary={
+              value.showLabel
+                ? `${value.name || "Unnamed"} · ${value.labelPosition}`
+                : "Hidden"
+            }
+          >
+            <TextRow
+              label="Name"
+              value={value.name}
+              onChange={(nextValue) => update("name", nextValue)}
+            />
+            <ToggleRow
+              label="Show Label"
+              checked={value.showLabel}
+              onChange={(nextValue) => update("showLabel", nextValue)}
+            />
+            <SegmentedRow
+              label="Position"
+              value={value.labelPosition}
+              options={LABEL_POSITIONS}
+              onChange={(nextValue) => update("labelPosition", nextValue)}
+              disabled={!value.showLabel}
+            />
+          </CollapsibleSection>
 
-      <ControlSection title="Line Style">
-        <LineStyleRow
-          label="Orbit"
-          value={value.orbitLineStyle}
-          onChange={(nextValue) => update("orbitLineStyle", nextValue)}
-        />
-        <LineStyleRow
-          label="Ground Track"
-          value={value.groundTrackLineStyle}
-          onChange={(nextValue) => update("groundTrackLineStyle", nextValue)}
-        />
-        <LineStyleRow
-          label="Connector"
-          value={value.connectorLineStyle}
-          onChange={(nextValue) => update("connectorLineStyle", nextValue)}
-          disabled={!value.showConnector}
-        />
-      </ControlSection>
+          <CollapsibleSection
+            {...sectionProps("Appearance")}
+            summary={`${value.altitudePx}px altitude · ${value.orbitWidth} width`}
+          >
+            <SliderRow
+              label="Altitude (px)"
+              value={value.altitudePx}
+              min={5}
+              max={100}
+              step={1}
+              onChange={(nextValue) => update("altitudePx", nextValue)}
+            />
+            <SliderRow
+              label="Orbit Width"
+              value={value.orbitWidth}
+              min={0.5}
+              max={8}
+              step={0.1}
+              onChange={(nextValue) => update("orbitWidth", nextValue)}
+            />
+            <SliderRow
+              label="Ground Track Width"
+              value={value.groundTrackWidth}
+              min={0.5}
+              max={5}
+              step={0.1}
+              onChange={(nextValue) => update("groundTrackWidth", nextValue)}
+            />
+            <ToggleRow
+              label="Show Glow"
+              checked={value.showGlow}
+              onChange={(nextValue) => update("showGlow", nextValue)}
+            />
+            <ToggleRow
+              label="Show Connector"
+              checked={value.showConnector}
+              onChange={(nextValue) => update("showConnector", nextValue)}
+            />
+          </CollapsibleSection>
 
-      <ControlSection title="Colors">
-        <ColorRow
-          label="Orbit"
-          value={value.orbitColor}
-          onChange={(nextValue) => update("orbitColor", nextValue)}
-        />
-        <ColorRow
-          label="Orbit Glow"
-          value={value.orbitGlowColor}
-          onChange={(nextValue) => update("orbitGlowColor", nextValue)}
-        />
-        <ColorRow
-          label="Ground Track"
-          value={value.groundTrackColor}
-          onChange={(nextValue) => update("groundTrackColor", nextValue)}
-        />
-        <ColorRow
-          label="Connector"
-          value={value.satelliteConnectorColor}
-          onChange={(nextValue) => update("satelliteConnectorColor", nextValue)}
-        />
-      </ControlSection>
+          <CollapsibleSection
+            {...sectionProps("Line Style")}
+            summary={`${value.orbitLineStyle} orbit · ${value.groundTrackLineStyle} track`}
+          >
+            <SegmentedRow
+              label="Orbit"
+              value={value.orbitLineStyle}
+              options={LINE_STYLES}
+              onChange={(nextValue) => update("orbitLineStyle", nextValue)}
+            />
+            <SegmentedRow
+              label="Ground Track"
+              value={value.groundTrackLineStyle}
+              options={LINE_STYLES}
+              onChange={(nextValue) =>
+                update("groundTrackLineStyle", nextValue)
+              }
+            />
+            <SegmentedRow
+              label="Connector"
+              value={value.connectorLineStyle}
+              options={LINE_STYLES}
+              onChange={(nextValue) => update("connectorLineStyle", nextValue)}
+              disabled={!value.showConnector}
+            />
+          </CollapsibleSection>
 
-      <ControlSection title="Satellite Icon">
-        <SliderRow
-          label="Rotation Offset"
-          value={value.satelliteIconRotationOffset}
-          min={-180}
-          max={180}
-          step={1}
-          onChange={(nextValue) =>
-            update("satelliteIconRotationOffset", nextValue)
-          }
-        />
-        <TextAreaRow
-          label="SVG String"
-          value={value.satelliteIconSvg}
-          onChange={(nextValue) => update("satelliteIconSvg", nextValue)}
-          placeholder={SATELLITE_ICON_PLACEHOLDER_SVG}
-        />
-      </ControlSection>
+          <CollapsibleSection
+            {...sectionProps("Colors")}
+            summary={
+              customColors === 0
+                ? "All auto"
+                : `${customColors} custom · ${4 - customColors} auto`
+            }
+          >
+            <ColorRow
+              label="Orbit"
+              value={value.orbitColor}
+              onChange={(nextValue) => update("orbitColor", nextValue)}
+            />
+            <ColorRow
+              label="Orbit Glow"
+              value={value.orbitGlowColor}
+              onChange={(nextValue) => update("orbitGlowColor", nextValue)}
+            />
+            <ColorRow
+              label="Ground Track"
+              value={value.groundTrackColor}
+              onChange={(nextValue) => update("groundTrackColor", nextValue)}
+            />
+            <ColorRow
+              label="Connector"
+              value={value.satelliteConnectorColor}
+              onChange={(nextValue) =>
+                update("satelliteConnectorColor", nextValue)
+              }
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            {...sectionProps("Satellite Icon")}
+            summary={
+              value.satelliteIconSvg
+                ? `Custom SVG · ${value.satelliteIconRotationOffset}° offset`
+                : "Default marker"
+            }
+          >
+            <SliderRow
+              label="Rotation Offset"
+              value={value.satelliteIconRotationOffset}
+              min={-180}
+              max={180}
+              step={1}
+              onChange={(nextValue) =>
+                update("satelliteIconRotationOffset", nextValue)
+              }
+            />
+            <TextAreaRow
+              label="SVG String"
+              value={value.satelliteIconSvg}
+              onChange={(nextValue) => update("satelliteIconSvg", nextValue)}
+              placeholder={SATELLITE_ICON_PLACEHOLDER_SVG}
+            />
+          </CollapsibleSection>
+        </div>
+      </div>
+      <p className="px-1 text-[11px] text-slate-400">
+        Open a section to tune it — the generated code follows every change.
+      </p>
     </div>
   );
 }
 
-function ControlSection({
+/** Mirrors the flight playground's layer rows: title, live summary, chevron. */
+function CollapsibleSection({
   title,
+  summary,
+  open,
+  onToggle,
   children,
 }: {
   title: string;
+  summary: string;
+  open: boolean;
+  onToggle: () => void;
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-      <p className="mb-2.5 text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
-        {title}
-      </p>
-      <div className="space-y-2.5">{children}</div>
-    </div>
-  );
-}
-
-function SliderRow({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-  disabled = false,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (value: number) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div className={disabled ? "pointer-events-none opacity-40" : ""}>
-      <div className="mb-1 flex justify-between">
-        <span className="text-xs text-slate-600">{label}</span>
-        <span className="font-mono text-xs text-slate-900">{value}</span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        disabled={disabled}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="w-full accent-slate-900"
-      />
-    </div>
-  );
-}
-
-function ToggleRow({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}) {
-  return (
-    <label className="flex cursor-pointer items-center justify-between">
-      <span className="text-xs text-slate-600">{label}</span>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-        className="accent-slate-900"
-      />
-    </label>
-  );
-}
-
-const LINE_STYLES: LineStyle[] = ["solid", "dash", "dot"];
-
-function LineStyleRow({
-  label,
-  value,
-  onChange,
-  disabled = false,
-}: {
-  label: string;
-  value: LineStyle;
-  onChange: (value: LineStyle) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div
-      className={`flex items-center justify-between gap-2 ${disabled ? "pointer-events-none opacity-40" : ""}`}
-    >
-      <span className="text-xs text-slate-600">{label}</span>
-      <div className="flex gap-1">
-        {LINE_STYLES.map((style) => (
-          <button
-            key={style}
-            type="button"
-            onClick={() => onChange(style)}
-            className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
-              value === style
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-            }`}
-          >
-            {style}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ColorRow({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  const hasCustom = value !== "";
-
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <span className="text-xs text-slate-600">{label}</span>
-      <div className="flex items-center gap-2">
-        {hasCustom ? (
-          <>
-            <input
-              type="color"
-              value={value}
-              onChange={(event) => onChange(event.target.value)}
-              className="h-5 w-8 cursor-pointer rounded border border-slate-200"
-            />
-            <button
-              type="button"
-              onClick={() => onChange("")}
-              className="text-[10px] text-slate-500 hover:text-slate-700"
-            >
-              auto
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={() => onChange("#000000")}
-            className="text-[10px] text-slate-500 underline decoration-dotted underline-offset-2 hover:text-slate-800"
-          >
-            auto
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function InputRow({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <span className="text-xs text-slate-600">{label}</span>
-      <input
-        type="text"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-900 focus:border-slate-400 focus:outline-none"
-      />
+    <div className="overflow-hidden rounded-xl border border-slate-200">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition-colors hover:bg-slate-50"
+      >
+        <span className="min-w-0">
+          <span className="block text-xs font-medium text-slate-900">
+            {title}
+          </span>
+          <span className="mt-0.5 block truncate font-mono text-[10px] text-slate-500">
+            {summary}
+          </span>
+        </span>
+        <ChevronDown
+          size={13}
+          aria-hidden="true"
+          className={cn(
+            "collapse-chevron shrink-0 text-slate-400",
+            open ? "rotate-180" : "",
+          )}
+        />
+      </button>
+      {open ? (
+        <div className="fade-rise space-y-2.5 border-t border-slate-100 px-3 py-3">
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -516,48 +510,5 @@ function TextAreaRow({
         className="min-h-36 rounded-xl border border-slate-200 bg-white px-3 py-2 font-mono text-xs leading-5 text-slate-700 focus:border-slate-400 focus:outline-none"
       />
     </label>
-  );
-}
-
-const LABEL_POSITIONS: SatelliteLabelPosition[] = [
-  "top",
-  "right",
-  "bottom",
-  "left",
-];
-
-function LabelPositionRow({
-  label,
-  value,
-  onChange,
-  disabled = false,
-}: {
-  label: string;
-  value: SatelliteLabelPosition;
-  onChange: (value: SatelliteLabelPosition) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div
-      className={`flex items-center justify-between gap-2 ${disabled ? "pointer-events-none opacity-40" : ""}`}
-    >
-      <span className="text-xs text-slate-600">{label}</span>
-      <div className="flex gap-1">
-        {LABEL_POSITIONS.map((position) => (
-          <button
-            key={position}
-            type="button"
-            onClick={() => onChange(position)}
-            className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
-              value === position
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-            }`}
-          >
-            {position}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }

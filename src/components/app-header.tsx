@@ -64,8 +64,19 @@ export function AppHeader({
           aria-label="Main navigation"
           className="hidden shrink-0 items-center gap-1 text-sm text-slate-600 md:flex"
         >
-          <Link href="/#showcase" className="app-nav-link">
-            Examples
+          <Link
+            href="/playground"
+            aria-current={pathname === "/playground" ? "page" : undefined}
+            className="app-nav-link"
+          >
+            Playground
+          </Link>
+          <Link
+            href="/blocks"
+            aria-current={pathname === "/blocks" ? "page" : undefined}
+            className="app-nav-link"
+          >
+            Blocks
           </Link>
           <Link
             href="/docs"

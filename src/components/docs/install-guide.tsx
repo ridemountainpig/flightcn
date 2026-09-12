@@ -4,7 +4,7 @@ import { AppFooter } from "@/components/app-footer";
 import { AppHeader } from "@/components/app-header";
 import { InstallSnippet } from "./install-snippet";
 import {
-  installCommandByProduct,
+  installItemByProduct,
   installSteps,
 } from "@/components/home/home-config";
 import {
@@ -20,7 +20,7 @@ const INSTALL_HREFS: Record<ProductKey, string> = {
 
 export function InstallGuide({ product }: { product: ProductKey }) {
   const copy = installSteps[product];
-  const installCommand = installCommandByProduct[product];
+  const installItem = installItemByProduct[product];
 
   return (
     <main
@@ -46,7 +46,7 @@ export function InstallGuide({ product }: { product: ProductKey }) {
           <p className="mt-3 text-sm leading-7 text-slate-600">
             {copy.step1Description}
           </p>
-          <InstallSnippet command={installCommand} />
+          <InstallSnippet item={installItem} />
         </section>
 
         <section className="mx-auto mt-6 max-w-4xl rounded-2xl border border-slate-200 bg-white p-5 sm:p-8">
