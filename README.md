@@ -14,6 +14,7 @@
   <a href="https://flightcn.yencheng.dev/playground"><img src="https://shieldcn.dev/badge/playground.svg?variant=secondary" alt="Playground" /></a>
   <a href="https://flightcn.yencheng.dev/satellite-playground"><img src="https://shieldcn.dev/badge/satellite_playground.svg?variant=secondary" alt="Satellite Playground" /></a>
   <a href="https://flightcn.yencheng.dev/blocks"><img src="https://shieldcn.dev/badge/blocks.svg?variant=secondary" alt="Blocks" /></a>
+  <a href="https://flightcn.yencheng.dev/recipes"><img src="https://shieldcn.dev/badge/recipes.svg?variant=secondary" alt="Recipes" /></a>
   <a href="https://flightcn.yencheng.dev/#showcase"><img src="https://shieldcn.dev/badge/examples.svg?variant=secondary" alt="Examples" /></a>
 </p>
 
@@ -43,6 +44,7 @@ flightcn gives you flight visualization components you own. Start with two IATA 
 - Built-in airport registry with `code`, `name`, `city`, `country`, `latitude`, and `longitude`
 - 11 prebuilt blocks — dashboards, route pickers, traffic flows, and orbit trackers — installable with one shadcn command
 - Interactive [playground](https://flightcn.yencheng.dev/playground) for composing visualizations and copying the generated React code
+- Step-by-step [recipes](https://flightcn.yencheng.dev/recipes) — live flight tracker, airline route map, and flight history map, each with a demo and full code
 
 ## Install
 
@@ -169,6 +171,14 @@ npx shadcn@latest add @flightcn/flight-tracker-dashboard
 | `aircraft-range-explorer`   | Compare aircraft reach from a departure airport with labeled range boundaries                              |
 | `network-coverage-grid`     | Region-filtered coverage map with two-way selection between stat cards and markers                         |
 | `satellite-orbit-tracker`   | Multi-satellite constellation on a globe with visibility toggles and orbital metadata                      |
+
+## Recipes
+
+Step-by-step guides for the things people actually build with flightcn — each ships a live demo, the data format, and the full component to copy:
+
+- [How to build a live flight tracker in React](https://flightcn.yencheng.dev/recipes/live-flight-tracker) — a controlled `FlightTracker` fed by any flight data API, with an OpenSky adapter example
+- [How to build an airline route map in React](https://flightcn.yencheng.dev/recipes/airline-route-map) — a weighted hub-and-spoke network with `FlightNetwork` and click-to-inspect selection
+- [How to visualize your flight history in React](https://flightcn.yencheng.dev/recipes/flight-history-map) — draw a year of flights with `FlightRoutes` and compute flights, airports, countries, and distance from the same log
 
 ## Playground
 

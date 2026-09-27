@@ -6,6 +6,17 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/seo";
 
 /**
+ * Kept in sync with src/components/recipes/recipes-config.tsx — the config
+ * module imports client map components, which metadata routes must not pull
+ * into their bundle.
+ */
+const recipeSlugs = [
+  "live-flight-tracker",
+  "airline-route-map",
+  "flight-history-map",
+] as const;
+
+/**
  * Resolved at build time: the last commit touching any of the route's source
  * paths, falling back to filesystem mtime for files not yet committed.
  */
@@ -70,6 +81,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ),
       priority: 0.9,
     },
+    {
+      url: `${siteConfig.url}/recipes`,
+      lastModified: lastModifiedOf("src/app/recipes", "src/components/recipes"),
+      priority: 0.9,
+    },
+    ...recipeSlugs.map((slug) => ({
+      url: `${siteConfig.url}/recipes/${slug}`,
+      lastModified: lastModifiedOf("src/app/recipes", "src/components/recipes"),
+      priority: 0.85,
+    })),
     {
       url: `${siteConfig.url}/docs/flight`,
       lastModified: lastModifiedOf(

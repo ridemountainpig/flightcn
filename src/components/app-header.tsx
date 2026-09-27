@@ -79,6 +79,13 @@ export function AppHeader({
             Blocks
           </Link>
           <Link
+            href="/recipes"
+            aria-current={pathname.startsWith("/recipes") ? "page" : undefined}
+            className="app-nav-link"
+          >
+            Recipes
+          </Link>
+          <Link
             href="/docs"
             aria-current={
               pathname.startsWith("/docs") &&
