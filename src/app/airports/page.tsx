@@ -10,7 +10,7 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Airport Search",
+  title: "IATA Airport Database & Search",
   description:
     "Search the built-in flightcn airport registry by IATA code, city, country, or airport name and preview each airport on the map.",
   path: "/airports",

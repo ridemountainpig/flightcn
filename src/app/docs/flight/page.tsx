@@ -10,7 +10,7 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Flight Documentation",
+  title: "Flight Map Components for React",
   description:
     "Read API references and live examples for flightcn route, tracker, network, range, trail, and traffic-flow components built for mapcn.",
   path: "/docs/flight",

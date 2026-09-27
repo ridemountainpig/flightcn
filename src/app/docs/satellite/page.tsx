@@ -10,7 +10,7 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Satellite Documentation",
+  title: "Satellite Orbit Components for React",
   description:
     "Read the API reference, props tables, and live playground for the flightcn SatelliteOrbit and SatelliteOrbits globe overlay components.",
   path: "/docs/satellite",
