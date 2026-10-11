@@ -1,11 +1,13 @@
 "use client";
 
 import { Network } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Map } from "@/components/ui/map";
+import { useEffect, useMemo, useState } from "react";
+import { Map, useMap } from "@/components/ui/map";
 import {
   FlightNetwork,
+  generateArcCoordinates,
   getAirportInfo,
+  resolveAirport,
   type FlightNetworkRoute,
   SingleWorldZoomLimit,
 } from "@/components/ui/flight";
@@ -27,6 +29,52 @@ const NETWORK_ROUTES: readonly (FlightNetworkRoute & { to: string })[] = [
   { from: HUB, to: "SFO", value: 12 },
   { from: HUB, to: "SYD", value: 8 },
 ];
+
+/**
+ * Frames every route on load and on resize, so the transpacific arcs stay in
+ * view at any container width instead of falling off a fixed camera.
+ */
+function NetworkCamera() {
+  const { map, isLoaded } = useMap();
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+    // Unwrap longitudes around the hub so routes that cross the date line
+    // extend past 180° and the bounds stay one continuous region.
+    const hubLongitude = resolveAirport(HUB)[0];
+    let west = Infinity;
+    let south = Infinity;
+    let east = -Infinity;
+    let north = -Infinity;
+    for (const route of NETWORK_ROUTES) {
+      for (const [longitude, latitude] of generateArcCoordinates(
+        resolveAirport(route.from),
+        resolveAirport(route.to),
+      )) {
+        const unwrapped =
+          longitude + 360 * Math.round((hubLongitude - longitude) / 360);
+        west = Math.min(west, unwrapped);
+        east = Math.max(east, unwrapped);
+        south = Math.min(south, latitude);
+        north = Math.max(north, latitude);
+      }
+    }
+    const fitNetwork = () => {
+      map.fitBounds(
+        [
+          [west, south],
+          [east, north],
+        ],
+        { padding: 40, maxZoom: 5, duration: 0 },
+      );
+    };
+    fitNetwork();
+    map.on("resize", fitNetwork);
+    return () => {
+      map.off("resize", fitNetwork);
+    };
+  }, [map, isLoaded]);
+  return null;
+}
 
 export function AirlineNetworkDashboard() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -110,13 +158,14 @@ export function AirlineNetworkDashboard() {
       <div className="relative min-h-[320px]">
         <Map
           theme="light"
-          center={[150, 20]}
-          zoom={2}
+          center={[172, 12]}
+          zoom={1.7}
           scrollZoom={false}
           renderWorldCopies
           className="h-full w-full"
         >
           <SingleWorldZoomLimit />
+          <NetworkCamera />
           <FlightNetwork
             routes={NETWORK_ROUTES}
             color="#8a8f86"

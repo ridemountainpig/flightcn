@@ -5,8 +5,9 @@ import { useMemo } from "react";
 import { Map } from "@/components/ui/map";
 import { FlightRoutes, getAirportInfo } from "@/registry/flight";
 import { mapStyles } from "@/components/home/home-config";
-import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
 import { cn } from "@/lib/utils";
+
+import { FitAirports } from "./fit-airports";
 
 /** One year of personal flights — the same shape the recipe walks through. */
 const FLIGHTS: readonly { from: string; to: string; date: string }[] = [
@@ -23,6 +24,16 @@ const FLIGHTS: readonly { from: string; to: string; date: string }[] = [
   { from: "TPE", to: "KIX", date: "2026-09-04" },
   { from: "KIX", to: "TPE", date: "2026-09-08" },
 ];
+
+const VISITED_AIRPORTS = [
+  ...new Set(FLIGHTS.flatMap((flight) => [flight.from, flight.to])),
+];
+
+/**
+ * Frames the airports rather than the arcs — JFK→TPE crosses the pole and
+ * would zoom the map out to the Arctic. Bottom padding clears the stats bar.
+ */
+const FIT_PADDING = { top: 72, bottom: 88, left: 40, right: 40 };
 
 function haversineKm(a: [number, number], b: [number, number]) {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
@@ -64,7 +75,6 @@ function computeStats(flights: readonly { from: string; to: string }[]) {
 }
 
 export function FlightHistoryMapDemo({ className }: { className?: string }) {
-  const zoom = useResponsiveZoom(1.62);
   const stats = useMemo(() => computeStats(FLIGHTS), []);
 
   const statItems = [
@@ -83,10 +93,16 @@ export function FlightHistoryMapDemo({ className }: { className?: string }) {
     >
       <Map
         className="h-full w-full"
-        viewport={{ center: [178, 34], zoom }}
-        onViewportChange={() => {}}
+        center={[178, 34]}
+        zoom={1.62}
         styles={mapStyles}
+        renderWorldCopies
       >
+        <FitAirports
+          airports={VISITED_AIRPORTS}
+          padding={FIT_PADDING}
+          maxZoom={1.9}
+        />
         <FlightRoutes routes={FLIGHTS} showAirports showLabel width={1.75} />
       </Map>
       <div className="absolute right-3 bottom-3 left-3 grid grid-cols-4 divide-x divide-slate-200 rounded-xl border border-black/10 bg-white/95 shadow-sm backdrop-blur sm:right-auto sm:bottom-4 sm:left-4">
