@@ -10,7 +10,7 @@ import type { FlightNetworkRoute } from "@/registry/flight";
 import { mapStyles } from "@/components/home/home-config";
 import { cn } from "@/lib/utils";
 
-import { FitAirports } from "./fit-airports";
+import { FitRoutes } from "./fit-routes";
 
 /** Weekly departures per route — value drives route width and node size. */
 const AIRLINE_ROUTES: readonly FlightNetworkRoute[] = [
@@ -30,12 +30,8 @@ const AIRLINE_ROUTES: readonly FlightNetworkRoute[] = [
   { from: "TPE", to: "YVR", value: 5 },
 ];
 
-const NETWORK_AIRPORTS = [
-  ...new Set(AIRLINE_ROUTES.flatMap((route) => [route.from, route.to])),
-];
-
-/** Extra top room for the northern transpacific arcs; bottom clears the hint chip. */
-const FIT_PADDING = { top: 64, bottom: 56, left: 40, right: 40 };
+/** Bottom padding clears the hint chip. */
+const FIT_PADDING = { top: 40, bottom: 56, left: 40, right: 40 };
 
 export function AirlineRouteMapDemo({ className }: { className?: string }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -72,7 +68,7 @@ export function AirlineRouteMapDemo({ className }: { className?: string }) {
         styles={mapStyles}
         renderWorldCopies
       >
-        <FitAirports airports={NETWORK_AIRPORTS} padding={FIT_PADDING} />
+        <FitRoutes routes={AIRLINE_ROUTES} padding={FIT_PADDING} />
         <FlightNetwork
           routes={AIRLINE_ROUTES}
           selectedAirport={selected}

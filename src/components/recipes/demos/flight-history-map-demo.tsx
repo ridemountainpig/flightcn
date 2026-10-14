@@ -7,7 +7,7 @@ import { FlightRoutes, getAirportInfo } from "@/registry/flight";
 import { mapStyles } from "@/components/home/home-config";
 import { cn } from "@/lib/utils";
 
-import { FitAirports } from "./fit-airports";
+import { FitRoutes } from "./fit-routes";
 
 /** One year of personal flights — the same shape the recipe walks through. */
 const FLIGHTS: readonly { from: string; to: string; date: string }[] = [
@@ -25,14 +25,7 @@ const FLIGHTS: readonly { from: string; to: string; date: string }[] = [
   { from: "KIX", to: "TPE", date: "2026-09-08" },
 ];
 
-const VISITED_AIRPORTS = [
-  ...new Set(FLIGHTS.flatMap((flight) => [flight.from, flight.to])),
-];
-
-/**
- * Frames the airports rather than the arcs — JFK→TPE crosses the pole and
- * would zoom the map out to the Arctic. Bottom padding clears the stats bar.
- */
+/** Bottom padding clears the stats bar. */
 const FIT_PADDING = { top: 72, bottom: 88, left: 40, right: 40 };
 
 function haversineKm(a: [number, number], b: [number, number]) {
@@ -98,11 +91,7 @@ export function FlightHistoryMapDemo({ className }: { className?: string }) {
         styles={mapStyles}
         renderWorldCopies
       >
-        <FitAirports
-          airports={VISITED_AIRPORTS}
-          padding={FIT_PADDING}
-          maxZoom={1.9}
-        />
+        <FitRoutes routes={FLIGHTS} padding={FIT_PADDING} maxZoom={1.9} />
         <FlightRoutes routes={FLIGHTS} showAirports showLabel width={1.75} />
       </Map>
       <div className="absolute right-3 bottom-3 left-3 grid grid-cols-4 divide-x divide-slate-200 rounded-xl border border-black/10 bg-white/95 shadow-sm backdrop-blur sm:right-auto sm:bottom-4 sm:left-4">
