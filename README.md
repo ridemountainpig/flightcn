@@ -23,7 +23,7 @@ npx shadcn@latest add @flightcn/flight
 ```
 
 <p align="center">
-  <img src="public/demos/flight-route.gif" alt="Animated TPE to HND route rendered with flightcn" />
+  <img src="public/flightcn-og.png" alt="flightcn - flight visualization components for React" />
 </p>
 
 flightcn gives you flight visualization components you own. Start with two IATA codes, add airport labels, animate an aircraft, or build a complete route network.

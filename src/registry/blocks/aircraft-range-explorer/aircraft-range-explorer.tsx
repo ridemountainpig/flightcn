@@ -74,6 +74,19 @@ function greatCircleKm(from: string, to: string) {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
+/**
+ * Past both poles, a range circle closes around the antipode instead of the
+ * departure airport, so the area inside the line becomes the part that is out
+ * of range. Mirrors the branch FlightRange uses to build the geometry.
+ */
+function enclosesAntipode(latitude: number, distanceKm: number) {
+  const kmPerDegree = (Math.PI * EARTH_RADIUS_KM) / 180;
+  return (
+    distanceKm > (90 - latitude) * kmPerDegree &&
+    distanceKm > (90 + latitude) * kmPerDegree
+  );
+}
+
 function HubCamera({ hub }: { hub: string }) {
   const { map, isLoaded } = useMap();
   useEffect(() => {
@@ -95,6 +108,8 @@ export function AircraftRangeExplorer() {
 
   const hubInfo = getAirportInfo(hub);
   const referenceKm = Math.round(aircraft.rangeKm * 0.75);
+  const maxWraps = enclosesAntipode(hubInfo?.latitude ?? 0, aircraft.rangeKm);
+  const referenceWraps = enclosesAntipode(hubInfo?.latitude ?? 0, referenceKm);
   const destinations = useMemo(
     () => DESTINATIONS.filter((code) => code !== hub),
     [hub],
@@ -190,7 +205,9 @@ export function AircraftRangeExplorer() {
             destinations in range
           </p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
-            Sample major airports within the orange boundary.
+            {maxWraps
+              ? "Sample major airports outside the orange ring, which circles the only area out of reach."
+              : "Sample major airports inside the orange boundary."}
           </p>
         </div>
       </aside>
@@ -234,18 +251,37 @@ export function AircraftRangeExplorer() {
         </div>
         <div className="border-t border-slate-200 bg-slate-50/80 p-4">
           <div className="flex items-center gap-4">
-            <div
-              aria-hidden="true"
-              className="relative hidden size-20 shrink-0 items-center justify-center rounded-full border-2 bg-orange-50 sm:flex"
-              style={{ borderColor: MAX_RANGE_COLOR }}
-            >
+            {maxWraps ? (
+              // Reachable everywhere (orange tint) except the antipodal cap.
               <div
-                className="flex size-14 items-center justify-center rounded-full border-2 bg-sky-50"
-                style={{ borderColor: REFERENCE_COLOR }}
+                aria-hidden="true"
+                className="relative hidden size-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-orange-50 sm:block"
               >
-                <span className="size-2 rounded-full bg-slate-950" />
+                <div
+                  className="absolute top-2 left-2 flex size-11 items-center justify-center rounded-full border-2 bg-sky-50"
+                  style={{ borderColor: REFERENCE_COLOR }}
+                >
+                  <span className="size-2 rounded-full bg-slate-950" />
+                </div>
+                <div
+                  className="absolute -right-1.5 -bottom-1.5 size-8 rounded-full border-2 bg-white"
+                  style={{ borderColor: MAX_RANGE_COLOR }}
+                />
               </div>
-            </div>
+            ) : (
+              <div
+                aria-hidden="true"
+                className="relative hidden size-20 shrink-0 items-center justify-center rounded-full border-2 bg-orange-50 sm:flex"
+                style={{ borderColor: MAX_RANGE_COLOR }}
+              >
+                <div
+                  className="flex size-14 items-center justify-center rounded-full border-2 bg-sky-50"
+                  style={{ borderColor: REFERENCE_COLOR }}
+                >
+                  <span className="size-2 rounded-full bg-slate-950" />
+                </div>
+              </div>
+            )}
             <dl
               aria-label="Range boundary legend"
               className="min-w-0 flex-1 space-y-3"
@@ -263,8 +299,11 @@ export function AircraftRangeExplorer() {
                   </span>
                 </dt>
                 <dd className="mt-1 pl-6 text-xs leading-5 text-slate-500">
-                  Inner boundary · three quarters of this aircraft’s maximum
-                  range.
+                  {referenceWraps
+                    ? "Three quarters of this aircraft’s maximum range · also past both poles, so inside this line is beyond 75%."
+                    : maxWraps
+                      ? "Around the departure airport · three quarters of this aircraft’s maximum range."
+                      : "Inner boundary · three quarters of this aircraft’s maximum range."}
                 </dd>
               </div>
               <div>
@@ -280,8 +319,9 @@ export function AircraftRangeExplorer() {
                   </span>
                 </dt>
                 <dd className="mt-1 pl-6 text-xs leading-5 text-slate-500">
-                  Outer boundary · beyond this line is outside the selected
-                  range.
+                  {maxWraps
+                    ? "Reaches past both poles, so this line circles the far side of the globe · inside it is out of range."
+                    : "Outer boundary · beyond this line is outside the selected range."}
                 </dd>
               </div>
             </dl>

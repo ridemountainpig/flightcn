@@ -350,13 +350,13 @@ const AIRLINE_ROUTES: FlightNetworkRoute[] = [
       },
       {
         title: "Render the network",
-        body: "Drop FlightNetwork on a Map and pass the routes. Route widths interpolate between minRouteWidth and maxRouteWidth, node sizes between minNodeSize and maxNodeSize — tune those four props and the two colors to match your brand instead of restyling individual routes.",
+        body: "Drop FlightNetwork on a Map and pass the routes. The map is centered on the Pacific with renderWorldCopies on, so transpacific routes cross the date line instead of being cut off at the edge of a single world. Route widths interpolate between minRouteWidth and maxRouteWidth, node sizes between minNodeSize and maxNodeSize — tune those four props and the two colors to match your brand instead of restyling individual routes.",
         code: `import { Map } from "@/components/ui/map";
 import { FlightNetwork } from "@/components/ui/flight";
 
 export function AirlineRouteMap() {
   return (
-    <Map center={[163, 26]} zoom={1.7}>
+    <Map center={[168, 15]} zoom={1.55} renderWorldCopies>
       <FlightNetwork
         routes={AIRLINE_ROUTES}
         color="#64748b"
@@ -385,7 +385,7 @@ export function AirlineRouteMap() {
   );
 
   return (
-    <Map center={[163, 26]} zoom={1.7}>
+    <Map center={[168, 15]} zoom={1.55} renderWorldCopies>
       <FlightNetwork
         routes={AIRLINE_ROUTES}
         selectedAirport={selected}
@@ -440,7 +440,7 @@ export function AirlineRouteMap() {
 
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl">
-      <Map center={[163, 26]} zoom={1.7}>
+      <Map center={[168, 15]} zoom={1.55} renderWorldCopies>
         <FlightNetwork
           routes={AIRLINE_ROUTES}
           selectedAirport={selected}
@@ -505,13 +505,13 @@ export function AirlineRouteMap() {
       },
       {
         title: "Draw every route",
-        body: "FlightRoutes takes the whole log at once — extra fields like date pass through untouched. Airport markers and code labels come from the same two props you'd use on a single route.",
+        body: "FlightRoutes takes the whole log at once — extra fields like date pass through untouched. Centering on the Pacific with renderWorldCopies on keeps transpacific legs in one continuous view. Airport markers and code labels come from the same two props you'd use on a single route.",
         code: `import { Map } from "@/components/ui/map";
 import { FlightRoutes } from "@/components/ui/flight";
 
 export function FlightHistoryMap() {
   return (
-    <Map center={[178, 34]} zoom={1.6}>
+    <Map center={[178, 34]} zoom={1.6} renderWorldCopies>
       <FlightRoutes routes={FLIGHTS} showAirports showLabel width={1.75} />
     </Map>
   );
@@ -648,7 +648,7 @@ export function FlightHistoryMap() {
 
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl">
-      <Map center={[178, 34]} zoom={1.6}>
+      <Map center={[178, 34]} zoom={1.6} renderWorldCopies>
         <FlightRoutes routes={FLIGHTS} showAirports showLabel width={1.75} />
       </Map>
       <div className="absolute bottom-4 left-4 grid grid-cols-4 divide-x rounded-xl border bg-white/95 shadow-sm backdrop-blur">

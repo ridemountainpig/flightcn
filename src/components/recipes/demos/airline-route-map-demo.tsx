@@ -8,8 +8,9 @@ import { Map } from "@/components/ui/map";
 import { FlightNetwork, getAirportInfo } from "@/registry/flight";
 import type { FlightNetworkRoute } from "@/registry/flight";
 import { mapStyles } from "@/components/home/home-config";
-import { useResponsiveZoom } from "@/lib/map-responsive-zoom";
 import { cn } from "@/lib/utils";
+
+import { FitRoutes } from "./fit-routes";
 
 /** Weekly departures per route — value drives route width and node size. */
 const AIRLINE_ROUTES: readonly FlightNetworkRoute[] = [
@@ -29,8 +30,10 @@ const AIRLINE_ROUTES: readonly FlightNetworkRoute[] = [
   { from: "TPE", to: "YVR", value: 5 },
 ];
 
+/** Bottom padding clears the hint chip. */
+const FIT_PADDING = { top: 40, bottom: 56, left: 40, right: 40 };
+
 export function AirlineRouteMapDemo({ className }: { className?: string }) {
-  const zoom = useResponsiveZoom(1.72);
   const [selected, setSelected] = useState<string | null>(null);
 
   const selectedSummary = useMemo(() => {
@@ -60,10 +63,12 @@ export function AirlineRouteMapDemo({ className }: { className?: string }) {
     >
       <Map
         className="h-full w-full"
-        viewport={{ center: [163, 26], zoom }}
-        onViewportChange={() => {}}
+        center={[168, 15]}
+        zoom={1.55}
         styles={mapStyles}
+        renderWorldCopies
       >
+        <FitRoutes routes={AIRLINE_ROUTES} padding={FIT_PADDING} />
         <FlightNetwork
           routes={AIRLINE_ROUTES}
           selectedAirport={selected}
