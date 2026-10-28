@@ -16,6 +16,7 @@ const footerNav: {
       { label: "Satellite playground", href: PLAYGROUND_HREFS.satellite },
       { label: "Blocks", href: "/blocks" },
       { label: "Recipes", href: "/recipes" },
+      { label: "Flight passport", href: "/passport" },
       { label: "Airports", href: "/airports" },
       { label: "Examples", href: "/#showcase" },
     ],

@@ -15,6 +15,7 @@
   <a href="https://flightcn.yencheng.dev/satellite-playground"><img src="https://shieldcn.dev/badge/satellite_playground.svg?variant=secondary" alt="Satellite Playground" /></a>
   <a href="https://flightcn.yencheng.dev/blocks"><img src="https://shieldcn.dev/badge/blocks.svg?variant=secondary" alt="Blocks" /></a>
   <a href="https://flightcn.yencheng.dev/recipes"><img src="https://shieldcn.dev/badge/recipes.svg?variant=secondary" alt="Recipes" /></a>
+  <a href="https://flightcn.yencheng.dev/passport"><img src="https://shieldcn.dev/badge/flight_passport.svg?variant=secondary" alt="Flight Passport" /></a>
   <a href="https://flightcn.yencheng.dev/#showcase"><img src="https://shieldcn.dev/badge/examples.svg?variant=secondary" alt="Examples" /></a>
 </p>
 
@@ -42,9 +43,10 @@ flightcn gives you flight visualization components you own. Start with two IATA 
 - Custom satellite SVG marker support for orbital visualizations
 - Optional airport labels, hover states, and route animation
 - Built-in airport registry with `code`, `name`, `city`, `country`, `latitude`, and `longitude`
-- 11 prebuilt blocks — dashboards, route pickers, traffic flows, and orbit trackers — installable with one shadcn command
+- 12 prebuilt blocks — dashboards, route pickers, traffic flows, and orbit trackers — installable with one shadcn command
 - Interactive [playground](https://flightcn.yencheng.dev/playground) for composing visualizations and copying the generated React code
 - Step-by-step [recipes](https://flightcn.yencheng.dev/recipes) — live flight tracker, airline route map, and flight history map, each with a demo and full code
+- A free [flight passport](https://flightcn.yencheng.dev/passport) — paste your flights to get a lifetime map, travel stats, and a year in review you can share
 
 ## Install
 
@@ -170,6 +172,7 @@ npx shadcn@latest add @flightcn/flight-tracker-dashboard
 | `departures-board`          | Status-filterable departure list that draws the selected flight on the map                                 |
 | `aircraft-range-explorer`   | Compare aircraft reach from a departure airport with labeled range boundaries                              |
 | `network-coverage-grid`     | Region-filtered coverage map with two-way selection between stat cards and markers                         |
+| `flight-passport`           | Personal flight history from a pasted log, with lifetime stats and a month-by-month year in review         |
 | `satellite-orbit-tracker`   | Multi-satellite constellation on a globe with visibility toggles and orbital metadata                      |
 
 ## Recipes
@@ -197,6 +200,8 @@ Current `AirportInfo` fields:
 - `latitude`
 - `longitude`
 
+The flight passport page also loads a larger OurAirports list on demand (`src/data/airports-extended.json`, built by `scripts/build-airports-extended.mjs`). Its share images draw land from [Natural Earth](https://www.naturalearthdata.com/) (public domain) and flags from [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0).
+
 ## Docs
 
 - Flight docs: [flightcn.yencheng.dev/docs/flight](https://flightcn.yencheng.dev/docs/flight)
@@ -205,6 +210,7 @@ Current `AirportInfo` fields:
 - Satellite install guide: [flightcn.yencheng.dev/docs/install/satellite](https://flightcn.yencheng.dev/docs/install/satellite)
 - Blocks: [flightcn.yencheng.dev/blocks](https://flightcn.yencheng.dev/blocks)
 - Playground: [flightcn.yencheng.dev/playground](https://flightcn.yencheng.dev/playground)
+- Flight passport: [flightcn.yencheng.dev/passport](https://flightcn.yencheng.dev/passport)
 - Satellite playground: [flightcn.yencheng.dev/satellite-playground](https://flightcn.yencheng.dev/satellite-playground)
 - Registry homepage: [flightcn.yencheng.dev](https://flightcn.yencheng.dev)
 

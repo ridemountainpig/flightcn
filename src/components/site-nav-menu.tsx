@@ -13,6 +13,7 @@ export const defaultSiteNavItems: SiteNavItem[] = [
   { label: "Flight playground", href: PLAYGROUND_HREFS.flight },
   { label: "Blocks", href: "/blocks" },
   { label: "Recipes", href: "/recipes" },
+  { label: "Flight passport", href: "/passport" },
   { label: "Documentation", href: "/docs" },
   { label: "Install Guide", href: "/docs/install" },
   { label: "Airports", href: "/airports" },

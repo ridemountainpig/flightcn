@@ -11,6 +11,7 @@ import { AirlineNetworkDashboard } from "@/registry/blocks/airline-network-dashb
 import { AirportSearchMap } from "@/registry/blocks/airport-search-map/airport-search-map";
 import { AircraftTrailReplay } from "@/registry/blocks/aircraft-trail-replay/aircraft-trail-replay";
 import { SatelliteOrbitTracker } from "@/registry/blocks/satellite-orbit-tracker/satellite-orbit-tracker";
+import { FlightPassport } from "@/registry/blocks/flight-passport/flight-passport";
 
 export type BlockConfig = {
   id: string;
@@ -23,6 +24,15 @@ export type BlockConfig = {
 };
 
 export const blocksConfig: readonly BlockConfig[] = [
+  {
+    id: "flight-passport",
+    title: "Flight Passport",
+    description:
+      "Personal flight history from a pasted log: a lifetime route map with travel stats, a year in review, and a replay that flies every trip in order.",
+    category: "Flight",
+    installItem: "@flightcn/flight-passport",
+    component: FlightPassport,
+  },
   {
     id: "flight-ops-overview",
     title: "Flight Ops Overview",
@@ -63,7 +73,7 @@ export const blocksConfig: readonly BlockConfig[] = [
     id: "airport-search-map",
     title: "Airport Search Map",
     description:
-      "Searchable panel over the built-in 500+ airport database with fly-to markers on selection.",
+      "Searchable panel over the built-in 1,100+ airport database with fly-to markers on selection.",
     category: "Flight",
     installItem: "@flightcn/airport-search-map",
     component: AirportSearchMap,

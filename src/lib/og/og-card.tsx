@@ -6,8 +6,7 @@ export const OG_SIZE = { width: 1200, height: 630 };
 
 const FONTS_DIR = path.join(process.cwd(), "src/lib/og/fonts");
 
-/** Font set for ImageResponse — Geist + Geist Mono, matching the site. */
-export async function loadOgFonts() {
+async function readOgFonts() {
   const files = [
     ["geist-latin-400-normal.woff", "Geist", 400],
     ["geist-latin-500-normal.woff", "Geist", 500],
@@ -25,14 +24,37 @@ export async function loadOgFonts() {
   );
 }
 
+let fontsPromise: ReturnType<typeof readOgFonts> | null = null;
+
+/**
+ * Font set for ImageResponse — Geist + Geist Mono, matching the site. Read
+ * once per server process; images rendered on request reuse the buffers.
+ */
+export function loadOgFonts() {
+  fontsPromise ??= readOgFonts().catch((error: unknown) => {
+    fontsPromise = null;
+    throw error;
+  });
+  return fontsPromise;
+}
+
 export type OgSubSegment = { text: string; accent?: boolean };
 
 const INK = "#221d12";
 const MUTED = "#4a4437";
 const ACCENT = "#c65d24";
 
+export const OG_COLORS = { ink: INK, muted: MUTED, accent: ACCENT } as const;
+
+/** Cream background with the dotted grid used by every OG card. */
+export const ogBackgroundStyle = {
+  backgroundColor: "#faf9f3",
+  backgroundImage: "radial-gradient(circle, #ddd8c6 2.2px, transparent 2.2px)",
+  backgroundSize: "40px 40px",
+} as const;
+
 /** Lucide "plane" glyph, used in the badge next to the kicker. */
-function PlaneBadge() {
+export function PlaneBadge() {
   return (
     <div
       style={{
@@ -85,10 +107,7 @@ export function OgCard({
         height: "100%",
         display: "flex",
         position: "relative",
-        backgroundColor: "#faf9f3",
-        backgroundImage:
-          "radial-gradient(circle, #ddd8c6 2.2px, transparent 2.2px)",
-        backgroundSize: "40px 40px",
+        ...ogBackgroundStyle,
         fontFamily: "Geist",
       }}
     >
