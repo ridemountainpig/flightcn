@@ -30,6 +30,8 @@ export type RecipeConfig = {
   demo: ComponentType<{ className?: string }>;
   /** One line under the live demo explaining what it shows. */
   demoNote: string;
+  /** Optional link under the demo to a ready-made page built on the recipe. */
+  cta?: { body: string; href: string; label: string };
   steps: readonly RecipeStep[];
   /** The complete component users copy at the end. */
   fullCode: string;
@@ -484,6 +486,11 @@ export function AirlineRouteMap() {
     demo: FlightHistoryMapDemo,
     demoNote:
       "Twelve flights from one year of travel — the stats bar is computed from the same array that draws the routes.",
+    cta: {
+      body: "Rather skip the code? Paste your own flights into Flight Passport for the same map and stats, plus a year in review you can share.",
+      href: "/passport",
+      label: "Make your flight passport",
+    },
     steps: [
       {
         title: "Log your flights",

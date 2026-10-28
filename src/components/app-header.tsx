@@ -86,6 +86,13 @@ export function AppHeader({
             Recipes
           </Link>
           <Link
+            href="/passport"
+            aria-current={pathname === "/passport" ? "page" : undefined}
+            className="app-nav-link"
+          >
+            Passport
+          </Link>
+          <Link
             href="/docs"
             aria-current={
               pathname.startsWith("/docs") &&
@@ -97,22 +104,26 @@ export function AppHeader({
           >
             Docs
           </Link>
-          <Link
-            href="/docs/install"
-            aria-current={
-              pathname.startsWith("/docs/install") ? "page" : undefined
-            }
-            className="app-nav-link"
-          >
-            Install
-          </Link>
-          <Link
-            href="/airports"
-            aria-current={pathname === "/airports" ? "page" : undefined}
-            className="app-nav-link"
-          >
-            Airports
-          </Link>
+          {/* Too many links for tablet widths: these two join from lg up,
+              and stay reachable from the footer and docs below that. */}
+          <span className="hidden lg:contents">
+            <Link
+              href="/docs/install"
+              aria-current={
+                pathname.startsWith("/docs/install") ? "page" : undefined
+              }
+              className="app-nav-link"
+            >
+              Install
+            </Link>
+            <Link
+              href="/airports"
+              aria-current={pathname === "/airports" ? "page" : undefined}
+              className="app-nav-link"
+            >
+              Airports
+            </Link>
+          </span>
           <a
             href="https://github.com/ridemountainpig/flightcn"
             className="pressable ml-3 inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-white hover:bg-slate-800"

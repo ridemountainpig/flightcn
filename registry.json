@@ -7,7 +7,7 @@
       "name": "flight",
       "type": "registry:ui",
       "title": "Flight",
-      "description": "Composable flight map components for routes, live tracking, weighted networks, geodesic ranges, aircraft trails, traffic flow, and a built-in 515-airport database.",
+      "description": "Composable flight map components for routes, live tracking, weighted networks, geodesic ranges, aircraft trails, traffic flow, and a built-in database of 1,100+ airports.",
       "dependencies": ["@turf/great-circle", "@turf/bearing"],
       "registryDependencies": ["https://mapcn.dev/r/map.json"],
       "files": [
@@ -105,7 +105,7 @@
       "name": "airport-search-map",
       "type": "registry:block",
       "title": "Airport Search Map",
-      "description": "Searchable panel over the built-in 500+ airport database with fly-to markers on selection.",
+      "description": "Searchable panel over the built-in 1,100+ airport database with fly-to markers on selection.",
       "dependencies": ["lucide-react"],
       "registryDependencies": [
         "@flightcn/flight",
@@ -242,6 +242,29 @@
           "path": "src/registry/blocks/satellite-orbit-tracker/satellite-orbit-tracker.tsx",
           "type": "registry:component",
           "target": "components/blocks/satellite-orbit-tracker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "flight-passport",
+      "type": "registry:block",
+      "title": "Flight Passport",
+      "description": "Personal flight history from a pasted log: a lifetime route map with travel stats, a year in review, and a replay that flies every trip in order.",
+      "dependencies": ["lucide-react", "maplibre-gl"],
+      "registryDependencies": [
+        "@flightcn/flight",
+        "https://mapcn.dev/r/map.json"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/flight-passport/flight-passport.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/flight-passport.tsx"
+        },
+        {
+          "path": "src/registry/blocks/flight-passport/flight-passport-stats.ts",
+          "type": "registry:component",
+          "target": "components/blocks/flight-passport-stats.ts"
         }
       ]
     }

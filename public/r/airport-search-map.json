@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "airport-search-map",
   "title": "Airport Search Map",
-  "description": "Searchable panel over the built-in 500+ airport database with fly-to markers on selection.",
+  "description": "Searchable panel over the built-in 1,100+ airport database with fly-to markers on selection.",
   "dependencies": ["lucide-react"],
   "registryDependencies": ["@flightcn/flight", "https://mapcn.dev/r/map.json"],
   "files": [

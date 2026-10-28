@@ -12,34 +12,45 @@ import { cn } from "@/lib/utils";
 
 const TABS = ["Preview", "Code"] as const;
 type Tab = (typeof TABS)[number];
+type SourceFile = { name: string; content: string };
+type RegistryFile = { path?: string; target?: string; content?: string };
 
 export function BlockCard({ block }: { block: BlockConfig }) {
   const [tab, setTab] = useState<Tab>("Preview");
   // Fetched on the first switch to the Code tab from the block's static
   // registry item (/r/<id>.json) instead of being embedded in the page
-  // payload — the eleven blocks total ~90KB of source.
-  const [source, setSource] = useState<string | null>(null);
+  // payload — the blocks total ~100KB of source.
+  const [files, setFiles] = useState<SourceFile[] | null>(null);
+  const [activeFile, setActiveFile] = useState(0);
+  const source = files ? (files[activeFile]?.content ?? "") : null;
   const BlockComponent = block.component;
 
   useEffect(() => {
-    if (tab !== "Code" || source !== null) return;
+    if (tab !== "Code" || files !== null) return;
     let cancelled = false;
     fetch(`/r/${block.id}.json`)
       .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-      .then((registryItem) => {
+      .then((registryItem: { files?: RegistryFile[] }) => {
         if (cancelled) return;
-        setSource(registryItem.files?.[0]?.content ?? "");
+        const loaded = (registryItem.files ?? []).map((file) => ({
+          name: (file.target ?? file.path ?? "").split("/").pop() || "",
+          content: file.content ?? "",
+        }));
+        setFiles(loaded.length > 0 ? loaded : [{ name: "", content: "" }]);
       })
       .catch(() => {
         if (cancelled) return;
-        setSource(
-          `// Couldn't load the source — install it instead:\n// ${buildInstallCommand("npm", block.installItem)}`,
-        );
+        setFiles([
+          {
+            name: "",
+            content: `// Couldn't load the source — install it instead:\n// ${buildInstallCommand("npm", block.installItem)}`,
+          },
+        ]);
       });
     return () => {
       cancelled = true;
     };
-  }, [tab, source, block.id, block.installItem]);
+  }, [tab, files, block.id, block.installItem]);
 
   return (
     <section
@@ -94,12 +105,37 @@ export function BlockCard({ block }: { block: BlockConfig }) {
         </div>
         <div hidden={tab !== "Code"}>
           <div className="overflow-hidden rounded-2xl bg-slate-950 text-slate-100">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 font-mono text-[10px] text-slate-300">
-              <span>SOURCE · TSX</span>
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 font-mono text-[10px] text-slate-300">
+              {files && files.length > 1 ? (
+                <div
+                  role="group"
+                  aria-label={`${block.title} files`}
+                  className="-ml-2 flex min-w-0 gap-1 overflow-x-auto"
+                >
+                  {files.map((file, index) => (
+                    <button
+                      key={file.name}
+                      type="button"
+                      onClick={() => setActiveFile(index)}
+                      aria-pressed={activeFile === index}
+                      className={cn(
+                        "pressable shrink-0 rounded-md px-2 py-1.5",
+                        activeFile === index
+                          ? "bg-white/10 text-white"
+                          : "text-slate-400 hover:text-slate-200",
+                      )}
+                    >
+                      {file.name}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span>SOURCE · TSX</span>
+              )}
               <CopyButton
-                key={source}
+                key={`${activeFile}:${source}`}
                 text={source ?? ""}
-                label={`Copy ${block.title} source`}
+                label={`Copy ${files?.[activeFile]?.name || block.title} source`}
                 className="hover:bg-white/10"
               />
             </div>

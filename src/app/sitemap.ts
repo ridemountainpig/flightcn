@@ -92,6 +92,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     })),
     {
+      url: `${siteConfig.url}/passport`,
+      lastModified: lastModifiedOf(
+        "src/app/passport",
+        "src/components/passport",
+        "src/registry/blocks/flight-passport",
+      ),
+      priority: 0.9,
+    },
+    {
       url: `${siteConfig.url}/docs/flight`,
       lastModified: lastModifiedOf(
         "src/app/docs/flight",

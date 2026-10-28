@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "flight",
   "title": "Flight",
-  "description": "Composable flight map components for routes, live tracking, weighted networks, geodesic ranges, aircraft trails, traffic flow, and a built-in 515-airport database.",
+  "description": "Composable flight map components for routes, live tracking, weighted networks, geodesic ranges, aircraft trails, traffic flow, and a built-in database of 1,100+ airports.",
   "dependencies": ["@turf/great-circle", "@turf/bearing"],
   "registryDependencies": ["https://mapcn.dev/r/map.json"],
   "files": [

@@ -102,6 +102,22 @@ export function RecipePage({ recipe }: { recipe: RecipeConfig }) {
           <p className="mt-3 text-xs leading-5 text-slate-500">
             {recipe.demoNote}
           </p>
+          {recipe.cta ? (
+            <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-200 pt-4 text-sm text-slate-600">
+              <span>{recipe.cta.body}</span>
+              <Link
+                href={recipe.cta.href}
+                className="inline-flex items-center gap-1 font-medium text-orange-700 hover:text-orange-800"
+              >
+                {recipe.cta.label}
+                <ArrowUpRight
+                  size={14}
+                  className="link-arrow"
+                  aria-hidden="true"
+                />
+              </Link>
+            </p>
+          ) : null}
         </section>
 
         <div className="mt-10 flex flex-col gap-8 sm:mt-14 sm:gap-10">
