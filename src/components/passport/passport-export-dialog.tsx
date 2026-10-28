@@ -201,6 +201,12 @@ function usePassportVideo(
     const controller = new AbortController();
     abortRef.current = controller;
     setState({ status: "rendering", progress: 0 });
+    // Stopped by a new passport, a cancel or closing the dialog. A progress
+    // update can land after the reset to idle, so settle back to idle here,
+    // unless a newer run has taken over.
+    const stopped = () => {
+      if (abortRef.current === controller) setState({ status: "idle" });
+    };
     try {
       const { createPassportVideo, PassportVideoUnsupportedError } =
         await import("./passport-video");
@@ -219,13 +225,13 @@ function usePassportVideo(
           },
         });
         // Cancelled, closed or changed while the file was being finished.
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted) return stopped();
         const file = new File([video.blob], `${filename}.${video.extension}`, {
           type: video.blob.type,
         });
         setState({ status: "ready", file, url: URL.createObjectURL(file) });
       } catch (error) {
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted) return stopped();
         setState({
           status: "error",
           message:
@@ -235,12 +241,11 @@ function usePassportVideo(
         });
       }
     } catch {
-      if (!controller.signal.aborted) {
-        setState({
-          status: "error",
-          message: "Couldn't load the video maker. Try again.",
-        });
-      }
+      if (controller.signal.aborted) return stopped();
+      setState({
+        status: "error",
+        message: "Couldn't load the video maker. Try again.",
+      });
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
     }

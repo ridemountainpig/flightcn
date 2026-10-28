@@ -143,11 +143,23 @@ function traceLeg(
   return { head, heading };
 }
 
-function loadImage(url: string) {
+/** Loads an image; aborting stops the download and rejects. */
+function loadImage(url: string, signal?: AbortSignal) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("The passport image didn't load."));
+    const onAbort = () => {
+      image.src = "";
+      reject(signal?.reason);
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+    image.onload = () => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve(image);
+    };
+    image.onerror = () => {
+      signal?.removeEventListener("abort", onAbort);
+      reject(new Error("The passport image didn't load."));
+    };
     image.src = url;
   });
 }
@@ -182,7 +194,7 @@ export async function createPassportVideo({
   if (!codec) throw new PassportVideoUnsupportedError();
   // Cancelled while the encoder loaded; skip rendering the plate.
   signal?.throwIfAborted();
-  const plate = await loadImage(plateUrl);
+  const plate = await loadImage(plateUrl, signal);
   signal?.throwIfAborted();
 
   // The same layout as the card, so the last frame matches the image.
