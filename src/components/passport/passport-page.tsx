@@ -73,6 +73,8 @@ const MAX_LISTED_ISSUES = 5;
 const toolbarButton =
   "pressable inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100";
 const settingLabel = "block text-xs font-medium text-slate-700";
+const primaryShareButton =
+  "pressable inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium whitespace-nowrap text-white hover:bg-slate-800";
 const CUSTOM_COLOR_SWATCH =
   "conic-gradient(from 180deg, #ef4444, #f59e0b, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444)";
 
@@ -431,36 +433,16 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
           </section>
 
           <section
-            aria-labelledby="passport-share-label"
+            aria-labelledby="passport-style-label"
             className="rounded-2xl border border-slate-200 bg-white"
           >
             <h2
-              id="passport-share-label"
+              id="passport-style-label"
               className="border-b border-slate-200 px-4 py-3 font-mono text-[10px] tracking-widest text-slate-500 uppercase"
             >
-              Share
+              Customize
             </h2>
             <div className="space-y-4 px-4 py-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <ShareLinkButton
-                  getUrl={() =>
-                    new URL(
-                      share.pagePath ?? "/passport",
-                      window.location.origin,
-                    ).href
-                  }
-                  title="Copy a link to this passport"
-                  label="Copy link"
-                  disabled={!share.pagePath}
-                />
-                <PassportExportDialog
-                  flights={resolved.flights}
-                  params={share.params}
-                  footerText={footerText ?? ""}
-                  onFooterTextChange={setFooterText}
-                  triggerClassName={toolbarButton}
-                />
-              </div>
               <div>
                 <span id="passport-unit-label" className={settingLabel}>
                   Distance
@@ -498,17 +480,49 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
                 />
                 Include exact dates in the link
               </label>
-              <ShareHint status={share.status} isExample={isExample} />
             </div>
           </section>
         </div>
 
         <div className="min-w-0">
-          {hydrated && isExample ? (
-            <p className="mb-3 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-[11px] text-slate-600">
-              Example passport — paste your flights to replace it
-            </p>
-          ) : null}
+          {/* Sharing sits on the passport itself, so a long flight list in
+              the sidebar never pushes it out of sight. */}
+          <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+            {hydrated && isExample ? (
+              <p className="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-[11px] text-slate-600">
+                Example passport — paste your flights to replace it
+              </p>
+            ) : (
+              <ShareHint status={share.status} />
+            )}
+            <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
+              <ShareLinkButton
+                getUrl={() =>
+                  new URL(share.pagePath ?? "/passport", window.location.origin)
+                    .href
+                }
+                title={
+                  share.pagePath
+                    ? "Copy a link to this passport"
+                    : "Add your flights to get a share link"
+                }
+                label="Copy link"
+                disabled={!share.pagePath}
+                className="flex-1 justify-center bg-white px-4 py-2 text-sm sm:flex-none"
+              />
+              <PassportExportDialog
+                flights={resolved.flights}
+                params={share.params}
+                footerText={footerText ?? ""}
+                onFooterTextChange={setFooterText}
+                triggerClassName={cn(
+                  primaryShareButton,
+                  "flex-1 justify-center sm:flex-none",
+                )}
+                iconSize={14}
+              />
+            </div>
+          </div>
           <FlightPassport
             flights={isExample ? SAMPLE_PASSPORT_FLIGHTS : parsed.flights}
             year={year}
@@ -588,18 +602,9 @@ function RouteColorPicker({
 
 function ShareHint({
   status,
-  isExample,
 }: {
   status: ReturnType<typeof usePassportShare>["status"];
-  isExample: boolean;
 }) {
-  if (isExample || status === "empty") {
-    return (
-      <p className="text-xs text-slate-500">
-        Add your flights to get a share link.
-      </p>
-    );
-  }
   if (status === "long") {
     return (
       <p className="text-xs text-slate-500">
