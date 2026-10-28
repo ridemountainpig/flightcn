@@ -237,6 +237,11 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
     color: routeColor,
     footer: normalizeFooterText(footerText),
   });
+  // Right after an edit the passport still shows the previous text, so the
+  // link and exports wait for it to catch up instead of sharing that.
+  const draftPending = draft !== deferredDraft;
+  const sharePath = draftPending ? null : share.pagePath;
+  const shareParams = draftPending ? null : share.params;
 
   const flightCount = resolved.flights.length;
   const skipped = parsed.flights.length - flightCount;
@@ -527,21 +532,20 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
             <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
               <ShareLinkButton
                 getUrl={() =>
-                  new URL(share.pagePath ?? "/passport", window.location.origin)
-                    .href
+                  new URL(sharePath ?? "/passport", window.location.origin).href
                 }
                 title={
-                  share.pagePath
+                  sharePath
                     ? "Copy a link to this passport"
                     : "Add your flights to get a share link"
                 }
                 label="Copy link"
-                disabled={!share.pagePath}
+                disabled={!sharePath}
                 className="flex-1 justify-center bg-white px-4 py-2 text-sm sm:flex-none"
               />
               <PassportExportDialog
                 flights={resolved.flights}
-                params={share.params}
+                params={shareParams}
                 footerText={footerText ?? ""}
                 onFooterTextChange={setFooterText}
                 triggerClassName={cn(
