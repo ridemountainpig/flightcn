@@ -73,6 +73,7 @@ const MAX_LISTED_ISSUES = 5;
 const toolbarButton =
   "pressable inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100";
 const settingLabel = "block text-xs font-medium text-slate-700";
+const NO_FLIGHTS: PassportFlightInput[] = [];
 const primaryShareButton =
   "pressable inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium whitespace-nowrap text-white hover:bg-slate-800";
 const CUSTOM_COLOR_SWATCH =
@@ -162,7 +163,7 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
   const [extendedLookup, setExtendedLookup] = useState<AirportLookup | null>(
     null,
   );
-  // The unknown codes when loading the list last failed; new codes retry.
+  // The unknown codes when loading the list last failed.
   const [failedFor, setFailedFor] = useState<string | null>(null);
   const lookup = useMemo(
     () =>
@@ -179,6 +180,9 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
   const unknownCodes = resolved.unknown.map((entry) => entry.code).join();
   const lookingUp =
     !!unknownCodes && !extendedLookup && failedFor !== unknownCodes;
+  // The larger list didn't load, so these codes were never checked in it.
+  const lookupFailed =
+    !!unknownCodes && !extendedLookup && failedFor === unknownCodes;
   useEffect(() => {
     if (!lookingUp) return;
     let cancelled = false;
@@ -224,7 +228,9 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
     [resolved],
   );
   const share = usePassportShare({
-    flights: shareFlights,
+    // Flights waiting on the larger airport list would be left out of the
+    // link, though the shared page could map them.
+    flights: lookingUp || lookupFailed ? NO_FLIGHTS : shareFlights,
     exactDates,
     year: year === "all" ? undefined : year,
     unit,
@@ -400,21 +406,41 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
               {lookingUp ? (
                 <p className="mt-2 text-slate-500">Looking up more airports…</p>
               ) : resolved.unknown.length > 0 ? (
-                <ul className="mt-2 flex flex-wrap gap-1.5">
-                  {resolved.unknown.map((entry) => (
-                    <li
-                      key={entry.code}
-                      className="rounded-md border border-red-200 bg-red-50 px-2 py-0.5 font-mono text-[11px] text-red-700"
-                    >
-                      {entry.code}
-                      {entry.hint ? (
-                        <span className="font-sans"> → try {entry.hint}</span>
-                      ) : (
-                        <span className="font-sans"> not found</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  {lookupFailed ? (
+                    <p className="mt-2 text-slate-600">
+                      Couldn&apos;t load the full airport list, so these
+                      weren&apos;t checked.{" "}
+                      {/* The bundler keeps a failed chunk load for the
+                          page's lifetime, so only a reload retries it. The
+                          log is saved, so nothing is lost. */}
+                      <button
+                        type="button"
+                        onClick={() => window.location.reload()}
+                        className="font-medium text-slate-950 underline underline-offset-2"
+                      >
+                        Reload to try again
+                      </button>
+                    </p>
+                  ) : null}
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {resolved.unknown.map((entry) => (
+                      <li
+                        key={entry.code}
+                        className="rounded-md border border-red-200 bg-red-50 px-2 py-0.5 font-mono text-[11px] text-red-700"
+                      >
+                        {entry.code}
+                        {entry.hint ? (
+                          <span className="font-sans"> → try {entry.hint}</span>
+                        ) : lookupFailed ? (
+                          <span className="font-sans"> not checked</span>
+                        ) : (
+                          <span className="font-sans"> not found</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </>
               ) : null}
               {parsed.issues.length > 0 ? (
                 <ul className="mt-2 space-y-1 text-red-700">
@@ -493,7 +519,10 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
                 Example passport — paste your flights to replace it
               </p>
             ) : (
-              <ShareHint status={share.status} />
+              <ShareHint
+                status={share.status}
+                waitingForAirports={lookupFailed}
+              />
             )}
             <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
               <ShareLinkButton
@@ -602,9 +631,18 @@ function RouteColorPicker({
 
 function ShareHint({
   status,
+  waitingForAirports,
 }: {
   status: ReturnType<typeof usePassportShare>["status"];
+  waitingForAirports: boolean;
 }) {
+  if (waitingForAirports) {
+    return (
+      <p className="text-xs text-slate-500">
+        Sharing waits until every airport is checked.
+      </p>
+    );
+  }
   if (status === "long") {
     return (
       <p className="text-xs text-slate-500">
