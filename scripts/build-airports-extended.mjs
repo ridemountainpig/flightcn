@@ -42,6 +42,10 @@ for (const match of builtInSource.matchAll(
 )) {
   builtInCountries.set(match[1], match[2]);
 }
+if (builtInCountries.size === 0) {
+  console.error("Couldn't read airports from src/registry/flight-airports.ts");
+  process.exit(1);
+}
 
 /**
  * Metropolitan codes (TYO, JKT) that the passport answers with a hint
@@ -106,6 +110,24 @@ function parseCsv(text) {
 
 const [header, ...records] = parseCsv(readFileSync(csvPath, "utf8"));
 const column = Object.fromEntries(header.map((name, index) => [name, index]));
+// A renamed column (or an error page saved as the CSV) would otherwise skip
+// every row and overwrite the data with an empty list.
+const missingColumns = [
+  "iata_code",
+  "iso_country",
+  "type",
+  "scheduled_service",
+  "latitude_deg",
+  "longitude_deg",
+  "name",
+  "municipality",
+  "wikipedia_link",
+  "keywords",
+].filter((name) => !(name in column));
+if (missingColumns.length > 0) {
+  console.error(`${csvPath} lacks columns: ${missingColumns.join(", ")}`);
+  process.exit(1);
+}
 const get = (record, name) => (record[column[name]] ?? "").trim();
 
 // Learn ISO code → country name from airports both datasets share, so the
@@ -210,6 +232,10 @@ const entries = [...candidates.values()]
   .map((candidate) => candidate.entry)
   // A fixed locale, so the output doesn't change with the machine's.
   .sort((a, b) => a[0].localeCompare(b[0], "en"));
+if (entries.length < 1000) {
+  console.error(`Only ${entries.length} airports found; check the input CSV.`);
+  process.exit(1);
+}
 writeFileSync(outputPath, `${JSON.stringify(entries)}\n`);
 console.log(
   `Wrote ${entries.length} airports to ${path.relative(root, outputPath)}`,

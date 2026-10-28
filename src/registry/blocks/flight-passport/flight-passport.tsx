@@ -1832,7 +1832,7 @@ function Footnote({
           }. `
         : ""}
       {undated > 0
-        ? `${plural(undated, "undated flight")} only count toward All time.`
+        ? `${plural(undated, "undated flight")} only ${undated === 1 ? "counts" : "count"} toward All time.`
         : ""}
     </p>
   );

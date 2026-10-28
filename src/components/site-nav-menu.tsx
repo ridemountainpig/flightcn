@@ -57,6 +57,8 @@ export function SiteNavMenu({
           collisionPadding={16}
           className={cn(
             "nav-popover z-[1300] w-60 rounded-2xl border border-slate-200 bg-white p-2 text-slate-950 shadow-xl shadow-slate-900/10",
+            // Short phones can't fit every link, so the list scrolls.
+            "max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto",
             panelClassName,
           )}
         >
