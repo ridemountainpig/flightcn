@@ -108,10 +108,17 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
   const [inputMode, setInputMode] = useState<"type" | "pick">("pick");
   // The last change made with a button (add, remove, Load example, Clear),
   // so it can be undone. Typing forgets it.
-  const [lastChange, setLastChange] = useState<{
+  const [recordedChange, setLastChange] = useState<{
     message: string;
     previous: string;
+    next: string;
   } | null>(null);
+  // Another tab may have changed the log since, and undoing would write
+  // over that, so the undo only lasts while the log is what it left.
+  const lastChange =
+    recordedChange && recordedChange.next === (draft ?? "")
+      ? recordedChange
+      : null;
   const editDraft = (text: string) => {
     setLastChange(null);
     setDraft(text);
@@ -120,7 +127,7 @@ function PassportEditor({ invalidShare }: { invalidShare: boolean }) {
     // A repeated click (Load example twice) would make the undo point at
     // the text it just set, losing the flights before it.
     if (text === (draft ?? "")) return;
-    setLastChange({ message, previous: draft ?? "" });
+    setLastChange({ message, previous: draft ?? "", next: text });
     setDraft(text);
   };
   const addFlights = (lines: string[], message: string) => {
@@ -656,7 +663,17 @@ function SharedPassportView({ shared }: { shared: SharedPassportProps }) {
             iconSize={14}
           />
           <ShareLinkButton
-            getUrl={() => window.location.href}
+            getUrl={() => {
+              // The year on screen, like the exports, so the link opens
+              // where the viewer is looking.
+              const url = new URL(window.location.href);
+              if (shareParams.year) {
+                url.searchParams.set("year", String(shareParams.year));
+              } else {
+                url.searchParams.delete("year");
+              }
+              return url.href;
+            }}
             title="Copy this passport's link"
             label="Copy link"
             className="px-4 py-2 text-sm"
